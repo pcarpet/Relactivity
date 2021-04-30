@@ -31,6 +31,7 @@ class App extends React.Component {
 		super(props);
 		this.state={position:[48.85, 2.33],zoom:11};
 		this.onSelection=this.onSelection.bind(this);
+		this.addItem = this.addItem.bind(this);
 	}
 	onSelection(id){
 		console.log("onselection "+id);
@@ -53,15 +54,21 @@ class App extends React.Component {
 	render(){
 	    return (
 	      <div className="App">
-	  	  <SplitPane split="vertical" allowResize="false" defaultSize="70%" resizerStyle={stylesSpliter}>
-	  	    <Pane  className="CarteMod">
-			<Button title="Dezoom" color="#005500" onPress={() => this.setState({zoom:8}) } />
-			 <Text >Before Position: {this.state.position[0]} , {this.state.position[1]} </Text>
-	  	  <Carte list={listV} center={this.state.position} zoom={this.state.zoom} />
-	  	  </Pane>
-	  	    <Pane className="CarteList">
+	  	  <SplitPane split="vertical" allowResize="true" defaultSize="50%" resizerStyle={stylesSpliter}>
+			<Pane className="CarteList">
+					<form onSubmit={this.addItem}>
+						<input placeholder="enter task">
+						</input>
+						<button type="submit">add</button>
+					</form>
 	  			  <ListItineraire list={listV} selection={this.onSelection} />
 	  	    </Pane>
+			<Pane  className="CarteMod">
+				<Button title="Dezoom" color="#005500" onPress={() => this.setState({zoom:8}) } />
+					<Text >Before Position: {this.state.position[0]} , {this.state.position[1]} </Text>
+				<Carte list={listV} center={this.state.position} zoom={this.state.zoom} />
+	  	  	</Pane>
+	  	   
 	  	  </SplitPane>
       
 	      </div>
