@@ -1,0 +1,51 @@
+{
+  "name": "front",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.12.0",
+    "@testing-library/react": "^11.2.6",
+    "@testing-library/user-event": "^12.8.3",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
+    "google-map-react": "^2.1.9",
+    "immutable": "^4.0.0-rc.12",
+    "react": "^17.0.2",
+    "react-addons": "^0.9.1-deprecated",
+    "react-controllables": "^0.6.0",
+    "react-dom": "^17.0.2",
+    "react-native": "^0.64.0",
+    "react-native-web": "^0.16.1",
+    "react-pure-render": "^1.0.2",
+    "react-scripts": "^4.0.3",
+    "react-split-pane": "^0.1.92",
+    "styled-components": "^5.2.3",
+    "web-vitals": "^1.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "proxy": "http://localhost:3001"
+}
