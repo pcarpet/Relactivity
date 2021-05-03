@@ -29,16 +29,21 @@ class App extends React.Component {
 	
 	constructor(props){
 		super(props);
+		this.list=listV;
 		this.state={position:[48.85, 2.33],zoom:11};
 		this.onSelection=this.onSelection.bind(this);
-		this.addItem = this.addItem.bind(this);
 	}
+
+  
+
 	onSelection(id){
 		console.log("onselection "+id);
 		for(var i=0;i<listV.length;i++){
 			for(var j=0;j<listV[i].data.length;j++){
 				//console.log("tabid "+this.list[i].data[j].id);
 			
+
+				//mise à jour de la position et le zoom de la carte
 				if(listV[i].data[j].id===id){
 					//this.position=[listV[i].data[j].lat,listV[i].data[j].long];
 					console.log({position:[listV[i].data[j].lat,listV[i].data[j].long]});
@@ -54,19 +59,15 @@ class App extends React.Component {
 	render(){
 	    return (
 	      <div className="App">
+			  <Button title="Check" color="#005500" onPress={() => console.log(listV) } />
 	  	  <SplitPane split="vertical" allowResize="true" defaultSize="50%" resizerStyle={stylesSpliter}>
 			<Pane className="CarteList">
-					<form onSubmit={this.addItem}>
-						<input placeholder="enter task">
-						</input>
-						<button type="submit">add</button>
-					</form>
-	  			  <ListItineraire list={listV} selection={this.onSelection} />
+	  			  <ListItineraire list={this.list} selection={this.onSelection} />
 	  	    </Pane>
 			<Pane  className="CarteMod">
 				<Button title="Dezoom" color="#005500" onPress={() => this.setState({zoom:8}) } />
 					<Text >Before Position: {this.state.position[0]} , {this.state.position[1]} </Text>
-				<Carte list={listV} center={this.state.position} zoom={this.state.zoom} />
+				<Carte list={this.list} center={this.state.position} zoom={this.state.zoom} />
 	  	  	</Pane>
 	  	   
 	  	  </SplitPane>

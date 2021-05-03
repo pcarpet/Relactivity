@@ -38,7 +38,6 @@ class Carte extends React.Component {
 		super(props);
 		this.props=props;
 		this.state = {
-			selection: this.props.selection || undefined,
 			places:this.props.list,
 		};
 	}
@@ -106,7 +105,7 @@ class Carte extends React.Component {
 			  {this.state.places.map((date) => (
 				 
 				 date.data.map((place) => (
-					 <Wrapper  key={place.id}  text={place.ville}  lat={place.lat} lng={place.long} >{place.id} </Wrapper>
+					 <Wrapper  key={place.id}  text={place.ville}  lat={place.lat} lng={place.long} > {place.ville} </Wrapper>
 				 ))
 		 	))}
            </GoogleMapReact>
