@@ -56,14 +56,14 @@ class ListItineraire extends React.Component {
 				'selected':false
 			};
 			//local
-			/*
+			
 			var listLocal=this.state.listSections;
 			listLocal[0].data.push(newItem);
 			this.setState({listSections:listLocal});
 			this.selection(newItem.id);
-			*/
+			
 			//modifParent
-			this.state.listSections[0].data.push(newItem);
+			//this.state.listSections[0].data.push(newItem);
 			this.setState({listSections:listLocal});
 		   
 			this._inputElement.value = "";
