@@ -91,7 +91,7 @@ class Carte extends React.Component {
 		    <Text >Position: {this.props.center[0]} , {this.props.center[1]} </Text>
 		    <Text >Zoom: {this.props.zoom} </Text>
            <GoogleMapReact
-             bootstrapURLKeys={{ key: "AIzaSyBAFrnc30zF7jrPO5Oz6EKYgemKOJALQeQ" }}
+             bootstrapURLKeys={{ key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc" }}
              center={this.props.center }
              zoom={this.props.zoom}
 		    yesIWantToUseGoogleMapApiInternals
@@ -102,12 +102,10 @@ class Carte extends React.Component {
 			 onChildMouseLeave={this._onChildMouseLeave}
 			 onClick={this._onClick}
            >
-			  {this.state.places.map((date) => (
-				 
-				 date.data.map((place) => (
+			{this.state.places.map((place) => (	
 					 <Wrapper  key={place.id}  text={place.ville}  lat={place.lat} lng={place.long} > {place.ville} </Wrapper>
-				 ))
-		 	))}
+				)
+		 	)}
            </GoogleMapReact>
 			   
          </div>

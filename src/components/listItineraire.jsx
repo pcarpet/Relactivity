@@ -1,5 +1,5 @@
 import React from 'react';
-import { SectionList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 
 const styles = StyleSheet.create({
@@ -33,15 +33,11 @@ class ListItineraire extends React.Component {
 	constructor(props) {
 		super(props);
 		this.selection= props.selection;
-		this.changeColor=this.changeColor.bind(this);
 		this.state = {
-			
 			background:"violet",
-			listSections:props.list,
 		};
 
 		this.addItem = this.addItem.bind(this);
-
 
 	}
 	
@@ -53,20 +49,11 @@ class ListItineraire extends React.Component {
 				'ville': this._inputElement.value,
 				'lat':48.9,
 				'long':2.4,
-				'selected':false
+				'selected':true
 			};
-			//local
 			
-			var listLocal=this.state.listSections;
-			listLocal[0].data.push(newItem);
-			this.setState({listSections:listLocal});
-			this.selection(newItem.id);
-			
-			//modifParent
-			//this.state.listSections[0].data.push(newItem);
-			this.setState({listSections:listLocal});
-		   
-			this._inputElement.value = "";
+			this.props.addEtape(newItem);
+			this.changeColor(newItem.id);
 		  }
 		   
 		  console.log(this.state.id);
@@ -76,28 +63,8 @@ class ListItineraire extends React.Component {
 
 
 
-	changeColor(id){
-		//console.log("change Background");
-		//console.log(this.list);
-		var selectionList = this.state.listSections;
-		for(var i=0;i<selectionList.length;i++){
-			for(var j=0;j<selectionList[i].data.length;j++){
-				//console.log("tabid "+this.list[i].data[j].id);
-				//whiteconsole.log("idselected "+id);
-				if(selectionList[i].data[j].id===id){
-					selectionList[i].data[j].selected=true;
-				}else{
-					selectionList[i].data[j].selected=false;
-				}
-				
-			}
-		}
-		//console.log(this.list);
-		
-		this.setState({listSections:selectionList});
-		this.selection(id);
-	}
-	
+
+
 	
 	
 
@@ -105,13 +72,14 @@ class ListItineraire extends React.Component {
 	    return (
 	      <View style={styles.container} >
 			<form onSubmit={this.addItem}>
-						<input ref={(a) => this._inputElement = a } placeholder="enter task">
+						<input ref={(a) => this._inputElement = a } placeholder="enter city">
 						</input>
 						<button type="submit">add</button>
 			</form>
-	        <SectionList sections={this.state.listSections} renderItem={({item}) => <Item data={item}  cbBg={this.changeColor} />}
-	          renderSectionHeader={({section}) => <Text style={styles.sectionHeader} >{section.title}</Text>}
-	          keyExtractor={(item, index) => index}
+	        <FlatList 
+			    data={this.props.listV} 
+			    renderItem={({item}) => <Item data={item}  cbBg={this.props.selectEtape} />}
+	            keyExtractor={(item, index) => index}
 	        />
 	      </View>
 	    );
@@ -121,25 +89,21 @@ class ListItineraire extends React.Component {
 class Item extends React.Component{
 	constructor(props){
 		super(props);
-		this.callbackBg=props.cbBg;
 		this.onClickItem=this.onClickItem.bind(this);
 		this.state={"id":props.data.id};
 
 	}
 
 
-	onClickItem(e){
-			//console.log(this.state.id);
-			this.callbackBg(this.state.id);
-			//console.log(e.nativeEvent.srcElement.innerText);
-			
-		
+	onClickItem(){
+			console.log("Click sur l'item" + this.state.id);
+			this.props.cbBg(this.state.id);
+			//console.log(e.nativeEvent.srcElement.innerText);		
 	}
 	
 		
 	render(){
 		return (
-
 
 			 <div className={this.props.data.selected ? "containerItemList itemSelected" : "containerItemList"}  onClick={this.onClickItem} >
 		
@@ -154,8 +118,6 @@ class Item extends React.Component{
 							<Text className="containerSubitem" >{this.props.data.long}</Text>
 						</div>
 					</div>
-		
-		
 		  	  </div>
 
 		);
