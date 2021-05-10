@@ -1,8 +1,9 @@
 import './App.css';
 import React from 'react';
 import SplitPane, { Pane } from 'react-split-pane';
-import Carte from './components/carte'
-import ListItineraire from './components/listItineraire'
+import Carte from './components/Carte.jsx'
+import ListItineraire from './components/ListItineraire'
+import StepFinder from './components/Stepfinder'
 import { Text,Button } from "react-native";
 
 const stylesSpliter = {
@@ -35,8 +36,32 @@ class App extends React.Component {
 
 	}
 
-  
 
+
+	addEtape(etape){
+		console.log("etape : " + etape)
+		var listLocal=this.state.listV;
+		// Ajout de l'étape à la liste
+		listLocal.push(etape);
+		this.setState({listV:listLocal});
+		//On centre la carte sur la nouvelle étape
+		this.selectEtape(etape.id);
+	}
+
+	selectEtape(idEtape){
+		var selectionList = this.state.listV;
+		for(const ligne of selectionList){
+			if(ligne.id===idEtape){
+				ligne.selected=true;
+			}else{
+				ligne.selected=false;
+			}
+		};
+
+		this.setState({ListV:selectionList});
+		this.onSelection(idEtape);
+	}
+	
 	onSelection(id){
 		console.log("onselection "+id);
 		const listV = this.state.listV;
@@ -50,49 +75,26 @@ class App extends React.Component {
 		
 	}
 	
-	addEtape(etape){
-		console.log("etape : " + etape)
-		var listLocal=this.state.listV;
-		// Ajout de l'étape à la liste
-		listLocal[0].data.push(etape);
-		this.setState({listV:listLocal});
-		//On centre la carte sur la nouvelle étape
-		this.onSelection(etape.id);
-	}
-
-	selectEtape(idEtape){
-		var selectionList = this.state.listV;
-	
-		for(const ligne of selectionList){
-			if(ligne.id===idEtape){
-				ligne.selected=true;
-			}else{
-				ligne.selected=false;
-			}
-		};
-
-		this.setState({ListV:selectionList});
-		this.onSelection(idEtape);
-	}
-	
 
 	render(){
 	    return (
-	      <div className="App">
-			  <Button title="Check" color="#005500" onPress={() => console.log(this.state.listV) } />
-	  	  <SplitPane split="vertical" allowResize="true" defaultSize="50%" resizerStyle={stylesSpliter}>
-			<Pane className="CarteList">
-	  			  <ListItineraire listV={this.state.listV} selection={this.onSelection} addEtape={this.addEtape} selectEtape={this.selectEtape} />
-	  	    </Pane>
-			<Pane  className="CarteMod">
-				<Button title="Dezoom" color="#005500" onPress={() => this.setState({zoom:8}) } />
-					<Text >Before Position: {this.state.position[0]} , {this.state.position[1]} </Text>
-				<Carte list={this.state.listV} center={this.state.position} zoom={this.state.zoom} />
-	  	  	</Pane>
-	  	   
+	    <div className="App">
+			<Button title="Check" color="#005500" onPress={() => console.log(this.state.listV) } />
+			<div className="StepFinder">
+				<StepFinder addEtape={this.addEtape} />
+			</div>
+			<SplitPane split="vertical" allowResize={true} defaultSize="50%" resizerStyle={stylesSpliter}>
+				<Pane className="CarteList">
+					<ListItineraire listV={this.state.listV} selectEtape={this.selectEtape} />
+				</Pane>
+				<Pane  className="CarteMod">
+					<Button title="Dezoom" color="#005500" onPress={() => this.setState({zoom:8}) } />
+						<Text >Before Position: {this.state.position[0]} , {this.state.position[1]} </Text>
+					<Carte list={this.state.listV} center={this.state.position} zoom={this.state.zoom} />
+				</Pane>
 	  	  </SplitPane>
       
-	      </div>
+	    </div>
 	    );
 	}
   

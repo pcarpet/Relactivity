@@ -12,16 +12,15 @@
     "google-map-react": "^2.1.9",
     "immutable": "^4.0.0-rc.12",
     "react": "^17.0.2",
-    "react-addons": "^0.9.1-deprecated",
     "react-controllables": "^0.6.0",
     "react-dom": "^17.0.2",
-    "react-native": "^0.64.0",
-    "react-native-web": "^0.16.1",
+    "react-native": "^0.64.1",
+    "react-native-web": "^0.16.2",
     "react-pure-render": "^1.0.2",
     "react-scripts": "^4.0.3",
     "react-split-pane": "^0.1.92",
-    "styled-components": "^5.2.3",
-    "web-vitals": "^1.1.1"
+    "styled-components": "^5.3.0",
+    "web-vitals": "^1.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
