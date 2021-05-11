@@ -1,13 +1,9 @@
 import React from 'react';
 import GoogleMapReact from 'google-map-react';
-import {PropTypes,Alert } from 'react';
-import controllable from 'react-controllables';
-import { Text, StyleSheet } from "react-native";
-import {List} from 'immutable';
+import { Text } from "react-native";
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import styled from 'styled-components';
 
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
 
 const Wrapper = styled.div`
   position: absolute;
@@ -91,10 +87,10 @@ class Carte extends React.Component {
 		    <Text >Position: {this.props.center[0]} , {this.props.center[1]} </Text>
 		    <Text >Zoom: {this.props.zoom} </Text>
            <GoogleMapReact
-             bootstrapURLKeys={{ key: "AIzaSyCsEisE6ttI_GGimbal3A4PdXJkLf9a0zc" }}
+             bootstrapURLKeys={{ key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc" }}
              center={this.props.center }
              zoom={this.props.zoom}
-		    yesIWantToUseGoogleMapApiInternals
+		     /* yesIWantToUseGoogleMapApiInternals */
 		    
 			 onBoundsChange={this._onBoundsChange}
 			 onChildClick={this._onChildClick}
@@ -113,4 +109,3 @@ class Carte extends React.Component {
      }
 }
 export default Carte
-//ReactDOM.render(<Example />, mountNode);

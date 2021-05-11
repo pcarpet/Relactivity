@@ -204,3 +204,4 @@ node_modules/.staging/semver-9d167212/semver.js
 node_modules/.staging/semver-9d167212/bin/semver.js
 node_modules
 workspace.code-workspace
+package-lock.json

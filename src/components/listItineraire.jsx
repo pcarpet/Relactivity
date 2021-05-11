@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import Etape from './Etape';
 
 
+
 const styles = StyleSheet.create({
   container: {
    flex: 1,
