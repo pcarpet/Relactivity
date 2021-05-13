@@ -1,34 +1,9 @@
 import React from 'react';
-import GoogleMapReact from 'google-map-react';
-import {PropTypes,Alert } from 'react';
-import controllable from 'react-controllables';
-import { Text, StyleSheet } from "react-native";
-import {List} from 'immutable';
+import Marker from './Marker'
+import GoogleMapReact from 'google-map-react'; //https://github.com/google-map-react/google-map-react
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import styled from 'styled-components';
 
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
-
-const Wrapper = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 18px;
-  height: 18px;
-  background-color: #006600;
-  border: 2px solid #fff;
-  border-radius: 100%;
-  user-select: none;
-  font-weight:bold;
-  padding-top:2px;
-  font-size:15px;
-  color:white;
-  transform: translate(-50%, -50%);
-  cursor: ${(props) => (props.onClick ? 'pointer' : 'default')};
-  &:hover {
-    z-index: 1;
-  }
-`;
 
 
 
@@ -38,8 +13,13 @@ class Carte extends React.Component {
 		super(props);
 		this.props=props;
 		this.state = {
-			places:this.props.list,
-		};
+      GMAPS_API_KEY: {
+        key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc",
+        language: "fr",
+      },
+      places: this.props.list,
+    };
+    
 	}
 
 	
@@ -78,39 +58,42 @@ class Carte extends React.Component {
 	_onClick ({x, y, lat, lng, event}){
 		console.log(x, y, lat, lng, event)
 	} 
-    	shouldComponentUpdate = shouldPureComponentUpdate;
+    
+	shouldComponentUpdate = shouldPureComponentUpdate;
  
-     render() {
+  render() {
        return (
-		  
-		  
-		   
          // Important! Always set the container height explicitly
-         <div style={{ height: '100vh', width: '100%' }}>
-		   
-		    <Text >Position: {this.props.center[0]} , {this.props.center[1]} </Text>
-		    <Text >Zoom: {this.props.zoom} </Text>
+         <div style={{ height: "90vh", width: "100%" }}>
+           {/* <Text>
+             Position: {this.props.center[0]} , {this.props.center[1]}{" "}
+           </Text>
+           <Text>Zoom: {this.props.zoom} </Text> */}
            <GoogleMapReact
-             bootstrapURLKeys={{ key: "AIzaSyCsEisE6ttI_GGimbal3A4PdXJkLf9a0zc" }}
-             center={this.props.center }
+             bootstrapURLKeys={this.state.GOOGLE_MAPS_API}
+             center={this.props.center}
              zoom={this.props.zoom}
-		    yesIWantToUseGoogleMapApiInternals
-		    
-			 onBoundsChange={this._onBoundsChange}
-			 onChildClick={this._onChildClick}
-			 onChildMouseEnter={this._onChildMouseEnter}
-			 onChildMouseLeave={this._onChildMouseLeave}
-			 onClick={this._onClick}
+             /* yesIWantToUseGoogleMapApiInternals */
+
+             onBoundsChange={this._onBoundsChange}
+             onChildClick={this._onChildClick}
+             onChildMouseEnter={this._onChildMouseEnter}
+             onChildMouseLeave={this._onChildMouseLeave}
+             onClick={this._onClick}
            >
-			{this.state.places.map((place) => (	
-					 <Wrapper  key={place.id}  text={place.ville}  lat={place.lat} lng={place.long} > {place.ville} </Wrapper>
-				)
-		 	)}
+             {this.state.places.map((place) => (
+               <Marker
+                 key={place.id}
+                 lat={place.lat}
+                 lng={place.long}
+                 text={place.id}
+                 isActive={place.selected}
+               />
+                
+             ))}
            </GoogleMapReact>
-			   
          </div>
        );
      }
 }
 export default Carte
-//ReactDOM.render(<Example />, mountNode);
