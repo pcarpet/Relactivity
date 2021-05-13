@@ -4,7 +4,6 @@ import moment from "moment";
 import ListEtape from './ListEtape'
 import StepFinder from './Stepfinder'
 import Carte from './Carte'
-import { Text,Button } from "react-native";
 
 const stylesSpliter = {
   background: '#000',
@@ -22,49 +21,61 @@ class Core extends React.Component {
 		this.state = {
       listV: [
         {
-          googleFormattedAdress: "13 rue des trucs, Paris",
-          nomEtape : "Location voiture",
-          lat: 48.866667,
-          long: 2.333333,
           id: 1,
+          activityType: "travel",
+          date: moment("2021-08-07", "YYYY-MM-DD"),
+          googleFormattedAdress: "Terminal 2, France",
+          lat: 49.0049612,
+          long: 2.5907692,
+          nomEtape: "Embarquement CDG",
+          price: "200",
           selected: false,
-          date: moment("2015-02-01", "YYYY-MM-DD"),
         },
         {
-          googleFormattedAdress: "Place du chateau",
-          nomEtape : "Chateau de versaille",
-          lat: 48.801408,
-          long: 2.130122,
           id: 2,
+          activityType: "hotel",
+          date: moment("2021-08-07", "YYYY-MM-DD"),
+          googleFormattedAdress: "Via Fabio Filzi, 43, 20124 Milano MI, Italie",
+          lat: 45.487847,
+          long: 9.202771799999999,
+          nomEtape: "Hotel 43 Station",
+          price: "140",
           selected: false,
-          date: moment("2015-01-03", "YYYY-MM-DD"),
         },
+
         {
-          googleFormattedAdress: "Rambouillet",
-          nomEtape : "Visite de la ville",
-          lat: 48.643868,
-          long: 1.829079,
           id: 3,
+          activityType: "activity",
+          date: moment("2021-08-08", "YYYY-MM-DD"),
+          googleFormattedAdress: "P.za del Duomo, 20122 Milano MI, Italie",
+          lat: 45.4640976,
+          long: 9.1919265,
+          nomEtape: "Messe au duomo",
+          price: undefined,
           selected: false,
-          date: moment("2015-04-01", "YYYY-MM-DD"),
         },
         {
-          googleFormattedAdress: "2 rue des Auberges, Chartre",
-          nomEtape: "Nuit à l'hotel",
-          lat: 48.443854,
-          long: 1.489012,
           id: 4,
+          activityType: "hotel",
+          date: moment("2021-08-08", "YYYY-MM-DD"),
+          googleFormattedAdress: "Via Fabio Filzi, 43, 20124 Milano MI, Italie",
+          lat: 45.487847,
+          long: 9.202771799999999,
+          nomEtape: "Hotel 43 Station",
+          price: undefined,
           selected: false,
-          date: moment("2015-02-04", "YYYY-MM-DD"),
         },
         {
-          googleFormattedAdress: "Impasse de la fourchette, Châteaudun",
-          nomEtape:"Resto de ouff",
-          lat: 48.0708,
-          long: 1.3237,
           id: 5,
+          activityType: "travel",
+          date: moment("2021-08-09", "YYYY-MM-DD"),
+          googleFormattedAdress:
+            "Piazza Quattro Novembre, 2, 20124 Milano MI, Italie",
+          lat: 45.486515,
+          long: 9.2033177,
+          nomEtape: "Location Fiat 500",
+          price: 500,
           selected: false,
-          date: moment("2015-04-01", "YYYY-MM-DD"),
         },
       ],
       position: [48.85, 2.33],
@@ -118,7 +129,7 @@ class Core extends React.Component {
 		for(const etape of listV){
 		    //Mise à jour de la position de la carte
 			if(etape.id===id){
-			    console.log({position:[etape.lat,etape.long]});
+			    console.log("Positions géo : " + {position:[etape.lat,etape.long]});
 		     	this.setState({position:[etape.lat,etape.long]},console.log("new pos ok " ));
 			}
 		}

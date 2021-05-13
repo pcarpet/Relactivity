@@ -1,8 +1,9 @@
 import React from "react";
 import "./stepFinder.scss"
 import "antd/dist/antd.css";
-import { DatePicker, Form, Button, Input } from "antd";
+import { DatePicker, Form, Button, Input,InputNumber, Radio } from "antd";
 import { Row, Col } from "antd";
+import Emoji from "a11y-react-emoji";
 import "moment/locale/fr";
 import locale from "antd/es/date-picker/locale/fr_FR";
 import PlacesAutocomplete, {
@@ -43,14 +44,17 @@ class StepFinder extends React.Component {
     var idEtape = this.state.etapeIdCount;
     var newItem = {
       id: idEtape++,
+      activityType : formValues.activityType,
       date: formValues.dateetape,
-      nomEtape : formValues.nomEtape,
+      nomEtape: formValues.nomEtape,
+      price: formValues.price,
       googlePlace: this.state.selectedPlace,
       googleFormattedAdress: this.state.placeFound.googleFormattedAddress,
       lat: this.state.placeFound.lat,
       long: this.state.placeFound.lng,
       selected: true,
     };
+    console.log(newItem);
     this.setState({ etapeIdCount: idEtape });
     this.props.addEtape(newItem);
     this.setState({ addressSearched: '' });
@@ -64,6 +68,7 @@ class StepFinder extends React.Component {
     this.setState({ addressSearched: value });
   };
 
+  // Appel des l'API place pour récupérer des l'infos sur le Place selectionné
   handleSelect = async (value) => {
     const results = await geocodeByAddress(value);
 
@@ -71,6 +76,8 @@ class StepFinder extends React.Component {
 
     const latLng = await getLatLng(results[0]);
 
+    console.log("Lat: " + latLng.lat + " Lng: " + latLng.lng);
+    
     var placeFound = {
       selectedPlace: value,
       googleFormattedAddress: results[0].formatted_address,
@@ -86,13 +93,32 @@ class StepFinder extends React.Component {
       <div className="step-finder-main">
         <Form
           name="AjoutEtape"
-          layout="inline"
+          layout="vertical"
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
           requiredMark={false}
         >
           <Row>
-            <Col span={6}>
+            <Col span={4}>
+              <Form.Item label="Activité" name="activityType" initialValue="travel">
+                <Radio.Group defaultValue="travel">
+                  <Radio.Button value="travel">
+                    <Emoji symbol="✈️" label="travel" />
+                  </Radio.Button>
+                  <Radio.Button value="hotel">
+                    <Emoji symbol="🛏️" label="hotel" />
+                  </Radio.Button>
+                  <Radio.Button value="activity">
+                    <Emoji symbol="🎾" label="activity" />
+                  </Radio.Button>
+                  <Radio.Button value="resto">
+                    <Emoji symbol="🍽️" label="restaurant" />
+                  </Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            <Col span={4}>
               <Form.Item
                 label="Date "
                 name="dateetape"
@@ -106,18 +132,25 @@ class StepFinder extends React.Component {
                 <DatePicker locale={locale} onChange={this.onDatePicking} />
               </Form.Item>
             </Col>
-            
-            <Col span={6}><Form.Item
-              label="Etape"
-              name="nomEtape"
-              rules={[{ required: true, message: 'Donne un nom à ton étape' }]}
-            >
-              <Input></Input>
-            </Form.Item>
+
+            <Col span={6}>
+              <Form.Item
+                label="Description"
+                name="nomEtape"
+                rules={[
+                  { required: true, message: "Donne un nom à ton étape" },
+                ]}
+              >
+                <Input></Input>
+              </Form.Item>
             </Col>
-              
-            <Col span={10}>
-              
+            <Col span="2">
+              <Form.Item label="Prix" name="price">
+                <InputNumber min="0" step="0.01" stringMode />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <div>Lieu :</div>
               <PlacesAutocomplete
                 value={this.state.addressSearched}
                 onChange={this.handleChange}
@@ -142,12 +175,11 @@ class StepFinder extends React.Component {
                         const className = suggestion.active
                           ? "suggestion-item active"
                           : "suggestion-item";
-                        
-                       
+
                         return (
                           <div
                             {...getSuggestionItemProps(suggestion, {
-                              className
+                              className,
                             })}
                           >
                             <span>{suggestion.description}</span>

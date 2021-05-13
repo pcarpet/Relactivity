@@ -1,9 +1,7 @@
 import React from 'react';
 import GoogleMapReact from 'google-map-react';
-import { Text } from "react-native";
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import styled from 'styled-components';
-
 
 const Wrapper = styled.div`
   position: absolute;
@@ -34,8 +32,13 @@ class Carte extends React.Component {
 		super(props);
 		this.props=props;
 		this.state = {
-			places:this.props.list,
-		};
+      GMAPS_API_KEY: {
+        key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc",
+        language: "fr",
+      },
+      places: this.props.list,
+    };
+    
 	}
 
 	
@@ -86,9 +89,7 @@ class Carte extends React.Component {
            </Text>
            <Text>Zoom: {this.props.zoom} </Text> */}
            <GoogleMapReact
-             bootstrapURLKeys={{
-               key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc",
-             }}
+             bootstrapURLKeys={this.state.GOOGLE_MAPS_API}
              center={this.props.center}
              zoom={this.props.zoom}
              /* yesIWantToUseGoogleMapApiInternals */
