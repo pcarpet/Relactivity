@@ -1,0 +1,187 @@
+.step-finder-main{
+    display: inline-block;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 10px;
+    width: 900px;
+}
+
+.location-search-input{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-variant: tabular-nums;
+    list-style: none;
+    font-feature-settings: 'tnum', "tnum";
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 11px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    line-height: 1.5715;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.autocomplete-dropdown-container{
+   
+    background-color: rgb(255, 255, 255);
+    border-width: 0px 1px 1px;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
+    border-right-color: rgb(204, 204, 204);
+    border-bottom-color: rgb(204, 204, 204);
+    border-left-color: rgb(204, 204, 204);
+    border-image: initial;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-style: initial;
+    border-top-color: initial;
+    box-shadow: 0px 5px 15px rgba(0,0,0,20%);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    max-width: 360px;
+    overflow: hidden scroll;
+    padding-top: 0px;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    /*  background-color: fff;
+    position: absolute!important;
+    z-index: 1000;
+    border-radius: 2px;
+    border-top: 1px solid #d9d9d9;
+    font-family: Arial, sans-serif;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-align: left;
+    padding-left: 15px;
+    margin: 2px; */
+}
+
+.suggestion-item{
+    background-color: rgb(255, 255, 255);
+    border-width: 1px 0px;
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-top-color: rgb(204, 204, 204);
+    border-bottom-color: rgb(204, 204, 204);
+    border-image: initial;
+    border-left-style: initial;
+    border-left-color: initial;
+    border-right-style: initial;
+    border-right-color: initial;
+    box-shadow: none;
+    color: rgb(41, 56, 50);
+    display: block;
+    flex-shrink: 0;
+    font-size: 1rem;
+    margin-top: -1px;
+    padding: 8px;
+    position: relative;
+    text-align: left;
+    transition: box-shadow 0.3s ease 0s, border-color 0.3s ease-in-out 0s;
+    width: 100%;
+}
+.active{
+background-color: rgb(250, 250, 250);
+    border-color: rgb(255, 197, 170);
+    box-shadow: 0px 0px 5px rgb(255, 197, 170);
+    cursor: pointer;
+    z-index: 1;
+}
+/* 
+.pac-container {
+    background-color: rgb(61, 160, 82);
+    position: absolute!important;
+    z-index: 1000;
+    border-radius: 2px;
+    border-top: 1px solid #d9d9d9;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden
+}
+
+.pac-logo:after {
+    content: "";
+    padding: 1px 1px 1px 0;
+    height: 16px;
+    text-align: right;
+    display: block;
+    background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white3.png);
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: 120px 14px
+}
+.hdpi.pac-logo:after {
+    background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/powered-by-google-on-white3_hdpi.png)
+}
+.pac-item {
+    cursor: default;
+    padding: 0 4px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: 30px;
+    text-align: left;
+    border-top: 1px solid #e6e6e6;
+    font-size: 11px;
+    color: #999
+}
+.pac-item:hover {
+    background-color: #fafafa
+}
+.pac-item-selected,
+.pac-item-selected:hover {
+    background-color: #ebf2fe
+}
+.pac-matched {
+    font-weight: 700
+}
+.pac-item-query {
+    font-size: 13px;
+    padding-right: 3px;
+    color: #000
+}
+.pac-icon {
+    width: 15px;
+    height: 20px;
+    margin-right: 7px;
+    margin-top: 6px;
+    display: inline-block;
+    vertical-align: top;
+    background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/autocomplete-icons.png);
+    background-size: 34px
+}
+.hdpi .pac-icon {
+    background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/autocomplete-icons_hdpi.png)
+}
+.pac-icon-search {
+    background-position: -1px -1px
+}
+.pac-item-selected .pac-icon-search {
+    background-position: -18px -1px
+}
+.pac-icon-marker {
+    background-position: -1px -161px
+}
+.pac-item-selected .pac-icon-marker {
+    background-position: -18px -161px
+}
+.pac-placeholder {
+    color: gray
+} */

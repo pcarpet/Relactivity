@@ -1,6 +1,8 @@
 import React from 'react';
-import { Text } from 'react-native';
-import styles from './Etape.module.css';
+import "./etape.scss";
+import { Row, Col, Tooltip} from "antd";
+import { CompassOutlined } from "@ant-design/icons";
+
 
 class Etape extends React.Component{
 	constructor(props){
@@ -16,38 +18,26 @@ class Etape extends React.Component{
 			this.props.cbBg(this.state.id);
 			//console.log(e.nativeEvent.srcElement.innerText);		
 	}
-	
-/* 'id' : idEtape++,
-        'date' : values.dateetape,
-        'googlePlace' : this.state.selectedPlace,
-        'googleFormattedAdress' : this.state.googleFormattedAddress,
-				'lat' : this.state.placeFound.lat,
-				'long' : this.state.placeFound.lng,
-				'selected' : true */		
+		
 	render(){
 		return (
+     
+      <div className="leaderboard__profile" onClick={this.onClickItem}>
+        <Row>
+          <Col span={6}>{this.props.data.date.format("ddd DD/MM")}</Col>
+          <Col span={10}>{this.props.data.nomEtape}</Col>
+          <Col span={3}>
+            <Tooltip
+              placement="topLeft"
+              title={this.props.data.googleFormattedAdress}
+            >
+              <CompassOutlined />
+            </Tooltip>
+          </Col>
 
-			 <div className={this.props.data.selected ? "containerItemList itemSelected" : "containerItemList"}  onClick={this.onClickItem} >
-		
-					<div style={{"postion": "relative",width:"100%",height:"60%"}}>
-						<Text style={styles.item} id={this.props.data.id} lat={this.props.data.lat} long={this.props.data.long} >
-							{this.props.data.googleFormattedAdress}
-						</Text>
-					</div>
-					<div style={{"postion": "relative",width:"100%",height:"40%"}}>
-						<div style={{"postion": "relative",width:"25%",height:"100%","float":"left"}}>
-							<Text className="containerSubitem" >{this.props.data.lat}</Text>
-						</div>
-						<div style={{"postion": "relative",width:"25%",height:"100%","float":"left"}}>
-							<Text className="containerSubitem" >{this.props.data.long}</Text>
-						</div>
-						<div style={{"postion": "relative",width:"50%",height:"100%","float":"left"}}>
-							<Text className="containerSubitem" >{this.props.data.date}</Text>
-						</div>
-					</div>
-		  	  </div>
-
-		);
+        </Row>
+      </div>
+    );
 	}
 }
 

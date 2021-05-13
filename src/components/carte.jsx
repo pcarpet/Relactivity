@@ -9,15 +9,15 @@ const Wrapper = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 18px;
-  height: 18px;
-  background-color: #006600;
+  width: 15px;
+  height: 15px;
+  background-color: #FF6600;
   border: 2px solid #fff;
   border-radius: 100%;
   user-select: none;
   font-weight:bold;
   padding-top:2px;
-  font-size:15px;
+  font-size:10px;
   color:white;
   transform: translate(-50%, -50%);
   cursor: ${(props) => (props.onClick ? 'pointer' : 'default')};
@@ -74,36 +74,42 @@ class Carte extends React.Component {
 	_onClick ({x, y, lat, lng, event}){
 		console.log(x, y, lat, lng, event)
 	} 
-    	shouldComponentUpdate = shouldPureComponentUpdate;
+    
+	shouldComponentUpdate = shouldPureComponentUpdate;
  
      render() {
        return (
-		  
-		  
-		   
          // Important! Always set the container height explicitly
-         <div style={{ height: '100vh', width: '100%' }}>
-		   
-		    <Text >Position: {this.props.center[0]} , {this.props.center[1]} </Text>
-		    <Text >Zoom: {this.props.zoom} </Text>
+         <div style={{ height: "90vh", width: "100%" }}>
+           {/* <Text>
+             Position: {this.props.center[0]} , {this.props.center[1]}{" "}
+           </Text>
+           <Text>Zoom: {this.props.zoom} </Text> */}
            <GoogleMapReact
-             bootstrapURLKeys={{ key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc" }}
-             center={this.props.center }
+             bootstrapURLKeys={{
+               key: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc",
+             }}
+             center={this.props.center}
              zoom={this.props.zoom}
-		     /* yesIWantToUseGoogleMapApiInternals */
-		    
-			 onBoundsChange={this._onBoundsChange}
-			 onChildClick={this._onChildClick}
-			 onChildMouseEnter={this._onChildMouseEnter}
-			 onChildMouseLeave={this._onChildMouseLeave}
-			 onClick={this._onClick}
+             /* yesIWantToUseGoogleMapApiInternals */
+
+             onBoundsChange={this._onBoundsChange}
+             onChildClick={this._onChildClick}
+             onChildMouseEnter={this._onChildMouseEnter}
+             onChildMouseLeave={this._onChildMouseLeave}
+             onClick={this._onClick}
            >
-			{this.state.places.map((place) => (	
-					 <Wrapper  key={place.id}  text={place.ville}  lat={place.lat} lng={place.long} > {place.ville} </Wrapper>
-				)
-		 	)}
+             {this.state.places.map((place) => (
+               <Wrapper
+                 key={place.id}
+                 lat={place.lat}
+                 lng={place.long}
+               >
+
+                 {place.date.format("ddd DD")}
+               </Wrapper>
+             ))}
            </GoogleMapReact>
-			   
          </div>
        );
      }
