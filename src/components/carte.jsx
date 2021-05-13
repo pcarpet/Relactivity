@@ -1,28 +1,9 @@
 import React from 'react';
-import GoogleMapReact from 'google-map-react';
+import Marker from './Marker'
+import GoogleMapReact from 'google-map-react'; //https://github.com/google-map-react/google-map-react
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 15px;
-  height: 15px;
-  background-color: #FF6600;
-  border: 2px solid #fff;
-  border-radius: 100%;
-  user-select: none;
-  font-weight:bold;
-  padding-top:2px;
-  font-size:10px;
-  color:white;
-  transform: translate(-50%, -50%);
-  cursor: ${(props) => (props.onClick ? 'pointer' : 'default')};
-  &:hover {
-    z-index: 1;
-  }
-`;
 
 
 
@@ -80,7 +61,7 @@ class Carte extends React.Component {
     
 	shouldComponentUpdate = shouldPureComponentUpdate;
  
-     render() {
+  render() {
        return (
          // Important! Always set the container height explicitly
          <div style={{ height: "90vh", width: "100%" }}>
@@ -101,14 +82,14 @@ class Carte extends React.Component {
              onClick={this._onClick}
            >
              {this.state.places.map((place) => (
-               <Wrapper
+               <Marker
                  key={place.id}
                  lat={place.lat}
                  lng={place.long}
-               >
-
-                 {place.date.format("ddd DD")}
-               </Wrapper>
+                 text={place.id}
+                 isActive={place.selected}
+               />
+                
              ))}
            </GoogleMapReact>
          </div>
