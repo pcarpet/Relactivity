@@ -1,9 +1,9 @@
 import React from 'react';
 import SplitPane, { Pane } from 'react-split-pane';
 import moment from "moment";
-import ListEtape from './ListEtape'
+import ListEtape from './time/ListEtape'
 import StepFinder from './Stepfinder'
-import Carte from './Carte'
+import Carte from './space/Carte'
 
 const stylesSpliter = {
   background: '#000',

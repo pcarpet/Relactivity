@@ -1,5 +1,5 @@
 import React from 'react';
-import Marker from '../Marker'
+import Marker from './Marker'
 import Polyline from './Polyline'
 import GoogleMapReact from 'google-map-react'; //https://github.com/google-map-react/google-map-react
 import shouldPureComponentUpdate from 'react-pure-render/function';
