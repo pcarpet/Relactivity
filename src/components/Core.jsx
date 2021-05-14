@@ -173,7 +173,7 @@ class Core extends React.Component {
                 {this.state.position[1]}{" "}
               </Text> */}
               <Carte
-                list={this.state.listV}
+                activitiesList={this.state.listV}
                 center={this.state.position}
                 zoom={this.state.zoom}
               />
