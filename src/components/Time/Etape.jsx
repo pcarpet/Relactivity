@@ -1,23 +1,28 @@
 import React from 'react';
 import "./etape.scss";
-import { Row, Col, Tooltip} from "antd";
+import { Row, Col, Tooltip, Button} from "antd";
 import { CompassOutlined } from "@ant-design/icons";
 import Emoji from "a11y-react-emoji";
 
 class Etape extends React.Component{
 	constructor(props){
 		super(props);
-		this.onClickItem=this.onClickItem.bind(this);
-		this.state={"id":props.data.id};
 
-	}
+    this.state = { key: this.props.data.key, etapeLocal: this.props.data, };
+    this.onClickItem = this.onClickItem.bind(this);
+    this.onClickDirection = this.onClickDirection.bind(this);
+  }
 
 
 	onClickItem(){
-			console.log("Click sur l'item" + this.state.id);
-			this.props.cbBg(this.state.id);
+			console.log("Click sur l'item" + this.state.key);
+			this.props.cbBg(this.state.key);
 			//console.log(e.nativeEvent.srcElement.innerText);		
-	}
+  }
+  
+  onClickDirection() {
+    this.props.getStepToStepDirection(this.state.key);
+  }
 	
   getEmoji(value) {
     switch (value) {
@@ -40,19 +45,22 @@ class Etape extends React.Component{
         <Row>
           <Col span={2}>
             <Emoji
-              symbol={this.getEmoji(this.props.data.activityType)}
-              label="this.props.data.activityType"
+              symbol={this.getEmoji(this.state.etapeLocal.activityType)}
+              label={this.state.etapeLocal.activityType}
             />
           </Col>
-          <Col span={6}>{this.props.data.date.format("ddd DD/MM")}</Col>
-          <Col span={10}>{this.props.data.nomEtape}</Col>
+          <Col span={6}>{this.state.etapeLocal.date.format("ddd DD/MM")}</Col>
+          <Col span={10}>{this.state.etapeLocal.nomEtape}</Col>
           <Col span={4}>
             <Tooltip
               placement="topLeft"
-              title={this.props.data.googleFormattedAdress}
+              title={this.state.etapeLocal.googleFormattedAdress}
             >
               <CompassOutlined />
             </Tooltip>
+          </Col>
+          <Col span={2}>
+            <Button onClick={this.onClickDirection}>Direction</Button>
           </Col>
         </Row>
       </div>

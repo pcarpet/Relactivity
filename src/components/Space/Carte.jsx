@@ -20,6 +20,8 @@ class Carte extends React.Component {
   onMapLoaded(map, maps) {
     this.fitBounds(map, maps);
 
+  
+
     this.setState({
       // Je commente car je sais pas à quoi ca sert
       // ...this.state,
@@ -74,10 +76,10 @@ class Carte extends React.Component {
         >
           {this.props.activitiesList.map((place) => (
             <Marker
-              key={place.id}
+              key={place.key}
               lat={place.lat}
               lng={place.long}
-              text={place.id + ""}
+              text={place.key + ""}
               isActive={place.selected}
             />
           ))}
