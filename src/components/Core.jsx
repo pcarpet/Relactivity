@@ -88,6 +88,8 @@ class Core extends React.Component {
           selected: false,
         },
       ],
+      focusOnPolylineId: undefined,
+      mapKey: 0,
       position: [48.85, 2.33],
       zoom: 11,
     };
@@ -144,8 +146,13 @@ class Core extends React.Component {
     var listLocal = this.state.listV;
     const index = listLocal.findIndex((etape) => etape.key === key);
     listLocal[index].directionsResult = directionsResult;
-    this.setState({ListV:listLocal})
-    console.log(this.state.listV)
+    // eslint-disable-next-line react/no-direct-mutation-state
+    this.state.focusOnPolylineId = key;
+    this.setState({ ListV: listLocal });
+    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
+    this.setState({ mapKey: this.state.mapKey + 1 });
+    // eslint-disable-next-line react/no-direct-mutation-state
+    this.state.focusOnPolylineId = undefined;
   }
 
 	/* TODO : à fusionner avec select etape */
@@ -155,11 +162,9 @@ class Core extends React.Component {
 		for(const etape of listV){
 		    //Mise à jour de la position de la carte
 			if(etape.key===key){
-			    console.log("Positions géo : " + {position:[etape.lat,etape.long]});
-		     	this.setState({position:[etape.lat,etape.long]},console.log("new pos ok " ));
+		     	this.setState({position:[etape.lat,etape.long]});
 			}
 		}
-		
 	}
 	
 
@@ -200,7 +205,9 @@ class Core extends React.Component {
                 {this.state.position[1]}{" "}
               </Text> */}
               <Carte
+                mapKey={this.state.mapKey}
                 activitiesList={this.state.listV}
+                focusOnPolylineId={this.state.focusOnPolylineId}
                 center={this.state.position}
                 zoom={this.state.zoom}
               />

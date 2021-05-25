@@ -17,21 +17,12 @@ class ListEtape extends React.Component {
 
 
   getStepToStepDirection(firstStepKey) {
-    console.log("Item Id:" + firstStepKey);
     const depart = this.props.listV.find((etape) => etape.key === firstStepKey);
 
-    console.log(
-      "Départ Googe PlaceId:" +
-        depart.googlePlaceId +
-        "Départ rank:" +
-        depart.rank
-    );
 
     const arrivee = this.props.listV.find(
       (etape) => etape.rank === depart.rank + 1
     );
-
-    console.log("Arrivée placeId: " + arrivee.placeId);
 
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
@@ -44,9 +35,9 @@ class ListEtape extends React.Component {
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (result, status) => {
+        console.log("Call direction services")
         // eslint-disable-next-line no-undef
         if (status === google.maps.DirectionsStatus.OK) {
-          console.log(result);
           //On remonte le rendered dans la liste
           this.props.setCalculatedDirection(firstStepKey, result);
         } else {
