@@ -21,10 +21,12 @@ class Core extends React.Component {
 		this.state = {
       listV: [
         {
-          id: 1,
+          key: 1,
+          rank: 1,
           activityType: "travel",
           date: moment("2021-08-07", "YYYY-MM-DD"),
           googleFormattedAdress: "Terminal 2, France",
+          googlePlaceId: "ChIJ7-sXgBkW5kcRFVrnq-iDYGY",
           lat: 49.0049612,
           long: 2.5907692,
           nomEtape: "Embarquement CDG",
@@ -32,10 +34,12 @@ class Core extends React.Component {
           selected: false,
         },
         {
-          id: 2,
+          key: 2,
+          rank: 2,
           activityType: "hotel",
           date: moment("2021-08-07", "YYYY-MM-DD"),
           googleFormattedAdress: "Via Fabio Filzi, 43, 20124 Milano MI, Italie",
+          googlePlaceId: "ChIJLT2PgNDGhkcR8JLKbYe11Us",
           lat: 45.487847,
           long: 9.202771799999999,
           nomEtape: "Hotel 43 Station",
@@ -44,10 +48,12 @@ class Core extends React.Component {
         },
 
         {
-          id: 3,
+          key: 3,
+          rank:3,
           activityType: "activity",
           date: moment("2021-08-08", "YYYY-MM-DD"),
           googleFormattedAdress: "P.za del Duomo, 20122 Milano MI, Italie",
+          googlePlaceId: "ChIJoTZGw67GhkcREy4aECdOf6s",
           lat: 45.4640976,
           long: 9.1919265,
           nomEtape: "Messe au duomo",
@@ -55,10 +61,12 @@ class Core extends React.Component {
           selected: false,
         },
         {
-          id: 4,
+          key: 4,
+          rank:4,
           activityType: "hotel",
           date: moment("2021-08-08", "YYYY-MM-DD"),
           googleFormattedAdress: "Via Fabio Filzi, 43, 20124 Milano MI, Italie",
+          googlePlaceId: "ChIJLT2PgNDGhkcR8JLKbYe11Us",
           lat: 45.487847,
           long: 9.202771799999999,
           nomEtape: "Hotel 43 Station",
@@ -66,11 +74,13 @@ class Core extends React.Component {
           selected: false,
         },
         {
-          id: 5,
+          key: 5,
+          rank:5,
           activityType: "travel",
           date: moment("2021-08-09", "YYYY-MM-DD"),
           googleFormattedAdress:
             "Piazza Quattro Novembre, 2, 20124 Milano MI, Italie",
+          googlePlaceId: "ChIJxWybptrGhkcRx5uwoz8FmK0",
           lat: 45.486515,
           long: 9.2033177,
           nomEtape: "Location Fiat 500",
@@ -78,12 +88,15 @@ class Core extends React.Component {
           selected: false,
         },
       ],
+      focusOnPolylineId: undefined,
+      mapKey: 0,
       position: [48.85, 2.33],
       zoom: 11,
     };
 		this.onSelection=this.onSelection.bind(this);
 		this.addEtape=this.addEtape.bind(this);
-		this.selectEtape=this.selectEtape.bind(this);
+    this.selectEtape = this.selectEtape.bind(this);
+    this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
 
 	}
 
@@ -100,18 +113,24 @@ class Core extends React.Component {
 			// Turn your strings into dates, and then subtract them
 			// to get a value that is either negative, positive, or zero.
 			return a.date - b.date;
-		})
+    })
+    //Recalcul du rank (ben c'est mieu que la position dans un array)
+    for (var i = 0; i < listLocal.length; i++) {
+      listLocal[i].rank = i + 1;
+    }
+
+    console.log(listLocal);
 
 		this.setState({listV:listLocal});
 		//On centre la carte sur la nouvelle étape
-		this.selectEtape(etape.id);
+		this.selectEtape(etape.key);
 	}
 
 	/* Déclanchement de la sélection d'un étape */
 	selectEtape(idEtape){
 		var selectionList = this.state.listV;
 		for(const ligne of selectionList){
-			if(ligne.id===idEtape){
+			if(ligne.key===idEtape){
 				ligne.selected=true;
 			}else{
 				ligne.selected=false;
@@ -122,18 +141,30 @@ class Core extends React.Component {
 		this.onSelection(idEtape);
 	}
 	
+
+  setCalculatedDirection(key, directionsResult) {
+    var listLocal = this.state.listV;
+    const index = listLocal.findIndex((etape) => etape.key === key);
+    listLocal[index].directionsResult = directionsResult;
+    // eslint-disable-next-line react/no-direct-mutation-state
+    this.state.focusOnPolylineId = key;
+    this.setState({ ListV: listLocal });
+    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
+    this.setState({ mapKey: this.state.mapKey + 1 });
+    // eslint-disable-next-line react/no-direct-mutation-state
+    this.state.focusOnPolylineId = undefined;
+  }
+
 	/* TODO : à fusionner avec select etape */
-	onSelection(id){
-		console.log("onselection "+id);
+	onSelection(key){
+		console.log("onselection " + key);
 		const listV = this.state.listV;
 		for(const etape of listV){
 		    //Mise à jour de la position de la carte
-			if(etape.id===id){
-			    console.log("Positions géo : " + {position:[etape.lat,etape.long]});
-		     	this.setState({position:[etape.lat,etape.long]},console.log("new pos ok " ));
+			if(etape.key===key){
+		     	this.setState({position:[etape.lat,etape.long]});
 			}
 		}
-		
 	}
 	
 
@@ -142,7 +173,7 @@ class Core extends React.Component {
 	render(){
 	    return (
         <div className="Core">
-         {/*  <Button
+          {/*  <Button
             title="Check"
             color="#005500"
             onPress={() => console.log(this.state.listV)}
@@ -160,6 +191,7 @@ class Core extends React.Component {
               <ListEtape
                 listV={this.state.listV}
                 selectEtape={this.selectEtape}
+                setCalculatedDirection={this.setCalculatedDirection}
               />
             </Pane>
             <Pane className="CarteMod">
@@ -173,7 +205,9 @@ class Core extends React.Component {
                 {this.state.position[1]}{" "}
               </Text> */}
               <Carte
+                mapKey={this.state.mapKey}
                 activitiesList={this.state.listV}
+                focusOnPolylineId={this.state.focusOnPolylineId}
                 center={this.state.position}
                 zoom={this.state.zoom}
               />

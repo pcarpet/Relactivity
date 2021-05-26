@@ -43,12 +43,13 @@ class StepFinder extends React.Component {
 
     var idEtape = this.state.etapeIdCount;
     var newItem = {
-      id: idEtape++,
+      key: idEtape++,
       activityType : formValues.activityType,
       date: formValues.dateetape,
       nomEtape: formValues.nomEtape,
       price: formValues.price,
       googlePlace: this.state.selectedPlace,
+      googlePlaceId: this.state.placeFound.placeId,
       googleFormattedAdress: this.state.placeFound.googleFormattedAddress,
       lat: this.state.placeFound.lat,
       long: this.state.placeFound.lng,
@@ -75,11 +76,10 @@ class StepFinder extends React.Component {
     console.log(results);
 
     const latLng = await getLatLng(results[0]);
-
-    console.log("Lat: " + latLng.lat + " Lng: " + latLng.lng);
     
     var placeFound = {
       selectedPlace: value,
+      placeId: results[0].place_id,
       googleFormattedAddress: results[0].formatted_address,
       lat: latLng.lat,
       lng: latLng.lng,
