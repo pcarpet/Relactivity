@@ -56,9 +56,12 @@ class ListEtape extends React.Component {
         <List
           split={false}
           dataSource={this.props.listV}
-          rowKey={(item, index) => index}
+          rowKey={(item, key) => key}
           renderItem={(item) => (
-            <List.Item className="etape">
+            <List.Item
+              key={item.key}
+              className="etape"
+            >
               <Etape
                 data={item}
                 cbBg={this.props.selectEtape}
@@ -66,7 +69,7 @@ class ListEtape extends React.Component {
               />
             </List.Item>
           )}
-        />
+        /> 
       </div>
     );
 	}

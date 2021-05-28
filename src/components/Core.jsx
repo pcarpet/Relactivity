@@ -93,7 +93,6 @@ class Core extends React.Component {
       position: [48.85, 2.33],
       zoom: 11,
     };
-		this.onSelection=this.onSelection.bind(this);
 		this.addEtape=this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
     this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
@@ -103,28 +102,26 @@ class Core extends React.Component {
 
 	/* Ajoute l'étape remontée par le composant StepFinder à la liste*/
 	addEtape(etape){
-		console.log("etape : " + etape)
-		var listLocal=this.state.listV;
-		// Ajout de l'étape à la liste
-		listLocal.push(etape);
+    console.log("Nouvelle etape key : " + etape.key);
+    var listLocal = this.state.listV;
+    // Ajout de l'étape à la liste
+    listLocal.push(etape);
 
-		//Tri des étapes par chronologie
-		listLocal.sort(function (a, b) {
-			// Turn your strings into dates, and then subtract them
-			// to get a value that is either negative, positive, or zero.
-			return a.date - b.date;
-    })
+    //Tri des étapes par chronologie
+    listLocal.sort(function (a, b) {
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return a.date - b.date;
+    });
     //Recalcul du rank (ben c'est mieu que la position dans un array)
     for (var i = 0; i < listLocal.length; i++) {
       listLocal[i].rank = i + 1;
     }
 
-    console.log(listLocal);
-
-		this.setState({listV:listLocal});
-		//On centre la carte sur la nouvelle étape
-		this.selectEtape(etape.key);
-	}
+    this.setState({ listV: listLocal });
+    //On centre la carte sur la nouvelle étape
+    this.selectEtape(etape.key);
+  }
 
 	/* Déclanchement de la sélection d'un étape */
 	selectEtape(idEtape){
@@ -137,11 +134,20 @@ class Core extends React.Component {
 			}
 		};
 
-		this.setState({ListV:selectionList});
-		this.onSelection(idEtape);
+    this.setState({ ListV: selectionList });
+    
+		console.log("onselection " + idEtape);
+     const listV = this.state.listV;
+     for (const etape of listV) {
+       //Mise à jour de la position de la carte
+       if (etape.key === idEtape) {
+         this.setState({ position: [etape.lat, etape.long] });
+      }
+  }
 	}
 	
 
+  //Ajouter l'itinéraire calculé dans le ListeEtape entre 2 étapes (rattaché l'étape de départ)
   setCalculatedDirection(key, directionsResult) {
     var listLocal = this.state.listV;
     const index = listLocal.findIndex((etape) => etape.key === key);
@@ -155,18 +161,6 @@ class Core extends React.Component {
     this.state.focusOnPolylineId = undefined;
   }
 
-	/* TODO : à fusionner avec select etape */
-	onSelection(key){
-		console.log("onselection " + key);
-		const listV = this.state.listV;
-		for(const etape of listV){
-		    //Mise à jour de la position de la carte
-			if(etape.key===key){
-		     	this.setState({position:[etape.lat,etape.long]});
-			}
-		}
-	}
-	
 
 
 	
