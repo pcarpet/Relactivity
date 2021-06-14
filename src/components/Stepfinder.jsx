@@ -97,12 +97,12 @@ class StepFinder extends React.Component {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
           requiredMark={false}
-          initialValues={{ activityType: "travel" }}
+          initialValues={{ activityType: "travel", dateetape: this.props.lastDate}}
         >
           <Row>
             <Col span={4}>
-              <Form.Item label="Activité" name="activityType" >
-                <Radio.Group >
+              <Form.Item label="Activité" name="activityType">
+                <Radio.Group>
                   <Radio.Button value="travel">
                     <Emoji symbol="✈️" label="travel" />
                   </Radio.Button>
