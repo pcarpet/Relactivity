@@ -133,6 +133,9 @@ const itemsRef = firebase.database().ref("activities");
     listLocal.sort(function (a, b) {
       // Turn your strings into dates, and then subtract them
       // to get a value that is either negative, positive, or zero.
+      if (a.date - b.date === 0) {
+        return a.heure - b.heure;
+      };
       return a.date - b.date;
     });
     //Recalcul du rank (ben c'est mieu que la position dans un array)

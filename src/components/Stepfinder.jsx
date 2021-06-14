@@ -1,7 +1,7 @@
 import React from "react";
 import "./stepFinder.scss"
 import "antd/dist/antd.css";
-import { DatePicker, Form, Button, Input,InputNumber, Radio } from "antd";
+import { DatePicker, TimePicker, Form, Button, Input,InputNumber, Radio } from "antd";
 import { Row, Col } from "antd";
 import Emoji from "a11y-react-emoji";
 import "moment/locale/fr";
@@ -11,11 +11,12 @@ import PlacesAutocomplete, {
   getLatLng,
 } from "react-places-autocomplete";
 
+
 class StepFinder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      etapeIdCount: 9,
+      etapeIdCount: 6,
       addressSearched: "",
       value: null,
       placeFound: {
@@ -35,6 +36,62 @@ class StepFinder extends React.Component {
 
   /* Validation du formulaire */
   onFinish = (formValues) => {
+
+    // Valeur par defaut si non renseigné
+    if (this.state.placeFound === null) {
+      this.setState({placeFound: [{
+        address_components: [
+          {
+            long_name: "Melun",
+            short_name: "Melun",
+            types: ["locality", "political"],
+          },
+          {
+            long_name: "Seine-et-Marne",
+            short_name: "Seine-et-Marne",
+            types: ["administrative_area_level_2", "political"],
+          },
+          {
+            long_name: "Île-de-France",
+            short_name: "IDF",
+            types: ["administrative_area_level_1", "political"],
+          },
+          {
+            long_name: "France",
+            short_name: "FR",
+            types: ["country", "political"],
+          },
+          {
+            long_name: "77000",
+            short_name: "77000",
+            types: ["postal_code"],
+          },
+        ],
+        formatted_address: "77000 Melun, France",
+        geometry: {
+          bounds: {
+            south: 48.52352699999999,
+            west: 2.628541,
+            north: 48.5607479,
+            east: 2.6819179,
+          },
+          location: {
+            lat: 48.542105,
+            lng: 2.6554,
+          },
+          location_type: "APPROXIMATE",
+          viewport: {
+            south: 48.52352699999999,
+            west: 2.628541,
+            north: 48.5607479,
+            east: 2.6819179,
+          },
+        },
+        place_id: "ChIJnwKcN2L65UcRUFSMaMOCCwQ",
+        types: ["locality", "political"],
+      }]})
+    }
+
     console.log("Success Formulaire Validé:", formValues);
     console.log(
       "GoogleFormattedAddress",
@@ -46,6 +103,7 @@ class StepFinder extends React.Component {
       key: idEtape++,
       activityType : formValues.activityType,
       date: formValues.dateetape,
+      heure: formValues.heure,
       nomEtape: formValues.nomEtape,
       price: formValues.price,
       googlePlace: this.state.selectedPlace,
@@ -71,8 +129,13 @@ class StepFinder extends React.Component {
 
   // Appel des l'API place pour récupérer des l'infos sur le Place selectionné
   handleSelect = async (value) => {
-    const results = await geocodeByAddress(value);
-
+    var results = null;
+    try {
+      results = await geocodeByAddress(value);
+    } catch (e) {
+      console.log("Error on GooglePlace Search");
+      console.log(e);
+    }
     console.log(results);
 
     const latLng = await getLatLng(results[0]);
@@ -131,6 +194,11 @@ class StepFinder extends React.Component {
                 ]}
               >
                 <DatePicker locale={locale} onChange={this.onDatePicking} />
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item label="Heure" name="heure">
+                <TimePicker format="HH:mm" />
               </Form.Item>
             </Col>
 
