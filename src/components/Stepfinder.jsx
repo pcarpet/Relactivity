@@ -100,17 +100,17 @@ class StepFinder extends React.Component {
 
     var idEtape = this.state.etapeIdCount;
     var newItem = {
-      key: idEtape++,
+      key: 0,
       activityType : formValues.activityType,
       date: formValues.dateetape,
-      heure: formValues.heure,
-      nomEtape: formValues.nomEtape,
-      price: formValues.price,
-      googlePlace: this.state.selectedPlace,
-      googlePlaceId: this.state.placeFound.placeId,
-      googleFormattedAdress: this.state.placeFound.googleFormattedAddress,
-      lat: this.state.placeFound.lat,
-      long: this.state.placeFound.lng,
+      heure: formValues.heure || null,
+      nomEtape: formValues.nomEtape || null,
+      price: formValues.price || null,
+      googlePlace: this.state.selectedPlace || null,
+      googlePlaceId: this.state.placeFound.placeId || null,
+      googleFormattedAdress: this.state.placeFound.googleFormattedAddress || null,
+      lat: this.state.placeFound.lat || null,
+      long: this.state.placeFound.lng || null,
       selected: true,
     };
     console.log(newItem);

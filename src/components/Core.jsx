@@ -7,6 +7,8 @@ import StepFinder from './Stepfinder'
 import Carte from './space/Carte'
 import {Button} from "antd";
 
+const db = firebase.database();
+
 const stylesSpliter = {
   background: '#000',
   width: '2px',
@@ -19,76 +21,10 @@ const stylesSpliter = {
 class Core extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      listV: [
-        {
-          key: 1,
-          rank: 1,
-          activityType: "travel",
-          date: moment("2021-08-07", "YYYY-MM-DD"),
-          googleFormattedAdress: "Terminal 2, France",
-          googlePlaceId: "ChIJ7-sXgBkW5kcRFVrnq-iDYGY",
-          lat: 49.0049612,
-          long: 2.5907692,
-          nomEtape: "Embarquement CDG",
-          price: "200",
-          selected: false,
-        },
-        {
-          key: 2,
-          rank: 2,
-          activityType: "hotel",
-          date: moment("2021-08-07", "YYYY-MM-DD"),
-          googleFormattedAdress: "Via Fabio Filzi, 43, 20124 Milano MI, Italie",
-          googlePlaceId: "ChIJLT2PgNDGhkcR8JLKbYe11Us",
-          lat: 45.487847,
-          long: 9.202771799999999,
-          nomEtape: "Hotel 43 Station",
-          price: "140",
-          selected: false,
-        },
 
-        {
-          key: 3,
-          rank: 3,
-          activityType: "activity",
-          date: moment("2021-08-08", "YYYY-MM-DD"),
-          googleFormattedAdress: "P.za del Duomo, 20122 Milano MI, Italie",
-          googlePlaceId: "ChIJoTZGw67GhkcREy4aECdOf6s",
-          lat: 45.4640976,
-          long: 9.1919265,
-          nomEtape: "Messe au duomo",
-          price: undefined,
-          selected: false,
-        },
-        {
-          key: 4,
-          rank: 4,
-          activityType: "hotel",
-          date: moment("2021-08-08", "YYYY-MM-DD"),
-          googleFormattedAdress: "Via Fabio Filzi, 43, 20124 Milano MI, Italie",
-          googlePlaceId: "ChIJLT2PgNDGhkcR8JLKbYe11Us",
-          lat: 45.487847,
-          long: 9.202771799999999,
-          nomEtape: "Hotel 43 Station",
-          price: undefined,
-          selected: false,
-        },
-        {
-          key: 5,
-          rank: 5,
-          activityType: "travel",
-          date: moment("2021-08-09", "YYYY-MM-DD"),
-          googleFormattedAdress:
-            "Piazza Quattro Novembre, 2, 20124 Milano MI, Italie",
-          googlePlaceId: "ChIJxWybptrGhkcRx5uwoz8FmK0",
-          lat: 45.486515,
-          long: 9.2033177,
-          nomEtape: "Location Fiat 500",
-          price: 500,
-          selected: false,
-        },
-      ],
+  
+    this.state = {
+      listV: [],
       focusOnPolylineId: undefined,
       mapKey: 0,
       position: [48.85, 2.33],
@@ -99,37 +35,102 @@ class Core extends React.Component {
     this.selectEtape = this.selectEtape.bind(this);
     this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
     this.saveList = this.saveList.bind(this);
-
-const itemsRef = firebase.database().ref("activities");
- console.log(itemsRef);
-    
-    itemsRef.on("value", (snapshot) => {
-  let items = snapshot.val();
-  console.log("retrieve from db :");
-  console.log(items);
-});
+    this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
+    this.refreshActivities = this.refreshActivities.bind(this);
 
   }
 
 
+  componentDidMount() {
+    //db.ref("activities/pca/lombardie").on("value", this.onDataChange);
+    this.loadActivitiesFromDb();
+  }
+
+  componentWillUnmount() {
+    //db.ref("activities/pca/lombardie").off("value", this.onDataChange);
+  }
+
+  //Chargement des donnée de la base
+  loadActivitiesFromDb(){
+    
+    console.log("Chargement des données de la base");
+
+    db.ref("activities/pca/lombardie").get().then((snapshot) => {
+    if (snapshot.exists()) {
+
+      console.log(snapshot.val());
+      
+      var activitiesConverted = this.state.listV;
+      snapshot.forEach((activity) => {
+        console.log(activity.key)
+        var activityFromDb = activity.val();
+        activityFromDb.key = activity.key;
+        activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
+        activitiesConverted.push(activityFromDb);
+        
+      })
+
+      console.log(activitiesConverted);
+      this.setState({listV : activitiesConverted});
+ 
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+
+  }
+
+
+  
+
   saveList() {
-    const activitiesRef = firebase.database().ref("activities");
-    const item = {
-      title: "Bonjour",
-      user: "Pierre",
-    };
-    const saveditem = activitiesRef.push(item);
-    console.log(saveditem);
+   
+    var listVnoDate = this.state.listV;
+    
+    console.log("Saving list");
+    const activitiesRef  = db.ref("activities/pca/lombardie");
+
+    for(var i=0;i<this.state.listV.length;i++){
+      console.log(i);
+      listVnoDate[i].date = this.state.listV[i].date.format("YYYY-MM-DD");
+      activitiesRef.push(listVnoDate[i]);
+      //console.log("Clef de l'enregistrement" + newActivityRef.key);
+    }
+  
+   /*  const newActivityRef = activitiesRef.push();
+    newActivityRef.set(listVnoDate); */
+
+   
   }
 
   /* Ajoute l'étape remontée par le composant StepFinder à la liste*/
   addEtape(etape) {
     console.log("Nouvelle etape key : " + etape.key);
-    var listLocal = this.state.listV;
-    // Ajout de l'étape à la liste
-    listLocal.push(etape);
 
-    //Tri des étapes par chronologie
+    var activityForDb = Object.assign({},etape);
+    //TODO : faire une fonction utils pour formater les dates
+    activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
+    const activitiesRef  = db.ref("activities/pca/lombardie");
+    const newEntry = activitiesRef.push(activityForDb);
+
+    etape.key = newEntry.key;
+    
+    // Ajout de l'étape à la liste
+    var listLocal = this.state.listV;
+    listLocal.push(etape);
+    
+    this.refreshActivities(listLocal);
+
+    //On centre la carte sur la nouvelle étape
+    this.selectEtape(etape.key);
+
+  }
+
+  refreshActivities(listLocal){
+   
+     //Tri des étapes par chronologie
     listLocal.sort(function (a, b) {
       // Turn your strings into dates, and then subtract them
       // to get a value that is either negative, positive, or zero.
@@ -144,12 +145,12 @@ const itemsRef = firebase.database().ref("activities");
     }
 
     //Récupération de la date la plus ancienne
-    this.setState({ lastDate: listLocal[listLocal.length].date });
+    this.setState({ lastDate: listLocal[listLocal.length-1].date });
 
+    console.log(listLocal);
     this.setState({ listV: listLocal });
-    //On centre la carte sur la nouvelle étape
-    this.selectEtape(etape.key);
   }
+
 
   /* Déclanchement de la sélection d'un étape */
   selectEtape(idEtape) {
@@ -214,6 +215,7 @@ const itemsRef = firebase.database().ref("activities");
             />
           </Pane>
           <Pane className="CarteMod">
+            <div></div>
             {/* <Button
                 title="Dezoom"
                 color="#005500"
@@ -223,13 +225,13 @@ const itemsRef = firebase.database().ref("activities");
                 Before Position: {this.state.position[0]} ,{" "}
                 {this.state.position[1]}{" "}
               </Text> */}
-            <Carte
+            {/* <Carte
               mapKey={this.state.mapKey}
               activitiesList={this.state.listV}
               focusOnPolylineId={this.state.focusOnPolylineId}
               center={this.state.position}
               zoom={this.state.zoom}
-            />
+            /> */}
           </Pane>
         </SplitPane>
       </div>
