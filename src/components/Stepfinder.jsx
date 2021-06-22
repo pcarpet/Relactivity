@@ -202,7 +202,7 @@ class StepFinder extends React.Component {
               </Form.Item>
             </Col>
 
-            <Col span={6}>
+            <Col span={4}>
               <Form.Item
                 label="Description"
                 name="nomEtape"
@@ -218,7 +218,7 @@ class StepFinder extends React.Component {
                 <InputNumber min="0" step="0.01" stringMode />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={6}>
               <div>Lieu :</div>
               <PlacesAutocomplete
                 value={this.state.addressSearched}

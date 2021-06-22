@@ -2,10 +2,10 @@ import React from 'react';
 import firebase from "../firebase.js";
 import SplitPane, { Pane } from 'react-split-pane';
 import moment from "moment";
-import ListEtape from './time/ListEtape'
-import StepFinder from './Stepfinder'
-import Carte from './space/Carte'
-import {Button} from "antd";
+import ListEtape from './time/ListEtape';
+import StepFinder from './Stepfinder';
+import Carte from './space/Carte';
+
 
 const db = firebase.database();
 
@@ -21,10 +21,8 @@ const stylesSpliter = {
 class Core extends React.Component {
   constructor(props) {
     super(props);
-
-  
     this.state = {
-      listV: [],
+      activities: [],
       focusOnPolylineId: undefined,
       mapKey: 0,
       position: [48.85, 2.33],
@@ -34,7 +32,6 @@ class Core extends React.Component {
     this.addEtape = this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
     this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
-    this.saveList = this.saveList.bind(this);
     this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
     this.refreshActivities = this.refreshActivities.bind(this);
 
@@ -42,13 +39,9 @@ class Core extends React.Component {
 
 
   componentDidMount() {
-    //db.ref("activities/pca/lombardie").on("value", this.onDataChange);
     this.loadActivitiesFromDb();
   }
 
-  componentWillUnmount() {
-    //db.ref("activities/pca/lombardie").off("value", this.onDataChange);
-  }
 
   //Chargement des donnée de la base
   loadActivitiesFromDb(){
@@ -58,20 +51,20 @@ class Core extends React.Component {
     db.ref("activities/pca/lombardie").get().then((snapshot) => {
     if (snapshot.exists()) {
 
-      console.log(snapshot.val());
-      
-      var activitiesConverted = this.state.listV;
+      var activitiesConverted = [];
       snapshot.forEach((activity) => {
-        console.log(activity.key)
+        //Ajout et convertion des activité de la base
         var activityFromDb = activity.val();
         activityFromDb.key = activity.key;
         activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
+        if(activityFromDb.heure){
+          activityFromDb.heure = moment(activityFromDb.heure, "HH:mm");
+        }
         activitiesConverted.push(activityFromDb);
         
       })
 
-      console.log(activitiesConverted);
-      this.setState({listV : activitiesConverted});
+      this.refreshActivities(activitiesConverted);
  
       } else {
         console.log("No data available");
@@ -83,28 +76,6 @@ class Core extends React.Component {
   }
 
 
-  
-
-  saveList() {
-   
-    var listVnoDate = this.state.listV;
-    
-    console.log("Saving list");
-    const activitiesRef  = db.ref("activities/pca/lombardie");
-
-    for(var i=0;i<this.state.listV.length;i++){
-      console.log(i);
-      listVnoDate[i].date = this.state.listV[i].date.format("YYYY-MM-DD");
-      activitiesRef.push(listVnoDate[i]);
-      //console.log("Clef de l'enregistrement" + newActivityRef.key);
-    }
-  
-   /*  const newActivityRef = activitiesRef.push();
-    newActivityRef.set(listVnoDate); */
-
-   
-  }
-
   /* Ajoute l'étape remontée par le composant StepFinder à la liste*/
   addEtape(etape) {
     console.log("Nouvelle etape key : " + etape.key);
@@ -112,13 +83,14 @@ class Core extends React.Component {
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
     activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
+    activityForDb.heure = activityForDb.heure.format("HH:mm");
     const activitiesRef  = db.ref("activities/pca/lombardie");
     const newEntry = activitiesRef.push(activityForDb);
 
     etape.key = newEntry.key;
     
     // Ajout de l'étape à la liste
-    var listLocal = this.state.listV;
+    var listLocal = this.state.activities;
     listLocal.push(etape);
     
     this.refreshActivities(listLocal);
@@ -128,6 +100,7 @@ class Core extends React.Component {
 
   }
 
+  //Retrie les activité par date et set la liste
   refreshActivities(listLocal){
    
      //Tri des étapes par chronologie
@@ -148,13 +121,13 @@ class Core extends React.Component {
     this.setState({ lastDate: listLocal[listLocal.length-1].date });
 
     console.log(listLocal);
-    this.setState({ listV: listLocal });
+    this.setState({ activities: listLocal });
   }
 
 
   /* Déclanchement de la sélection d'un étape */
   selectEtape(idEtape) {
-    var selectionList = this.state.listV;
+    var selectionList = this.state.activities;
     for (const ligne of selectionList) {
       if (ligne.key === idEtape) {
         ligne.selected = true;
@@ -166,8 +139,8 @@ class Core extends React.Component {
     this.setState({ ListV: selectionList });
 
     console.log("onselection " + idEtape);
-    const listV = this.state.listV;
-    for (const etape of listV) {
+    const activities = this.state.activities;
+    for (const etape of activities) {
       //Mise à jour de la position de la carte
       if (etape.key === idEtape) {
         this.setState({ position: [etape.lat, etape.long] });
@@ -177,12 +150,12 @@ class Core extends React.Component {
 
   //Ajouter l'itinéraire calculé dans le ListeEtape entre 2 étapes (rattaché l'étape de départ)
   setCalculatedDirection(key, directionsResult) {
-    var listLocal = this.state.listV;
+    var listLocal = this.state.activities;
     const index = listLocal.findIndex((etape) => etape.key === key);
     listLocal[index].directionsResult = directionsResult;
     // eslint-disable-next-line react/no-direct-mutation-state
     this.state.focusOnPolylineId = key;
-    this.setState({ ListV: listLocal });
+    this.setState({ activities: listLocal });
     //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
     this.setState({ mapKey: this.state.mapKey + 1 });
     // eslint-disable-next-line react/no-direct-mutation-state
@@ -192,12 +165,6 @@ class Core extends React.Component {
   render() {
     return (
       <div className="Core">
-        <p>
-          <Button type="primary" onClick={() => this.saveList()}>
-            {" "}
-            SAVE LIST{" "}
-          </Button>
-        </p>
         <div className="StepFinder">
           <StepFinder addEtape={this.addEtape} lastDate={this.lastDate} />
         </div>
@@ -209,13 +176,12 @@ class Core extends React.Component {
         >
           <Pane className="CarteList">
             <ListEtape
-              listV={this.state.listV}
+              listV={this.state.activities}
               selectEtape={this.selectEtape}
               setCalculatedDirection={this.setCalculatedDirection}
             />
           </Pane>
           <Pane className="CarteMod">
-            <div></div>
             {/* <Button
                 title="Dezoom"
                 color="#005500"
@@ -225,13 +191,13 @@ class Core extends React.Component {
                 Before Position: {this.state.position[0]} ,{" "}
                 {this.state.position[1]}{" "}
               </Text> */}
-            {/* <Carte
+            {<Carte
               mapKey={this.state.mapKey}
-              activitiesList={this.state.listV}
+              activitiesList={this.state.activities}
               focusOnPolylineId={this.state.focusOnPolylineId}
               center={this.state.position}
               zoom={this.state.zoom}
-            /> */}
+            />}
           </Pane>
         </SplitPane>
       </div>
