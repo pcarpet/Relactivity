@@ -213,12 +213,12 @@ class StepFinder extends React.Component {
                 <Input></Input>
               </Form.Item>
             </Col>
-            <Col span="2">
+           {/*  <Col span="2">
               <Form.Item label="Prix" name="price">
                 <InputNumber min="0" step="0.01" stringMode />
               </Form.Item>
             </Col>
-            <Col span={6}>
+ */}            <Col span={6}>
               <div>Lieu :</div>
               <PlacesAutocomplete
                 value={this.state.addressSearched}

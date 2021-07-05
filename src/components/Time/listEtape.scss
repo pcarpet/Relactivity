@@ -1,8 +1,16 @@
 .list-etape-main{
     margin-left: 20px;
     margin-right: 10px;
-    overflow: scroll;
+    //overflow: scroll;
 
+}
+
+.ant-timeline-item.timeLineItem{
+    padding-bottom: 0px;
+}
+
+.label-date{
+    text-align: left;
 }
 
 .etape{

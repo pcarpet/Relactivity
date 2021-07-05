@@ -1,8 +1,10 @@
 import React from 'react';
 import "./etape.scss";
-import { Row, Col, Tooltip, Button} from "antd";
+import { Row, Col, Tooltip, Button, Typography} from "antd";
 import { CompassOutlined } from "@ant-design/icons";
 import Emoji from "a11y-react-emoji";
+
+const { Paragraph } = Typography;  
 
 class Etape extends React.Component{
 	constructor(props){
@@ -11,6 +13,7 @@ class Etape extends React.Component{
     this.state = { key: this.props.data.key, etapeLocal: this.props.data, };
     this.onClickItem = this.onClickItem.bind(this);
     this.onClickDirection = this.onClickDirection.bind(this);
+    this.onActivityNameChange = this.onActivityNameChange.bind(this);
   }
 
 
@@ -39,6 +42,12 @@ class Etape extends React.Component{
     }
   }
 
+  onActivityNameChange(newName){
+    var etape = this.state.etapeLocal;
+    etape.nomEtape = newName;
+    this.setState({etapeLocal : etape});
+  }
+
 	render(){
 		return (
       <div className="leaderboard__profile" onClick={this.onClickItem}>
@@ -49,11 +58,18 @@ class Etape extends React.Component{
               label={this.state.etapeLocal.activityType}
             />
           </Col>
-          <Col span={5}>{this.state.etapeLocal.date ? this.state.etapeLocal.date.format("ddd DD/MM") : ""}</Col>
+          <Col span={5}>
+            {this.state.etapeLocal.date ? this.state.etapeLocal.date.format("ddd DD/MM") : ""}
+
+          </Col>
           <Col span={3}>
             {this.state.etapeLocal.heure ? this.state.etapeLocal.heure.format("HH:mm") : ""}
           </Col>
-          <Col span={8}>{this.state.etapeLocal.nomEtape}</Col>
+          <Col span={8}>
+            <Paragraph editable={{ tooltip: false, onChange: this.onActivityNameChange }}>
+              {this.state.etapeLocal.nomEtape}
+            </Paragraph>
+          </Col>
           <Col span={4}>
             <Tooltip
               placement="topLeft"

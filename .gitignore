@@ -207,3 +207,4 @@ workspace.code-workspace
 package-lock.json
 .env
 package-lock.json
+.vscode/launch.json
