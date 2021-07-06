@@ -115,7 +115,8 @@ class ListEtape extends React.Component {
                                             }
                                             getStepToStepDirection={
                                                 this.getStepToStepDirection
-                                            }/>
+                                            }
+                                            deleteActivity={this.props.deleteActivity}/>
 
                                     </Timeline.Item>
                                     {

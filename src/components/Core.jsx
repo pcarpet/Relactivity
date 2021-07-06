@@ -31,6 +31,7 @@ class Core extends React.Component {
     };
     this.addEtape = this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
+    this.deleteActivity = this.deleteActivity.bind(this);
     this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
     this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
     this.refreshActivities = this.refreshActivities.bind(this);
@@ -162,6 +163,20 @@ class Core extends React.Component {
     this.state.focusOnPolylineId = undefined;
   }
 
+  deleteActivity(key){
+    console.log("Nouvelle etape key : " + key);
+   //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
+    var listLocal = this.state.activities;
+    listLocal = listLocal.filter(e => e.key !== key);
+    
+    //Mise à jour du state
+    this.refreshActivities(listLocal);
+
+    //Supression en base
+    //db.ref("activities/pca/lombardie").child(key).remove();
+
+  }
+
   render() {
     return (
       <div className="Core">
@@ -178,6 +193,7 @@ class Core extends React.Component {
             <ListEtape
               listV={this.state.activities}
               selectEtape={this.selectEtape}
+              deleteActivity={this.deleteActivity}
               setCalculatedDirection={this.setCalculatedDirection}
             />
           </Pane>

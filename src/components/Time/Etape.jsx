@@ -13,6 +13,7 @@ class Etape extends React.Component{
     this.state = { key: this.props.data.key, etapeLocal: this.props.data, };
     this.onClickItem = this.onClickItem.bind(this);
     this.onClickDirection = this.onClickDirection.bind(this);
+    this.onClickDelete = this.onClickDelete.bind(this);
     this.onActivityNameChange = this.onActivityNameChange.bind(this);
   }
 
@@ -25,6 +26,10 @@ class Etape extends React.Component{
   
   onClickDirection() {
     this.props.getStepToStepDirection(this.state.key);
+  }
+
+  onClickDelete(){
+    this.props.deleteActivity(this.state.key);
   }
 	
   getEmoji(value) {
@@ -70,7 +75,7 @@ class Etape extends React.Component{
               {this.state.etapeLocal.nomEtape}
             </Paragraph>
           </Col>
-          <Col span={4}>
+          <Col span={2}>
             <Tooltip
               placement="topLeft"
               title={this.state.etapeLocal.googleFormattedAdress}
@@ -79,7 +84,10 @@ class Etape extends React.Component{
             </Tooltip>
           </Col>
           <Col span={2}>
-            <Button onClick={this.onClickDirection}>Direction</Button>
+            <Button onClick={this.onClickDirection}>🚘</Button>
+          </Col>
+          <Col span={2}>
+            <Button onClick={this.onClickDelete}>🗑️</Button>
           </Col>
         </Row>
       </div>
