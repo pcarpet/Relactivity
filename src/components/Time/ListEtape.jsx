@@ -56,7 +56,7 @@ class ListEtape extends React.Component {
     displayDate(date) {
 
         return (
-            <Timeline.Item className="timeLineItem label-date">
+            <Timeline.Item key={date.format("YYYYDDMMhhmmss")}  className="timeLineItem label-date">
                 {
                 date.format("ddd DD/MM")
             } </Timeline.Item>
@@ -80,9 +80,9 @@ class ListEtape extends React.Component {
 
     displayDirection(direction) {
 
-        if (direction !== undefined) {
+        if (direction !== undefined && direction !== null) {
             return (
-                <Timeline.Item className="timeLineItem label-date">Direction</Timeline.Item>
+                <Timeline.Item key={direction.geocoded_waypoints[0].place_id} className="timeLineItem label-date">Direction : {direction.geocoded_waypoints[0].place_id}</Timeline.Item>
             );
         }
     }
@@ -93,20 +93,18 @@ class ListEtape extends React.Component {
                 <Divider orientation="left">Liste des étapes</Divider>
                 <Timeline mode="left">
                     <List split={false}
-                        dataSource={
-                            this.props.listV
-                        }
+                        dataSource={this.props.listV}
                         rowKey={
-                            (item, key) => key
+                            (item) => item.key
                         }
                         renderItem={
                             (item) => (
-                                <div> {
-                                    this.displayDate(item.date)
-                                }
-                                    <Timeline.Item key={
-                                            item.key
-                                        }
+                               <div key={item.key}>
+                                    {
+                                        this.displayDate(item.date)
+                                    }
+                                    
+                                    <Timeline.Item key={item.key}
                                         className="timeLineItem etape">
 
                                         <Etape data={item}
@@ -119,9 +117,11 @@ class ListEtape extends React.Component {
                                             deleteActivity={this.props.deleteActivity}/>
 
                                     </Timeline.Item>
-                                    {
-                                    this.displayDirection(item.directionsResult)
-                                } </div>
+                                    
+                                     {
+                                        this.displayDirection(item.directionsResult)
+                                    } 
+                                </div>
                             )
                         }/>
 

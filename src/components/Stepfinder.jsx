@@ -1,7 +1,8 @@
 import React from "react";
 import "./stepFinder.scss"
 import "antd/dist/antd.css";
-import { DatePicker, TimePicker, Form, Button, Input,InputNumber, Radio } from "antd";
+import moment from "moment";
+import { DatePicker, TimePicker, Form, Button, Input, Radio } from "antd";
 import { Row, Col } from "antd";
 import Emoji from "a11y-react-emoji";
 import "moment/locale/fr";
@@ -102,8 +103,8 @@ class StepFinder extends React.Component {
     var newItem = {
       key: 0,
       activityType : formValues.activityType,
-      date: formValues.dateetape,
-      heure: formValues.heure || null,
+      date: moment(formValues.dateetape.format("YYYY-MM-DD"), "YYYY-MM-DD"),
+      heure: moment(formValues.heure.format("HH:mm"), "HH:mm") || null,
       nomEtape: formValues.nomEtape || null,
       price: formValues.price || null,
       googlePlace: this.state.selectedPlace || null,
@@ -198,7 +199,7 @@ class StepFinder extends React.Component {
             </Col>
             <Col span={2}>
               <Form.Item label="Heure" name="heure">
-                <TimePicker format="HH:mm" />
+                <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
             </Col>
 

@@ -99,7 +99,7 @@ class Carte extends React.Component {
           ))}
           {/* Comment tout mettre dans une seul boucle ? */}
           {this.props.activitiesList
-            .filter((place) => place.directionsResult !== undefined)
+            .filter((place) => place.directionsResult !== undefined && place.directionsResult !== null)
             .map((place) => this.loadDirectionsOnMap(place.directionsResult, place.key))}
         </GoogleMapReact>
       </div>

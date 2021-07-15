@@ -84,7 +84,9 @@ class Core extends React.Component {
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
     activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
-    activityForDb.heure = activityForDb.heure.format("HH:mm");
+    if(activityForDb.heure !== null){
+      activityForDb.heure = activityForDb.heure.format("HH:mm");
+    }
     const activitiesRef  = db.ref("activities/pca/lombardie");
     const newEntry = activitiesRef.push(activityForDb);
 
@@ -109,7 +111,7 @@ class Core extends React.Component {
       // Turn your strings into dates, and then subtract them
       // to get a value that is either negative, positive, or zero.
       if (a.date - b.date === 0) {
-        return a.heure - b.heure;
+          return a.heure - b.heure;
       };
       return a.date - b.date;
     });
@@ -157,6 +159,12 @@ class Core extends React.Component {
     // eslint-disable-next-line react/no-direct-mutation-state
     this.state.focusOnPolylineId = key;
     this.setState({ activities: listLocal });
+
+    //Mise à jour de la base de doonnées
+    db.ref("activities/pca/lombardie").child(key).update(
+      {directionsResult : JSON.parse( JSON.stringify(directionsResult))}
+    );
+
     //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
     this.setState({ mapKey: this.state.mapKey + 1 });
     // eslint-disable-next-line react/no-direct-mutation-state
@@ -164,17 +172,30 @@ class Core extends React.Component {
   }
 
   deleteActivity(key){
-    console.log("Nouvelle etape key : " + key);
-   //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
+    console.log("Supression de l'étape key : " + key);
     var listLocal = this.state.activities;
+    var startActivity = null;
+    //On supprime la direction qui meme à cette étape si elle existe
+    const rank = listLocal.find((etape) => etape.key === key).rank;
+    if(rank>0){
+      startActivity = listLocal.find((etape) => etape.rank === rank-1);
+      startActivity.directionsResult = null;
+    }
+
+    //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
     listLocal = listLocal.filter(e => e.key !== key);
     
     //Mise à jour du state
     this.refreshActivities(listLocal);
 
-    //Supression en base
-    //db.ref("activities/pca/lombardie").child(key).remove();
+     //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
+    this.setState({ mapKey: this.state.mapKey + 1 });
 
+    //Supression en base
+    db.ref("activities/pca/lombardie").child(key).remove();
+    if(startActivity !== null){
+        db.ref("activities/pca/lombardie").child(startActivity.key).update({directionsResult : null});
+    }
   }
 
   render() {

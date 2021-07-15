@@ -63,14 +63,10 @@ class Etape extends React.Component{
               label={this.state.etapeLocal.activityType}
             />
           </Col>
-          <Col span={5}>
-            {this.state.etapeLocal.date ? this.state.etapeLocal.date.format("ddd DD/MM") : ""}
-
-          </Col>
           <Col span={3}>
             {this.state.etapeLocal.heure ? this.state.etapeLocal.heure.format("HH:mm") : ""}
           </Col>
-          <Col span={8}>
+          <Col span={13}>
             <Paragraph editable={{ tooltip: false, onChange: this.onActivityNameChange }}>
               {this.state.etapeLocal.nomEtape}
             </Paragraph>
