@@ -3,3 +3,8 @@ $myColor: red;
 h1 {
   color: $myColor;
 }
+
+.RightPane{
+    overflow: auto;
+    height: 85vh;
+}

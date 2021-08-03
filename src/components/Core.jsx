@@ -1,22 +1,14 @@
 import React from 'react';
+import './core.scss'
 import firebase from "../firebase.js";
-import SplitPane, { Pane } from 'react-split-pane';
 import moment from "moment";
 import ListEtape from './time/ListEtape';
 import StepFinder from './Stepfinder';
 import Carte from './space/Carte';
+import {Row, Col} from "antd";
 
 
 const db = firebase.database();
-
-const stylesSpliter = {
-  background: '#000',
-  width: '2px',
-  cursor: 'col-resize',
-  margin: '0 5px',
-  height: '100%',
-};
-
 
 class Core extends React.Component {
   constructor(props) {
@@ -204,39 +196,25 @@ class Core extends React.Component {
         <div className="StepFinder">
           <StepFinder addEtape={this.addEtape} lastDate={this.lastDate} />
         </div>
-        <SplitPane
-          split="vertical"
-          allowResize={true}
-          defaultSize="50%"
-          resizerStyle={stylesSpliter}
-        >
-          <Pane className="CarteList">
+        <Row>
+          <Col span={12} className="RightPane">
             <ListEtape
               listV={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
               setCalculatedDirection={this.setCalculatedDirection}
             />
-          </Pane>
-          <Pane className="CarteMod">
-            {/* <Button
-                title="Dezoom"
-                color="#005500"
-                onPress={() => this.setState({ zoom: 8 })}
-              />
-              <Text>
-                Before Position: {this.state.position[0]} ,{" "}
-                {this.state.position[1]}{" "}
-              </Text> */}
-            {<Carte
+          </Col>
+          <Col span={12}>
+            <Carte
               mapKey={this.state.mapKey}
               activitiesList={this.state.activities}
               focusOnPolylineId={this.state.focusOnPolylineId}
               center={this.state.position}
               zoom={this.state.zoom}
-            />}
-          </Pane>
-        </SplitPane>
+            />
+          </Col>
+        </Row>
       </div>
     );
   }
