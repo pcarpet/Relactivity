@@ -197,7 +197,7 @@ class Core extends React.Component {
           <StepFinder addEtape={this.addEtape} lastDate={this.lastDate} />
         </div>
         <Row>
-          <Col span={12} className="RightPane">
+          <Col span={16} className="RightPane">
             <ListEtape
               listV={this.state.activities}
               selectEtape={this.selectEtape}
@@ -205,7 +205,7 @@ class Core extends React.Component {
               setCalculatedDirection={this.setCalculatedDirection}
             />
           </Col>
-          <Col span={12}>
+          <Col span={8}>
             <Carte
               mapKey={this.state.mapKey}
               activitiesList={this.state.activities}

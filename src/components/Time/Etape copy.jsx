@@ -15,7 +15,6 @@ class Etape extends React.Component{
     this.onClickDirection = this.onClickDirection.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
     this.onActivityNameChange = this.onActivityNameChange.bind(this);
-    this.getMidi = this.getMidi.bind(this);
   }
 
 
@@ -54,30 +53,37 @@ class Etape extends React.Component{
     this.setState({etapeLocal : etape});
   }
 
-  getMidi(dayActivite){
-    console.log(dayActivite)
-    console.log(dayActivite.find(e => e.activityType === 'travel'))
-    return dayActivite.find(e => e.activityType === 'travel') ? dayActivite.find(e => e.activityType === 'travel').nomEtape : 'Midi';
-  }
-
 	render(){
 		return (
       <div className="leaderboard__profile" onClick={this.onClickItem}>
         <Row>
-          <Col span={7}>
-            Matin
+          <Col span={2}>
+            <Emoji
+              symbol={this.getEmoji(this.state.etapeLocal.activityType)}
+              label={this.state.etapeLocal.activityType}
+            />
           </Col>
           <Col span={3}>
-            {this.getMidi(this.props.data)}
+            {this.state.etapeLocal.heure ? this.state.etapeLocal.heure.format("HH:mm") : ""}
           </Col>
-          <Col span={7}>
-           Aprem
+          <Col span={13}>
+            <Paragraph editable={{ tooltip: false, onChange: this.onActivityNameChange }}>
+              {this.state.etapeLocal.nomEtape}
+            </Paragraph>
           </Col>
-          <Col span={3}>
-            Dinner
+          <Col span={2}>
+            <Tooltip
+              placement="topLeft"
+              title={this.state.etapeLocal.googleFormattedAdress}
+            >
+              <CompassOutlined />
+            </Tooltip>
           </Col>
-          <Col span={4}>
-            Hotel
+          <Col span={2}>
+            <Button onClick={this.onClickDirection}>🚘</Button>
+          </Col>
+          <Col span={2}>
+            <Button onClick={this.onClickDelete}>🗑️</Button>
           </Col>
         </Row>
       </div>

@@ -7,7 +7,7 @@ export default class Polyline extends Component {
   renderPolylines () {
     const { map, maps, path } = this.props
 
-    if (maps === undefined) { return;}
+    if (maps === undefined || maps == null) { return;}
 
     let nonGeodesicPolyline = new maps.Polyline({
       path: path,

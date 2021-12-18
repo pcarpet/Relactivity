@@ -1,6 +1,6 @@
 import React from 'react';
 import './listEtape.scss';
-import {List, Divider, Timeline} from "antd";
+import {List, Divider, Timeline, Button} from "antd";
 import Etape from './Etape';
 
 
@@ -15,10 +15,29 @@ class ListEtape extends React.Component {
         this.getStepToStepDirection = this.getStepToStepDirection.bind(this);
         this.displayDate = this.displayDate.bind(this);
         this.displayDirection = this.displayDirection.bind(this);
+        this.groupByDate = this.groupByDate.bind(this);
+        
     }
 
     componentDidMount() {
-        console.log("Chargement de la liste etape");
+        console.log("Chargement de la liste etape...");
+
+    }
+
+    groupByDate(list){
+    
+        var groupedByDate = [];
+
+        for (var i = 0; i < list.length; i++) {
+            const goodday = groupedByDate.find((activite) => activite.date.isSame(list[i].date), 'day');
+            if (goodday === undefined) {
+                groupedByDate.push({ date: list[i].date, activite: [list[i]] });
+            } else goodday.activite.push(list[i]);
+        };
+                
+        console.log(groupedByDate);
+
+        return groupedByDate;
     }
 
     getStepToStepDirection(firstStepKey) {
@@ -93,21 +112,21 @@ class ListEtape extends React.Component {
                 <Divider orientation="left">Liste des étapes</Divider>
                 <Timeline mode="left">
                     <List split={false}
-                        dataSource={this.props.listV}
+                        dataSource={this.groupByDate(this.props.listV)}
                         rowKey={
-                            (item) => item.key
+                            (item) => item.date
                         }
                         renderItem={
                             (item) => (
-                               <div key={item.key}>
+                               <div key={item.date}>
                                     {
                                         this.displayDate(item.date)
                                     }
                                     
-                                    <Timeline.Item key={item.key}
+                                    <Timeline.Item key={item.date}
                                         className="timeLineItem etape">
 
-                                        <Etape data={item}
+                                        <Etape data={item.activite}
                                             cbBg={
                                                 this.props.selectEtape
                                             }
@@ -118,9 +137,6 @@ class ListEtape extends React.Component {
 
                                     </Timeline.Item>
                                     
-                                     {
-                                        this.displayDirection(item.directionsResult)
-                                    } 
                                 </div>
                             )
                         }/>
