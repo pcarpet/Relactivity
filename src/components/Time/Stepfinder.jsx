@@ -2,7 +2,7 @@ import React from "react";
 import "./stepFinder.scss"
 import "antd/dist/antd.css";
 import moment from "moment";
-import { DatePicker, TimePicker, Form, Button, Input, Radio } from "antd";
+import { DatePicker, TimePicker, Form, Button, Input, Radio, Modal } from "antd";
 import { Row, Col } from "antd";
 import Emoji from "a11y-react-emoji";
 import "moment/locale/fr";
@@ -17,6 +17,8 @@ class StepFinder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      modalVisible : false,
+      modalConfirmationLoading : false,
       etapeIdCount: 6,
       addressSearched: "",
       value: null,
@@ -27,17 +29,17 @@ class StepFinder extends React.Component {
         long: null,
       },
     };
+  
+    this.setState({modalVisible : this.props.modalVisible});
 
-    this.onDatePicking = this.onDatePicking.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
   }
-
-  onDatePicking(date, dateString) {
-    console.log(date, dateString);
-  }
-
+  
+  
   /* Validation du formulaire */
   onFinish = (formValues) => {
-
+    
+    this.setState({modalConfirmationLoading : true});
     // Valeur par defaut si non renseigné
     if (this.state.placeFound === null) {
       this.setState({placeFound: [{
@@ -93,6 +95,7 @@ class StepFinder extends React.Component {
       }]})
     }
 
+    console.log("Ajout d'une activité pour le :", this.props.etapeDate);
     console.log("Success Formulaire Validé:", formValues);
     console.log(
       "GoogleFormattedAddress",
@@ -102,11 +105,11 @@ class StepFinder extends React.Component {
     var idEtape = this.state.etapeIdCount;
     var newItem = {
       key: 0,
-      activityType : formValues.activityType,
-      date: moment(formValues.dateetape.format("YYYY-MM-DD"), "YYYY-MM-DD"),
+      activityType : this.props.timeOfDay,
+      date: this.props.etapeDay,
       heure: moment(formValues.heure.format("HH:mm"), "HH:mm") || null,
       nomEtape: formValues.nomEtape || null,
-      price: formValues.price || null,
+      //price: formValues.price || null,
       googlePlace: this.state.selectedPlace || null,
       googlePlaceId: this.state.placeFound.placeId || null,
       googleFormattedAdress: this.state.placeFound.googleFormattedAddress || null,
@@ -117,11 +120,18 @@ class StepFinder extends React.Component {
     console.log(newItem);
     this.setState({ etapeIdCount: idEtape });
     this.props.addEtape(newItem);
+    this.setState({modalVisible : false});
+    this.setState({modalConfirmationLoading : false});
     this.setState({ addressSearched: '' });
   };
 
   onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
+    this.setState({modalConfirmationLoading : true});
+    setTimeout(() => {
+      this.setState({modalVisible : false});
+      this.setState({modalConfirmationLoading : false});
+    }, 500);
   };
 
   handleChange = (value) => {
@@ -151,11 +161,30 @@ class StepFinder extends React.Component {
     this.setState({ addressSearched: value });
     this.setState({ placeFound: placeFound });
   };
+ 
+  handleCancel = () => {
+    console.log("Annulation");
+    this.setState({ modalVisible : false });
+  };
 
   render() {
     return (
+        <Modal
+        title="Ajouter une étape"
+        visible={this.props.modalVisible}
+        confirmLoading={this.state.confirmLoading}
+        footer={[
+            <Button key="back" onClick={this.handleCancel}>
+              Return
+            </Button>,
+            <Button form="stepfinder" key="submit" type="primary" htmlType="submit">
+                  Ajouter
+            </Button>
+          ]}
+      >
       <div className="step-finder-main">
         <Form
+          id="stepfinder"
           name="AjoutEtape"
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
@@ -224,13 +253,12 @@ class StepFinder extends React.Component {
            
            
               <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Ajouter
-                </Button>
+                
               </Form.Item>
            
         </Form>
       </div>
+      </Modal>
     );
   }
 }

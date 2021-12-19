@@ -17,14 +17,10 @@ class Etape extends React.Component{
       modalVisible : false,
       modalTimeOfDay : '' };
   
-
-
     this.onClickItem = this.onClickItem.bind(this);
     this.onClickDirection = this.onClickDirection.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
-    this.onActivityNameChange = this.onActivityNameChange.bind(this);
     this.showModal = this.showModal.bind(this);
-    this.handleOk = this.handleOk.bind(this);
     this.getMidi = this.getMidi.bind(this);
   }
 
@@ -43,40 +39,13 @@ class Etape extends React.Component{
     this.props.deleteActivity(this.state.key);
   }
 	
-  getEmoji(value) {
-    switch (value) {
-      case 'travel':
-        return "✈️";
-      case 'hotel':
-        return "🛏️";
-      case 'activity':
-        return "🎾";
-      case 'resto':
-        return "🍽️";
-      default:
-        console.error(`Sorry, we are out of ${value}.`);
-    }
-  }
 
-  onActivityNameChange(newName){
-    var etape = this.state.etapeLocal;
-    etape.nomEtape = newName;
-    this.setState({etapeLocal : etape});
-  }
+  
 
   showModal(){
-    this.setState({modalVisible : true});
-    this.setState({modalTimeOfDay : 'dinner'});
+    this.setState({modalTimeOfDay : 'dinner', modalVisible : true});
   };
   
-  handleOk(){
-    //setModalText('The modal will be closed after two seconds');
-    this.setState({modalConfirmationLoading : true});
-    setTimeout(() => {
-      this.setState({modalVisible : false});
-      this.setState({modalConfirmationLoading : false});
-    }, 500);
-  }
 
   getMidi(dayActivite){
     console.log(dayActivite)
@@ -89,17 +58,10 @@ class Etape extends React.Component{
       <div //className="leaderboard__profile" 
         //onClick={this.onClickItem}
       >
-        <Modal
-        title="Ajouter une étape"
-        visible={this.state.modalVisible}
-        onOk={this.handleOk}
-        confirmLoading={this.state.confirmLoading}
-        //onCancel={handleCancel}
-      >
         <div className="StepFinder">
-          <StepFinder etapeDay={this.props.date} timeOfDay={this.state.timeOfDay} addEtape={this.props.addEtape}  />
+          <StepFinder modalVisible={this.state.modalVisible} etapeDay={this.props.data.etapeDay} timeOfDay={this.state.modalTimeOfDay} addEtape={this.props.addEtape}  />
         </div>
-      </Modal>
+  
         <Row gutter={[24,16]}>
           <Col span={7} className="timeoftheday">
             Matin
