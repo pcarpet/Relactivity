@@ -3,7 +3,6 @@ import './core.scss'
 import firebase from "../firebase.js";
 import moment from "moment";
 import ListEtape from './time/ListEtape';
-import StepFinder from './Stepfinder';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
 
@@ -18,8 +17,7 @@ class Core extends React.Component {
       focusOnPolylineId: undefined,
       mapKey: 0,
       position: [48.85, 2.33],
-      zoom: 11,
-      lastDate: moment(),
+      zoom: 11
     };
     this.addEtape = this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
@@ -193,9 +191,6 @@ class Core extends React.Component {
   render() {
     return (
       <div className="Core">
-        <div className="StepFinder">
-          <StepFinder addEtape={this.addEtape} lastDate={this.lastDate} />
-        </div>
         <Row>
           <Col span={16} className="RightPane">
             <ListEtape
@@ -203,6 +198,7 @@ class Core extends React.Component {
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
               setCalculatedDirection={this.setCalculatedDirection}
+              addEtape={this.addEtape}
             />
           </Col>
           <Col span={8}>

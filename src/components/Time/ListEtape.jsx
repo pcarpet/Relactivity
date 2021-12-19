@@ -29,10 +29,10 @@ class ListEtape extends React.Component {
         var groupedByDate = [];
 
         for (var i = 0; i < list.length; i++) {
-            const goodday = groupedByDate.find((activite) => activite.date.isSame(list[i].date), 'day');
+            const goodday = groupedByDate.find((activities) => activities.date.isSame(list[i].date), 'day');
             if (goodday === undefined) {
-                groupedByDate.push({ date: list[i].date, activite: [list[i]] });
-            } else goodday.activite.push(list[i]);
+                groupedByDate.push({ date: list[i].date, activities: [list[i]] });
+            } else goodday.activities.push(list[i]);
         };
                 
         console.log(groupedByDate);
@@ -119,21 +119,19 @@ class ListEtape extends React.Component {
                         renderItem={
                             (item) => (
                                <div key={item.date}>
-                                    {
-                                        this.displayDate(item.date)
-                                    }
+                                    {this.displayDate(item.date)}
                                     
                                     <Timeline.Item key={item.date}
                                         className="timeLineItem etape">
 
-                                        <Etape data={item.activite}
-                                            cbBg={
-                                                this.props.selectEtape
-                                            }
+                                        <Etape 
+                                            data={item}
+                                            cbBg={this.props.selectEtape}
                                             getStepToStepDirection={
                                                 this.getStepToStepDirection
                                             }
-                                            deleteActivity={this.props.deleteActivity}/>
+                                            deleteActivity={this.props.deleteActivity} 
+                                            addEtape={this.props.addEtape}/>
 
                                     </Timeline.Item>
                                     

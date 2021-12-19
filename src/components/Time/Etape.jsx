@@ -1,7 +1,8 @@
 import React from 'react';
 import "./etape.scss";
-import { Row, Col, Tooltip, Button, Typography} from "antd";
-import { CompassOutlined } from "@ant-design/icons";
+import StepFinder from './Stepfinder';
+import { Row, Col,Icon, Button, Typography, Modal} from "antd";
+import { CompassOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import Emoji from "a11y-react-emoji";
 
 const { Paragraph } = Typography;  
@@ -10,11 +11,20 @@ class Etape extends React.Component{
 	constructor(props){
 		super(props);
 
-    this.state = { key: this.props.data.key, etapeLocal: this.props.data, };
+    this.state = { 
+      etapeLocal: this.props.data,
+      modalConfirmationLoading : true,
+      modalVisible : false,
+      modalTimeOfDay : '' };
+  
+
+
     this.onClickItem = this.onClickItem.bind(this);
     this.onClickDirection = this.onClickDirection.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
     this.onActivityNameChange = this.onActivityNameChange.bind(this);
+    this.showModal = this.showModal.bind(this);
+    this.handleOk = this.handleOk.bind(this);
     this.getMidi = this.getMidi.bind(this);
   }
 
@@ -54,6 +64,20 @@ class Etape extends React.Component{
     this.setState({etapeLocal : etape});
   }
 
+  showModal(){
+    this.setState({modalVisible : true});
+    this.setState({modalTimeOfDay : 'dinner'});
+  };
+  
+  handleOk(){
+    //setModalText('The modal will be closed after two seconds');
+    this.setState({modalConfirmationLoading : true});
+    setTimeout(() => {
+      this.setState({modalVisible : false});
+      this.setState({modalConfirmationLoading : false});
+    }, 500);
+  }
+
   getMidi(dayActivite){
     console.log(dayActivite)
     console.log(dayActivite.find(e => e.activityType === 'travel'))
@@ -62,21 +86,35 @@ class Etape extends React.Component{
 
 	render(){
 		return (
-      <div className="leaderboard__profile" onClick={this.onClickItem}>
-        <Row>
-          <Col span={7}>
+      <div //className="leaderboard__profile" 
+        //onClick={this.onClickItem}
+      >
+        <Modal
+        title="Ajouter une étape"
+        visible={this.state.modalVisible}
+        onOk={this.handleOk}
+        confirmLoading={this.state.confirmLoading}
+        //onCancel={handleCancel}
+      >
+        <div className="StepFinder">
+          <StepFinder etapeDay={this.props.date} timeOfDay={this.state.timeOfDay} addEtape={this.props.addEtape}  />
+        </div>
+      </Modal>
+        <Row gutter={[24,16]}>
+          <Col span={7} className="timeoftheday">
             Matin
           </Col>
-          <Col span={3}>
-            {this.getMidi(this.props.data)}
+          <Col span={3} className="timeoftheday">
+            {this.getMidi(this.props.data.activities)}
           </Col>
-          <Col span={7}>
+          <Col span={7} className="timeoftheday">
            Aprem
           </Col>
-          <Col span={3}>
+          <Col span={3} className="timeoftheday">
             Dinner
+            <PlusCircleOutlined onClick={this.showModal}/>
           </Col>
-          <Col span={4}>
+          <Col span={4} className="timeoftheday">
             Hotel
           </Col>
         </Row>

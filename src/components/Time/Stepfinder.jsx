@@ -157,53 +157,19 @@ class StepFinder extends React.Component {
       <div className="step-finder-main">
         <Form
           name="AjoutEtape"
-          layout="vertical"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
           requiredMark={false}
           initialValues={{ activityType: "travel", dateetape: this.props.lastDate}}
         >
-          <Row>
-            <Col span={4}>
-              <Form.Item label="Activité" name="activityType">
-                <Radio.Group>
-                  <Radio.Button value="travel">
-                    <Emoji symbol="✈️" label="travel" />
-                  </Radio.Button>
-                  <Radio.Button value="hotel">
-                    <Emoji symbol="🛏️" label="hotel" />
-                  </Radio.Button>
-                  <Radio.Button value="activity">
-                    <Emoji symbol="🎾" label="activity" />
-                  </Radio.Button>
-                  <Radio.Button value="resto">
-                    <Emoji symbol="🍽️" label="restaurant" />
-                  </Radio.Button>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-
-            <Col span={4}>
-              <Form.Item
-                label="Date "
-                name="dateetape"
-                rules={[
-                  {
-                    required: true,
-                    message: "Tu as bien une idée de la date?",
-                  },
-                ]}
-              >
-                <DatePicker locale={locale} onChange={this.onDatePicking} />
-              </Form.Item>
-            </Col>
-            <Col span={2}>
+          
               <Form.Item label="Heure" name="heure">
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
-            </Col>
+        
 
-            <Col span={4}>
               <Form.Item
                 label="Description"
                 name="nomEtape"
@@ -213,13 +179,8 @@ class StepFinder extends React.Component {
               >
                 <Input></Input>
               </Form.Item>
-            </Col>
-           {/*  <Col span="2">
-              <Form.Item label="Prix" name="price">
-                <InputNumber min="0" step="0.01" stringMode />
-              </Form.Item>
-            </Col>
- */}            <Col span={6}>
+         
+         
               <div>Lieu :</div>
               <PlacesAutocomplete
                 value={this.state.addressSearched}
@@ -260,16 +221,14 @@ class StepFinder extends React.Component {
                   </div>
                 )}
               </PlacesAutocomplete>
-            </Col>
-
-            <Col span={2}>
+           
+           
               <Form.Item>
                 <Button type="primary" htmlType="submit">
                   Ajouter
                 </Button>
               </Form.Item>
-            </Col>
-          </Row>
+           
         </Form>
       </div>
     );
