@@ -29,7 +29,8 @@ class ListEtape extends React.Component {
         var groupedByDate = [];
 
         for (var i = 0; i < list.length; i++) {
-            const goodday = groupedByDate.find((activities) => activities.etapeDay.isSame(list[i].etapeDay), 'day');
+            const goodday = groupedByDate.find((activities) => activities.etapeDay.isSame(list[i].date, 'day'));
+            console.log(goodday);
             if (goodday === undefined) {
                 groupedByDate.push({ etapeDay: list[i].date, activities: [list[i]] });
             } else goodday.activities.push(list[i]);
@@ -80,20 +81,6 @@ class ListEtape extends React.Component {
                 date.format("ddd DD/MM")
             } </Timeline.Item>
         );
-        /*  if (this.uniqDate.find(d => d === date) === undefined){
-          //Nouvelle date
-          this.uniqDate.push(date);
-          //this.setState({uniqDate : uniqDatelocal})
-          return (
-              <Timeline.Item className="timeLineItem label-date">
-                  {
-                  date.format("ddd DD/MM")
-              } </Timeline.Item>
-          );
-        }else{
-          //La date est déja affiché on ne met rien
-          return("");
-        } */
 
     }
 

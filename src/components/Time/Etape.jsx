@@ -20,7 +20,7 @@ class Etape extends React.Component{
     this.onClickDirection = this.onClickDirection.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
     this.showModal = this.showModal.bind(this);
-    this.getMidi = this.getMidi.bind(this);
+    this.getActivity = this.getActivity.bind(this);
   }
 
 
@@ -41,7 +41,7 @@ class Etape extends React.Component{
 
   
 
-  showModal(){
+  showModal(modalTimeOfDay){
     this.setState({modalTimeOfDay : 'dinner', modalVisible : true});
   };
 
@@ -50,10 +50,8 @@ class Etape extends React.Component{
     } 
   
 
-  getMidi(dayActivite){
-    console.log(dayActivite)
-    console.log(dayActivite.find(e => e.activityType === 'travel'))
-    return dayActivite.find(e => e.activityType === 'travel') ? dayActivite.find(e => e.activityType === 'travel').nomEtape : 'Midi';
+  getActivity(timeOfDay, dayActivite){
+    return dayActivite.find(e => e.activityType === timeOfDay) ? dayActivite.find(e => e.activityType === timeOfDay).nomEtape : 'Ajouter';
   }
 
 	render(){
@@ -70,16 +68,20 @@ class Etape extends React.Component{
             Matin
           </Col>
           <Col span={3} className="timeoftheday">
-            {this.getMidi(this.props.data.activities)}
+            🍽️ {this.getActivity('midi', this.props.data.activities)}
+            <PlusCircleOutlined onClick={() => this.showModal('midi')} />
           </Col>
           <Col span={7} className="timeoftheday">
            Aprem
           </Col>
           <Col span={3} className="timeoftheday">
-            Dinner
-            <PlusCircleOutlined onClick={this.showModal}/>
+            🍽️ {this.getActivity('dinner', this.props.data.activities)}
+    
+            <PlusCircleOutlined onClick={() => this.showModal('dinner')} />
           </Col>
           <Col span={4} className="timeoftheday">
+            🛏️  {this.getActivity('hotel', this.props.data.activities)}
+            <PlusCircleOutlined onClick={() => this.showModal('hotel')} />
             Hotel
           </Col>
         </Row>

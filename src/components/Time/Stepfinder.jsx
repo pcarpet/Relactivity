@@ -180,12 +180,6 @@ class StepFinder extends React.Component {
           requiredMark={false}
           initialValues={{ activityType: "travel", dateetape: this.props.lastDate}}
         >
-          
-              <Form.Item label="Heure" name="heure">
-                <TimePicker minuteStep={5} format="HH:mm" />
-              </Form.Item>
-        
-
               <Form.Item
                 label="Description"
                 name="nomEtape"
@@ -195,8 +189,11 @@ class StepFinder extends React.Component {
               >
                 <Input></Input>
               </Form.Item>
-         
-         
+          
+              <Form.Item label="Heure" name="heure">
+                <TimePicker minuteStep={5} format="HH:mm" />
+              </Form.Item>
+        
               <div>Lieu :</div>
               <PlacesAutocomplete
                 value={this.state.addressSearched}
