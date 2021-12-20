@@ -17,7 +17,6 @@ class StepFinder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalVisible : false,
       modalConfirmationLoading : false,
       etapeIdCount: 6,
       addressSearched: "",
@@ -29,10 +28,6 @@ class StepFinder extends React.Component {
         long: null,
       },
     };
-  
-    this.setState({modalVisible : this.props.modalVisible});
-
-    this.handleCancel = this.handleCancel.bind(this);
   }
   
   
@@ -120,18 +115,13 @@ class StepFinder extends React.Component {
     console.log(newItem);
     this.setState({ etapeIdCount: idEtape });
     this.props.addEtape(newItem);
-    this.setState({modalVisible : false});
+    this.props.closeModal();
     this.setState({modalConfirmationLoading : false});
     this.setState({ addressSearched: '' });
   };
 
   onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
-    this.setState({modalConfirmationLoading : true});
-    setTimeout(() => {
-      this.setState({modalVisible : false});
-      this.setState({modalConfirmationLoading : false});
-    }, 500);
   };
 
   handleChange = (value) => {
@@ -162,10 +152,6 @@ class StepFinder extends React.Component {
     this.setState({ placeFound: placeFound });
   };
  
-  handleCancel = () => {
-    console.log("Annulation");
-    this.setState({ modalVisible : false });
-  };
 
   render() {
     return (
@@ -173,8 +159,9 @@ class StepFinder extends React.Component {
         title="Ajouter une étape"
         visible={this.props.modalVisible}
         confirmLoading={this.state.confirmLoading}
+        onCancel={this.props.closeModal}
         footer={[
-            <Button key="back" onClick={this.handleCancel}>
+            <Button key="back" onClick={this.props.closeModal}>
               Return
             </Button>,
             <Button form="stepfinder" key="submit" type="primary" htmlType="submit">
