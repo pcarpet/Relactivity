@@ -2,6 +2,7 @@ import React from 'react';
 import './core.scss'
 import firebase from "../firebase.js";
 import moment from "moment";
+import Periode from './Periode';
 import ListEtape from './time/ListEtape';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
@@ -10,67 +11,87 @@ import {Row, Col} from "antd";
 const db = firebase.database();
 
 class Core extends React.Component {
+
   constructor(props) {
     super(props);
+    
     this.state = {
       activities: [],
+      defaultPickerValue : [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
       focusOnPolylineId: undefined,
       mapKey: 0,
       position: [48.85, 2.33],
       zoom: 11
     };
+
     this.addEtape = this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
     this.deleteActivity = this.deleteActivity.bind(this);
     this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
     this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
     this.refreshActivities = this.refreshActivities.bind(this);
+    this.getDefaultPickerValue = this.getDefaultPickerValue.bind(this);
 
   }
 
 
   componentDidMount() {
     this.loadActivitiesFromDb();
+
   }
 
 
   //Chargement des donnée de la base
   loadActivitiesFromDb(){
     
-    console.log("Chargement des données de la base");
-
+  //  console.log("Chargement des données de la base");
+    
     db.ref("activities/pca/lombardie").get().then((snapshot) => {
-    if (snapshot.exists()) {
-
-      var activitiesConverted = [];
-      snapshot.forEach((activity) => {
-        //Ajout et convertion des activité de la base
-        var activityFromDb = activity.val();
-        activityFromDb.key = activity.key;
-        activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
-        if(activityFromDb.heure){
-          activityFromDb.heure = moment(activityFromDb.heure, "HH:mm");
-        }
-        activitiesConverted.push(activityFromDb);
+      if (snapshot.exists()) {
         
-      })
-
-      this.refreshActivities(activitiesConverted);
- 
+        var activitiesConverted = [];
+        snapshot.forEach((activity) => {
+          //Ajout et convertion des activité de la base
+          var activityFromDb = activity.val();
+          activityFromDb.key = activity.key;
+          activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
+          if(activityFromDb.heure){
+            activityFromDb.heure = moment(activityFromDb.heure, "HH:mm");
+          }
+          activitiesConverted.push(activityFromDb);
+          
+        })
+        
+        this.refreshActivities(activitiesConverted);
+        
       } else {
         console.log("No data available");
       }
     }).catch((error) => {
       console.error(error);
     });
+    
+  }
+  
+  // retrouve la date la plus ancienne et la plus récente de la liste d'activité
+  getDefaultPickerValue(){
+    var allDates = [];
+    allDates = this.state.activities.map((act) => act.date);
+
+    const maxDate = moment.max(allDates);
+    const minDate = moment.min(allDates);
+    
+    const range = [minDate, maxDate];
+
+    this.setState({defaultPickerValue: range}, () => console.log(this.state.defaultPickerValue));
+    
 
   }
-
-
+  
   /* Ajoute l'étape remontée par le composant StepFinder à la liste*/
   addEtape(etape) {
     console.log("Nouvelle etape key : " + etape.key);
-
+    
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
     activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
@@ -115,6 +136,8 @@ class Core extends React.Component {
 
     console.log(listLocal);
     this.setState({ activities: listLocal });
+
+    this.getDefaultPickerValue();
   }
 
 
@@ -188,9 +211,15 @@ class Core extends React.Component {
     }
   }
 
+
   render() {
     return (
       <div className="Core">
+        <Row>
+          <Col span={8}>
+            <Periode defaultPickerValue={this.state.defaultPickerValue}/>
+          </Col>
+        </Row>
         <Row>
           <Col span={16} className="RightPane">
             <ListEtape
