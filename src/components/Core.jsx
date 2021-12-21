@@ -31,6 +31,7 @@ class Core extends React.Component {
     this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
     this.refreshActivities = this.refreshActivities.bind(this);
     this.getDefaultPickerValue = this.getDefaultPickerValue.bind(this);
+    this.updateListOfDays = this.updateListOfDays.bind(this);
 
   }
 
@@ -83,8 +84,44 @@ class Core extends React.Component {
     
     const range = [minDate, maxDate];
 
-    this.setState({defaultPickerValue: range}, () => console.log(this.state.defaultPickerValue));
-    
+    this.setState({defaultPickerValue: range});
+  }
+
+  // On s'assure que la liste contient des activités pour les jours de la période (création d'activités fictives)
+  // On va supprimmer toutes les activités liés au jours hors de la période !!!
+  updateListOfDays(dateRange){
+
+      const debut = dateRange[0];
+      const fin = dateRange[1];
+
+      console.log(debut);
+
+      var day = debut.clone();
+      var periodeList = [];
+
+      while(day.isSameOrBefore(fin)){
+        periodeList.push(day.clone());
+        day.add(1, 'days');
+      }
+      
+      console.log(periodeList);
+      
+      //Ajout des activité pour les jours manquant (activité fictive)
+      for(const d of periodeList){
+
+        if(this.state.activities.find((activities) => activities.date.isSame(d, 'day'))===undefined){
+          console.log("Ajouter un activité pour le jour : " + d.format());
+        }
+      }
+
+      //Suppression de toutes les activités hors période !!!! WARNING : ca peut tout niquer en 2 2 !!!!
+      var activitiesKeysToDelete = [];
+      for(const act of this.state.activities){
+          if(periodeList.find((d) => d.isSame(act.date, 'day'))===undefined){
+            console.log("Delete activité : " + act.nomEtape + " du " + act.date)
+          }
+      }
+
 
   }
   
@@ -217,7 +254,11 @@ class Core extends React.Component {
       <div className="Core">
         <Row>
           <Col span={8}>
-            <Periode defaultPickerValue={this.state.defaultPickerValue}/>
+            <Periode  
+              defaultPickerValue={this.state.defaultPickerValue} 
+              updateDefaultPickerValue={this.getDefaultPickerValue}
+              updateListOfDays={this.updateListOfDays}
+            />
           </Col>
         </Row>
         <Row>
