@@ -42,7 +42,7 @@ class Etape extends React.Component{
   
 
   showModal(modalTimeOfDay){
-    this.setState({modalTimeOfDay : 'dinner', modalVisible : true});
+    this.setState({modalTimeOfDay : modalTimeOfDay, modalVisible : true});
   };
 
   closeModal = () => {

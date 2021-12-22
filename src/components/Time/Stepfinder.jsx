@@ -97,12 +97,12 @@ class StepFinder extends React.Component {
       this.state.placeFound.googleFormattedAddress
     );
 
-    var idEtape = this.state.etapeIdCount;
-    var newItem = {
+    let idEtape = this.state.etapeIdCount;
+    let newItem = {
       key: 0,
       activityType : this.props.timeOfDay,
       date: this.props.etapeDay,
-      heure: moment(formValues.heure.format("HH:mm"), "HH:mm") || null,
+      heure: formValues.heure === undefined ? null : (moment(formValues.heure.format("HH:mm"), "HH:mm") || null),
       nomEtape: formValues.nomEtape || null,
       //price: formValues.price || null,
       googlePlace: this.state.selectedPlace || null,
