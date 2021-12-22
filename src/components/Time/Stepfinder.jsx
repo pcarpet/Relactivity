@@ -6,7 +6,7 @@ import { DatePicker, TimePicker, Form, Button, Input, Radio, Modal } from "antd"
 import { Row, Col } from "antd";
 import Emoji from "a11y-react-emoji";
 import "moment/locale/fr";
-import locale from "antd/es/date-picker/locale/fr_FR";
+
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,

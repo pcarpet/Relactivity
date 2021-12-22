@@ -2,6 +2,7 @@ import React from 'react';
 import './periode.scss'
 import {DatePicker, Space, Tooltip, Button} from 'antd';
 import { EditOutlined, CheckCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
+import locale from "antd/es/date-picker/locale/fr_FR";
 
 const{RangePicker} = DatePicker;
 
@@ -68,6 +69,7 @@ class Periode extends React.Component {
                 key={this.generateRangePickerKey(this.props.defaultPickerValue)} 
                 defaultValue={this.props.defaultPickerValue}
                 format='DD/MM/YYYY'
+                locale={locale}
                 allowClear={false}
                 disabled={this.state.rangePickerDisable}
                 onChange={this.handleChange}
