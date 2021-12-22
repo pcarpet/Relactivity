@@ -18,7 +18,6 @@ class StepFinder extends React.Component {
     super(props);
     this.state = {
       modalConfirmationLoading : false,
-      etapeIdCount: 6,
       addressSearched: "",
       value: null,
       placeFound: {
@@ -97,7 +96,6 @@ class StepFinder extends React.Component {
       this.state.placeFound.googleFormattedAddress
     );
 
-    let idEtape = this.state.etapeIdCount;
     let newItem = {
       key: 0,
       activityType : this.props.timeOfDay,
@@ -113,17 +111,26 @@ class StepFinder extends React.Component {
       selected: true,
     };
     console.log(newItem);
-    this.setState({ etapeIdCount: idEtape });
+
     this.props.addEtape(newItem);
     this.props.closeModal();
     this.setState({modalConfirmationLoading : false});
-    this.setState({ addressSearched: '' });
+    this.setState({addressSearched: '' , 
+                  value : null, 
+                  placeFound: {
+                    selectedPlace: "",
+                    googleFormattedAddress: "",
+                    lat: null,
+                    long: null,
+                  }});
+
   };
 
   onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
 
+  //pour l'autocompletion
   handleChange = (value) => {
     this.setState({ addressSearched: value });
   };
@@ -156,6 +163,7 @@ class StepFinder extends React.Component {
   render() {
     return (
         <Modal
+        key={this.props.timeOfDay + this.props.etapeDay}
         title="Ajouter une étape"
         visible={this.props.modalVisible}
         confirmLoading={this.state.confirmLoading}
@@ -169,8 +177,10 @@ class StepFinder extends React.Component {
             </Button>
           ]}
       >
+      <p>Ajout d'une activité {this.props.timeOfDay} pour le {this.props.etapeDay.format("DD/MM/YYYY")} .</p>
       <div className="step-finder-main">
         <Form
+          key={this.props.timeOfDay + this.props.etapeDay}
           id="stepfinder"
           name="AjoutEtape"
           labelCol={{ span: 8 }}
@@ -234,11 +244,6 @@ class StepFinder extends React.Component {
                   </div>
                 )}
               </PlacesAutocomplete>
-           
-           
-              <Form.Item>
-                
-              </Form.Item>
            
         </Form>
       </div>

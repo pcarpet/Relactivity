@@ -34,8 +34,18 @@ class Carte extends React.Component {
 
   fitBounds(map, maps) {
     var bounds = new maps.LatLngBounds();
-    for (let place of this.props.activitiesList) {
-      bounds.extend(new maps.LatLng(place.lat, place.long));
+    if(this.props.activitiesList.length ===0){
+      let initMapsZone = [{lat: 50.802448,long:-4.947507},
+                          {lat: 42.559802,long:-4.947507},
+                          {lat: 50.802448,long:8.432071197773451},
+                          {lat: 42.559802,long:8.432071197773451}]
+      for (let place of initMapsZone) {
+        bounds.extend(new maps.LatLng(place.lat, place.long));
+      }
+    }else{
+      for (let place of this.props.activitiesList) {
+        bounds.extend(new maps.LatLng(place.lat, place.long));
+      }
     }
     map.fitBounds(bounds);
   }
