@@ -10,7 +10,8 @@ import {Row, Col} from "antd";
 
 const db = firebase.database();
 
-const trip = "lombardie";
+//const trip = "lombardie";
+const trip = "cotedor";
 
 class Core extends React.Component {
 
@@ -303,7 +304,7 @@ class Core extends React.Component {
           <Col span={8}>
             <Carte
               mapKey={this.state.mapKey}
-              activitiesList={this.state.activities}
+              activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
               focusOnPolylineId={this.state.focusOnPolylineId}
               center={this.state.position}
               zoom={this.state.zoom}

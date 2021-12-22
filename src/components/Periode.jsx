@@ -68,6 +68,7 @@ class Periode extends React.Component {
                 key={this.generateRangePickerKey(this.props.defaultPickerValue)} 
                 defaultValue={this.props.defaultPickerValue}
                 format='DD/MM/YYYY'
+                allowClear={false}
                 disabled={this.state.rangePickerDisable}
                 onChange={this.handleChange}
             />
