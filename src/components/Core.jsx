@@ -10,6 +10,8 @@ import {Row, Col} from "antd";
 
 const db = firebase.database();
 
+const trip = "lombardie";
+
 class Core extends React.Component {
 
   constructor(props) {
@@ -47,7 +49,7 @@ class Core extends React.Component {
     
   //  console.log("Chargement des données de la base");
     
-    db.ref("activities/pca/lombardie").get().then((snapshot) => {
+    db.ref("activities/pca/" + trip).get().then((snapshot) => {
       if (snapshot.exists()) {
         
         var activitiesConverted = [];
@@ -107,19 +109,43 @@ class Core extends React.Component {
       console.log(periodeList);
       
       //Ajout des activité pour les jours manquant (activité fictive)
+      var newDates = [];
       for(const d of periodeList){
-
         if(this.state.activities.find((activities) => activities.date.isSame(d, 'day'))===undefined){
-          console.log("Ajouter un activité pour le jour : " + d.format());
+          newDates.push(d);
         }
       }
+      
+      console.log(newDates);
+      
+      for(const nd of newDates){
+        var dayActivity = {
+          key: 0,
+          activityType : 'day',
+          date: nd,
+          heure: null,
+          nomEtape: null,
+          //price: formValues.price || null,
+          googlePlace: null,
+          googlePlaceId: null,
+          googleFormattedAdress: null,
+          lat: null,
+          long: null,
+          selected: false,
+        };
+        this.addEtape(dayActivity);
+      }
+
 
       //Suppression de toutes les activités hors période !!!! WARNING : ca peut tout niquer en 2 2 !!!!
       var activitiesKeysToDelete = [];
       for(const act of this.state.activities){
           if(periodeList.find((d) => d.isSame(act.date, 'day'))===undefined){
-            console.log("Delete activité : " + act.nomEtape + " du " + act.date)
+            activitiesKeysToDelete.push(act.key)
           }
+        }
+      for(const aktk of activitiesKeysToDelete){
+        this.deleteActivity(aktk);
       }
 
 
@@ -135,7 +161,7 @@ class Core extends React.Component {
     if(activityForDb.heure !== null){
       activityForDb.heure = activityForDb.heure.format("HH:mm");
     }
-    const activitiesRef  = db.ref("activities/pca/lombardie");
+    const activitiesRef  = db.ref("activities/pca/" + trip);
     const newEntry = activitiesRef.push(activityForDb);
 
     etape.key = newEntry.key;
@@ -146,10 +172,39 @@ class Core extends React.Component {
     
     this.refreshActivities(listLocal);
 
-    //On centre la carte sur la nouvelle étape
-    this.selectEtape(etape.key);
+    //On centre la carte sur la nouvelle étape si ce n'est pas une day activity
+    if(etape.activityType !== 'day')
+      this.selectEtape(etape.key);
 
   }
+
+  deleteActivity(key){
+    console.log("Supression de l'étape key : " + key);
+    var listLocal = this.state.activities;
+    var startActivity = null;
+    //On supprime la direction qui meme à cette étape si elle existe
+    const rank = listLocal.find((etape) => etape.key === key).rank;
+    if(rank>1){
+      startActivity = listLocal.find((etape) => etape.rank === rank-1);
+      startActivity.directionsResult = null;
+    }
+
+    //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
+    listLocal = listLocal.filter(e => e.key !== key);
+    
+    //Mise à jour du state
+    this.refreshActivities(listLocal);
+
+     //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
+    this.setState({ mapKey: this.state.mapKey + 1 });
+
+    //Supression en base
+    db.ref("activities/pca/" + trip).child(key).remove();
+    if(startActivity !== null){
+        db.ref("activities/pca/" + trip).child(startActivity.key).update({directionsResult : null});
+    }
+  }
+
 
   //Retrie les activité par date et set la liste
   refreshActivities(listLocal){
@@ -164,6 +219,7 @@ class Core extends React.Component {
       return a.date - b.date;
     });
     //Recalcul du rank (ben c'est mieu que la position dans un array)
+    //Le rank commence à 1
     for (var i = 0; i < listLocal.length; i++) {
       listLocal[i].rank = i + 1;
     }
@@ -211,7 +267,7 @@ class Core extends React.Component {
     this.setState({ activities: listLocal });
 
     //Mise à jour de la base de doonnées
-    db.ref("activities/pca/lombardie").child(key).update(
+    db.ref("activities/pca/" + trip).child(key).update(
       {directionsResult : JSON.parse( JSON.stringify(directionsResult))}
     );
 
@@ -219,33 +275,6 @@ class Core extends React.Component {
     this.setState({ mapKey: this.state.mapKey + 1 });
     // eslint-disable-next-line react/no-direct-mutation-state
     this.state.focusOnPolylineId = undefined;
-  }
-
-  deleteActivity(key){
-    console.log("Supression de l'étape key : " + key);
-    var listLocal = this.state.activities;
-    var startActivity = null;
-    //On supprime la direction qui meme à cette étape si elle existe
-    const rank = listLocal.find((etape) => etape.key === key).rank;
-    if(rank>0){
-      startActivity = listLocal.find((etape) => etape.rank === rank-1);
-      startActivity.directionsResult = null;
-    }
-
-    //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
-    listLocal = listLocal.filter(e => e.key !== key);
-    
-    //Mise à jour du state
-    this.refreshActivities(listLocal);
-
-     //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
-    this.setState({ mapKey: this.state.mapKey + 1 });
-
-    //Supression en base
-    db.ref("activities/pca/lombardie").child(key).remove();
-    if(startActivity !== null){
-        db.ref("activities/pca/lombardie").child(startActivity.key).update({directionsResult : null});
-    }
   }
 
 

@@ -14,7 +14,6 @@ class ListEtape extends React.Component {
         };
         this.getStepToStepDirection = this.getStepToStepDirection.bind(this);
         this.displayDate = this.displayDate.bind(this);
-        this.displayDirection = this.displayDirection.bind(this);
         this.groupByDate = this.groupByDate.bind(this);
         
     }
@@ -79,15 +78,6 @@ class ListEtape extends React.Component {
             } </Timeline.Item>
         );
 
-    }
-
-    displayDirection(direction) {
-
-        if (direction !== undefined && direction !== null) {
-            return (
-                <Timeline.Item key={direction.geocoded_waypoints[0].place_id} className="timeLineItem label-date">Direction : {direction.geocoded_waypoints[0].place_id}</Timeline.Item>
-            );
-        }
     }
 
     render() {
