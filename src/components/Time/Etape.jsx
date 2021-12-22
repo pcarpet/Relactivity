@@ -60,7 +60,11 @@ class Etape extends React.Component{
         //onClick={this.onClickItem}
       >
         <div className="StepFinder">
-          <StepFinder modalVisible={this.state.modalVisible} closeModal={this.closeModal} etapeDay={this.props.data.etapeDay} timeOfDay={this.state.modalTimeOfDay} addEtape={this.props.addEtape}  />
+          <StepFinder modalVisible={this.state.modalVisible} 
+                      closeModal={this.closeModal}
+                      etapeDay={this.props.data.etapeDay} 
+                      timeOfDay={this.state.modalTimeOfDay} 
+                      addEtape={this.props.addEtape}  />
         </div>
   
         <Row gutter={[24,16]}>
