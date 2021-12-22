@@ -1,5 +1,6 @@
 import React from 'react';
 import './listEtape.scss';
+import StepFinder from './Stepfinder';
 import {List, Divider, Timeline, Button} from "antd";
 import Etape from './Etape';
 
@@ -10,11 +11,16 @@ class ListEtape extends React.Component {
         super(props);
         this.state = {
             background: "violet",
-            direction: null
+            direction: null,
+            modalVisible : false,
+            modalEtapeDay : null,
+            modalTimeOfDay : null,
+
         };
         this.getStepToStepDirection = this.getStepToStepDirection.bind(this);
         this.displayDate = this.displayDate.bind(this);
         this.groupByDate = this.groupByDate.bind(this);
+        this.showModal = this.showModal.bind(this);
         
     }
 
@@ -80,41 +86,62 @@ class ListEtape extends React.Component {
 
     }
 
+    showModal(etapeDay, timeOfDay){
+        this.setState({
+            modalVisible : true, 
+            modalEtapeDay : etapeDay,
+            modalTimeOfDay : timeOfDay})
+    }
+    
+    closeModal = () => {
+        this.setState({ modalVisible : false ,
+                        modalEtapeDay : null,
+                        modalTimeOfDay : null});
+    }
+
     render() {
         return (
-            <div className="list-etape-main">
-                <Divider orientation="left">Liste des étapes</Divider>
-                <Timeline mode="left">
-                    <List split={false}
-                        dataSource={this.groupByDate(this.props.listV)}
-                        rowKey={
-                            (item) => item.etapeDay
-                        }
-                        renderItem={
-                            (item) => (
-                               <div key={item.etapeDay}>
-                                    {this.displayDate(item.etapeDay)}
-                                    
-                                    <Timeline.Item key={item.etapeDay}
-                                        className="timeLineItem etape">
+            <div>
+                {this.state.modalVisible ?(
+                    <div className="StepFinder">
+                        <StepFinder  
+                                    showModal={this.showModal}
+                                    closeModal={this.closeModal}
+                                    etapeDay={this.state.modalEtapeDay} 
+                                    timeOfDay={this.state.modalTimeOfDay} 
+                                    addEtape={this.props.addEtape}  />
+                    </div>) : ''
+                }
+                <div className="list-etape-main">
+                    
+                    <Divider orientation="left">Liste des étapes</Divider>
+                    <Timeline mode="left">
+                        <List split={false}
+                            dataSource={this.groupByDate(this.props.listV)}
+                            rowKey={
+                                (item) => item.etapeDay
+                            }
+                            renderItem={
+                                (item) => (
+                                <div key={item.etapeDay.format()}>
+                                        {this.displayDate(item.etapeDay)}
+                                        <Timeline.Item key={item.etapeDay} className="timeLineItem etape">
+                                            <Etape 
+                                                data={item}
+                                                cbBg={this.props.selectEtape}
+                                                getStepToStepDirection={this.getStepToStepDirection}
+                                                showModal={this.showModal}
+                                                deleteActivity={this.props.deleteActivity}
+                                            />
+                                        </Timeline.Item>
+                                        
+                                    </div>
+                                )
+                            }/>
 
-                                        <Etape 
-                                            data={item}
-                                            cbBg={this.props.selectEtape}
-                                            getStepToStepDirection={
-                                                this.getStepToStepDirection
-                                            }
-                                            deleteActivity={this.props.deleteActivity} 
-                                            addEtape={this.props.addEtape}/>
+                    </Timeline>
 
-                                    </Timeline.Item>
-                                    
-                                </div>
-                            )
-                        }/>
-
-                </Timeline>
-
+            </div>
         </div>
         );
     }

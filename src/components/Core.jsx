@@ -145,9 +145,7 @@ class Core extends React.Component {
             activitiesKeysToDelete.push(act.key)
           }
         }
-      for(const aktk of activitiesKeysToDelete){
-        this.deleteActivity(aktk);
-      }
+        this.deleteActivities(activitiesKeysToDelete);
 
 
   }
@@ -184,26 +182,46 @@ class Core extends React.Component {
     var listLocal = this.state.activities;
     var startActivity = null;
     //On supprime la direction qui meme à cette étape si elle existe
-    const rank = listLocal.find((etape) => etape.key === key).rank;
-    if(rank>1){
-      startActivity = listLocal.find((etape) => etape.rank === rank-1);
-      startActivity.directionsResult = null;
-    }
+   // const rank = listLocal.find((etape) => etape.key === key).rank;
+    //if(rank>1){
+    //  startActivity = listLocal.find((etape) => etape.rank === rank-1);
+    //  startActivity.directionsResult = null;
+    //}
 
     //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
     listLocal = listLocal.filter(e => e.key !== key);
     
-    //Mise à jour du state
-    this.refreshActivities(listLocal);
-
-     //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
+    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
     this.setState({ mapKey: this.state.mapKey + 1 });
-
+    
     //Supression en base
     db.ref("activities/pca/" + trip).child(key).remove();
     if(startActivity !== null){
-        db.ref("activities/pca/" + trip).child(startActivity.key).update({directionsResult : null});
+      db.ref("activities/pca/" + trip).child(startActivity.key).update({directionsResult : null});
     }
+
+    //Mise à jour du state
+    this.refreshActivities(listLocal);
+  }
+
+  //Obligé de faire une fonction multiple car le setState de la liste des activité dans le refresh ne la met pas à jour et les élements supprimés reviennent
+  deleteActivities(keys){
+    console.log("Supression des étape key : " + keys);
+    var listLocal = this.state.activities;
+  
+    //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
+    listLocal = listLocal.filter(e => !keys.includes(e.key));
+    
+    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
+    this.setState({ mapKey: this.state.mapKey + 1 });
+    
+    //Supression en base
+    for(const key of keys){
+      db.ref("activities/pca/" + trip).child(key).remove();
+    }
+
+    //Mise à jour du state
+    this.refreshActivities(listLocal);
   }
 
 
@@ -212,11 +230,7 @@ class Core extends React.Component {
    
      //Tri des étapes par chronologie
     listLocal.sort(function (a, b) {
-      // Turn your strings into dates, and then subtract them
-      // to get a value that is either negative, positive, or zero.
-      if (a.date - b.date === 0) {
-          return a.heure - b.heure;
-      };
+      if (a.date - b.date === 0) { return a.heure - b.heure;};
       return a.date - b.date;
     });
     //Recalcul du rank (ben c'est mieu que la position dans un array)
@@ -224,9 +238,6 @@ class Core extends React.Component {
     for (var i = 0; i < listLocal.length; i++) {
       listLocal[i].rank = i + 1;
     }
-
-    //Récupération de la date la plus ancienne
-    this.setState({ lastDate: listLocal[listLocal.length-1].date });
 
     console.log(listLocal);
     this.setState({ activities: listLocal });
