@@ -89,7 +89,7 @@ class StepFinder extends React.Component {
       }]})
     }
 
-    console.log("Ajout d'une activité pour le :", this.props.etapeDate);
+    console.log("Ajout d'une activité pour le :", this.props.etapeDay.format("DD/MM/YYYY"));
     console.log("Success Formulaire Validé:", formValues);
     console.log(
       "GoogleFormattedAddress",
@@ -113,16 +113,16 @@ class StepFinder extends React.Component {
     console.log(newItem);
 
     this.props.addEtape(newItem);
-    this.props.closeModal();
     this.setState({modalConfirmationLoading : false});
     this.setState({addressSearched: '' , 
-                  value : null, 
-                  placeFound: {
-                    selectedPlace: "",
-                    googleFormattedAddress: "",
-                    lat: null,
-                    long: null,
-                  }});
+    value : null, 
+    placeFound: {
+      selectedPlace: "",
+      googleFormattedAddress: "",
+      lat: null,
+      long: null,
+    }});
+    this.props.closeModal();
 
   };
 
@@ -163,9 +163,8 @@ class StepFinder extends React.Component {
   render() {
     return (
         <Modal
-        key={this.props.timeOfDay + this.props.etapeDay}
         title="Ajouter une étape"
-        visible={this.props.modalVisible}
+        visible={true}
         confirmLoading={this.state.confirmLoading}
         onCancel={this.props.closeModal}
         footer={[
@@ -177,10 +176,9 @@ class StepFinder extends React.Component {
             </Button>
           ]}
       >
-      <p>Ajout d'une activité {this.props.timeOfDay} pour le {this.props.etapeDay.format("DD/MM/YYYY")} .</p>
+      
       <div className="step-finder-main">
         <Form
-          key={this.props.timeOfDay + this.props.etapeDay}
           id="stepfinder"
           name="AjoutEtape"
           labelCol={{ span: 8 }}

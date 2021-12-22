@@ -1,6 +1,6 @@
 import React from 'react';
 import "./etape.scss";
-import StepFinder from './Stepfinder';
+
 import { Row, Col,Icon, Button, Typography, Modal} from "antd";
 import { CompassOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import Emoji from "a11y-react-emoji";
@@ -13,13 +13,11 @@ class Etape extends React.Component{
 
     this.state = { 
       etapeLocal: this.props.data,
-      modalVisible : false,
-      modalTimeOfDay : '' };
+   };
   
     this.onClickItem = this.onClickItem.bind(this);
     this.onClickDirection = this.onClickDirection.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
-    this.showModal = this.showModal.bind(this);
     this.getActivity = this.getActivity.bind(this);
   }
 
@@ -39,17 +37,6 @@ class Etape extends React.Component{
   }
 	
 
-  
-
-  showModal(modalTimeOfDay){
-    this.setState({modalTimeOfDay : modalTimeOfDay, modalVisible : true});
-  };
-
-  closeModal = () => {
-        this.setState({ modalVisible : false });
-    } 
-  
-
   getActivity(timeOfDay, dayActivite){
     return dayActivite.find(e => e.activityType === timeOfDay) ? dayActivite.find(e => e.activityType === timeOfDay).nomEtape : 'Ajouter';
   }
@@ -59,21 +46,13 @@ class Etape extends React.Component{
       <div //className="leaderboard__profile" 
         //onClick={this.onClickItem}
       >
-        <div className="StepFinder">
-          <StepFinder modalVisible={this.state.modalVisible} 
-                      closeModal={this.closeModal}
-                      etapeDay={this.props.data.etapeDay} 
-                      timeOfDay={this.state.modalTimeOfDay} 
-                      addEtape={this.props.addEtape}  />
-        </div>
-  
         <Row gutter={[24,16]}>
           <Col span={7} className="timeoftheday">
             Matin
           </Col>
           <Col span={3} className="timeoftheday">
             🍽️ {this.getActivity('midi', this.props.data.activities)}
-            <PlusCircleOutlined onClick={() => this.showModal('midi')} />
+            <PlusCircleOutlined onClick={() => this.props.showModal(this.props.data.etapeDay, 'midi')} />
           </Col>
           <Col span={7} className="timeoftheday">
            Aprem
@@ -81,11 +60,11 @@ class Etape extends React.Component{
           <Col span={3} className="timeoftheday">
             🍽️ {this.getActivity('dinner', this.props.data.activities)}
     
-            <PlusCircleOutlined onClick={() => this.showModal('dinner')} />
+            <PlusCircleOutlined onClick={() => this.props.showModal(this.props.data.etapeDay, 'dinner')} />
           </Col>
           <Col span={4} className="timeoftheday">
             🛏️  {this.getActivity('hotel', this.props.data.activities)}
-            <PlusCircleOutlined onClick={() => this.showModal('hotel')} />
+            <PlusCircleOutlined onClick={() => this.props.showModal(this.props.data.etapeDay, 'hotel')} />
             Hotel
           </Col>
         </Row>
