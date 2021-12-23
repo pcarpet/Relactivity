@@ -12,15 +12,20 @@ class ListEtape extends React.Component {
         this.state = {
             background: "violet",
             direction: null,
-            modalVisible : false,
-            modalEtapeDay : null,
-            modalTimeOfDay : null,
+            modalData :{
+                isModify : false,
+                isVisible : false,
+                etapeDay : null,
+                timeOfDay : null,
+                activityToModify : null,
+            }
 
         };
         this.getStepToStepDirection = this.getStepToStepDirection.bind(this);
         this.displayDate = this.displayDate.bind(this);
         this.groupByDate = this.groupByDate.bind(this);
         this.showModal = this.showModal.bind(this);
+        this.modifyActivity = this.modifyActivity.bind(this);
         
     }
 
@@ -29,25 +34,25 @@ class ListEtape extends React.Component {
 
     }
 
-    groupByDate(list){
+    groupByDate(activities){
     
         var groupedByDate = [];
 
-        for (var i = 0; i < list.length; i++) {
-            const goodday = groupedByDate.find((activities) => activities.etapeDay.isSame(list[i].date, 'day'));
+        for (var i = 0; i < activities.length; i++) {
+            const goodday = groupedByDate.find((a) => a.etapeDay.isSame(activities[i].date, 'day'));
             if (goodday === undefined) {
-                groupedByDate.push({ etapeDay: list[i].date, activities: [list[i]] });
-            } else goodday.activities.push(list[i]);
+                groupedByDate.push({ etapeDay: activities[i].date, activities: [activities[i]] });
+            } else goodday.activities.push(activities[i]);
         };
                 
         return groupedByDate;
     }
 
     getStepToStepDirection(firstStepKey) {
-        const depart = this.props.listV.find((etape) => etape.key === firstStepKey);
+        const depart = this.props.activities.find((etape) => etape.key === firstStepKey);
 
 
-        const arrivee = this.props.listV.find((etape) => etape.rank === depart.rank + 1);
+        const arrivee = this.props.activities.find((etape) => etape.rank === depart.rank + 1);
 
         // eslint-disable-next-line no-undef
         const directionsService = new google.maps.DirectionsService();
@@ -87,28 +92,48 @@ class ListEtape extends React.Component {
     }
 
     showModal(etapeDay, timeOfDay){
-        this.setState({
-            modalVisible : true, 
-            modalEtapeDay : etapeDay,
-            modalTimeOfDay : timeOfDay})
+        this.setState({modalData : {
+                            isModify : false,
+                            isVisible : true, 
+                            etapeDay : etapeDay,
+                            timeOfDay : timeOfDay,
+                            activityToModify : null,
+                        }})
     }
     
     closeModal = () => {
-        this.setState({ modalVisible : false ,
-                        modalEtapeDay : null,
-                        modalTimeOfDay : null});
+        this.setState({modalData : { 
+                        modalVisible : false ,
+                        etapeDay : null,
+                        timeOfDay : null,
+                        activityToModify : null,
+                    }});
     }
 
+    modifyActivity(key){
+        const activity = this.props.activities.find((a) => key === a.key);
+        
+        this.setState({modalData : { 
+                                isVisible : true ,
+                                isModify : true,
+                                etapeDay : activity.date,
+                                timeOfDay : activity.activityType,
+                                activityToModify : activity,
+                            }});
+
+
+    }
+    
+    
     render() {
         return (
             <div>
-                {this.state.modalVisible ?(
+                {this.state.modalData.isVisible ?(
                     <div className="StepFinder">
                         <StepFinder  
                                     showModal={this.showModal}
                                     closeModal={this.closeModal}
-                                    etapeDay={this.state.modalEtapeDay} 
-                                    timeOfDay={this.state.modalTimeOfDay} 
+                                    modalData={this.state.modalData} 
                                     addEtape={this.props.addEtape}  />
                     </div>) : ''
                 }
@@ -117,7 +142,7 @@ class ListEtape extends React.Component {
                     <Divider orientation="left">Liste des étapes</Divider>
                     <Timeline mode="left">
                         <List split={false}
-                            dataSource={this.groupByDate(this.props.listV)}
+                            dataSource={this.groupByDate(this.props.activities)}
                             rowKey={
                                 (item) => item.etapeDay
                             }
@@ -132,6 +157,7 @@ class ListEtape extends React.Component {
                                                 getStepToStepDirection={this.getStepToStepDirection}
                                                 showModal={this.showModal}
                                                 deleteActivity={this.props.deleteActivity}
+                                                modifyActivity={this.modifyActivity}
                                             />
                                         </Timeline.Item>
                                         

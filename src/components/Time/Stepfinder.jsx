@@ -11,17 +11,26 @@ import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,
 } from "react-places-autocomplete";
+import { ThemeProvider } from "styled-components";
 
 
 class StepFinder extends React.Component {
+
+            // modalData :{
+            //     isModify : false,
+            //     isVisible : false,
+            //     etapeDay : null,
+            //     timeOfDay : null,
+            //     activityToModify : null,
+            // }
+
   constructor(props) {
     super(props);
     this.state = {
       modalConfirmationLoading : false,
-      addressSearched: "",
-      value: null,
+      addressSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
       placeFound: {
-        selectedPlace: "",
+        placeId: null,
         googleFormattedAddress: "",
         lat: null,
         long: null,
@@ -89,39 +98,38 @@ class StepFinder extends React.Component {
       }]})
     }
 
-    console.log("Ajout d'une activité pour le :", this.props.etapeDay.format("DD/MM/YYYY"));
+    console.log("Ajout d'une activité pour le :", this.props.modalData.etapeDay.format("DD/MM/YYYY"));
     console.log("Success Formulaire Validé:", formValues);
-    console.log(
-      "GoogleFormattedAddress",
-      this.state.placeFound.googleFormattedAddress
-    );
+    console.log("GoogleFormattedAddress",this.state.placeFound.googleFormattedAddress);
 
+    //Création du nouvel élément à sauvegarder
     let newItem = {
-      key: 0,
-      activityType : this.props.timeOfDay,
-      date: this.props.etapeDay,
-      heure: formValues.heure === undefined ? null : (moment(formValues.heure.format("HH:mm"), "HH:mm") || null),
+      key: this.props.modalData.isModify ? this.props.modalData.activityToModify.key : 0,
+      activityType : this.props.modalData.timeOfDay,
+      date: this.props.modalData.etapeDay,
+      heure: formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm")),
       nomEtape: formValues.nomEtape || null,
-      //price: formValues.price || null,
-      googlePlace: this.state.selectedPlace || null,
-      googlePlaceId: this.state.placeFound.placeId || null,
-      googleFormattedAdress: this.state.placeFound.googleFormattedAddress || null,
-      lat: this.state.placeFound.lat || null,
-      long: this.state.placeFound.lng || null,
+
       selected: true,
     };
+    //En cas de modification de l'étape sans changment d'adresse les éléments ne sont pas rechargés
+    if(this.state.placeFound.placeId !== null){
+      newItem.addressSearched = this.state.addressSearched || null;
+      newItem.googlePlaceId = this.state.placeFound.placeId || null;
+      newItem.googleFormattedAdress = this.state.placeFound.googleFormattedAddress || null;
+      newItem.lat = this.state.placeFound.lat || null;
+      newItem.long = this.state.placeFound.lng || null;
+    }
     console.log(newItem);
 
     this.props.addEtape(newItem);
     this.setState({modalConfirmationLoading : false});
     this.setState({addressSearched: '' , 
-    value : null, 
-    placeFound: {
-      selectedPlace: "",
-      googleFormattedAddress: "",
-      lat: null,
-      long: null,
-    }});
+                    placeFound: {
+                      googleFormattedAddress: "",
+                      lat: null,
+                      long: null,
+                    }});
     this.props.closeModal();
 
   };
@@ -149,7 +157,6 @@ class StepFinder extends React.Component {
     const latLng = await getLatLng(results[0]);
     
     var placeFound = {
-      selectedPlace: value,
       placeId: results[0].place_id,
       googleFormattedAddress: results[0].formatted_address,
       lat: latLng.lat,
@@ -158,12 +165,22 @@ class StepFinder extends React.Component {
     this.setState({ addressSearched: value });
     this.setState({ placeFound: placeFound });
   };
- 
+
+  initFormValue(){
+    return {
+      nomEtape: this.props.modalData.activityToModify.nomEtape,
+      heure: this.props.modalData.activityToModify.heure,
+      };
+  }
+
+  getModalTitle(){
+    return "Ajouter une étape " + this.props.modalData.timeOfDay + " pour le " + this.props.modalData.etapeDay.format("DD/MM/YY") ;
+  }
 
   render() {
     return (
         <Modal
-        title="Ajouter une étape"
+        title={this.getModalTitle()}
         visible={true}
         confirmLoading={this.state.confirmLoading}
         onCancel={this.props.closeModal}
@@ -172,7 +189,7 @@ class StepFinder extends React.Component {
               Return
             </Button>,
             <Button form="stepfinder" key="submit" type="primary" htmlType="submit">
-                  Ajouter
+                  {this.props.modalData.isModify ? 'Modifier' : 'Ajouter'}
             </Button>
           ]}
       >
@@ -186,7 +203,7 @@ class StepFinder extends React.Component {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
           requiredMark={false}
-          initialValues={{ activityType: "travel", dateetape: this.props.lastDate}}
+          initialValues={this.props.modalData.isModify ? this.initFormValue() : {}}
         >
               <Form.Item
                 label="Description"
@@ -194,8 +211,9 @@ class StepFinder extends React.Component {
                 rules={[
                   { required: true, message: "Donne un nom à ton étape" },
                 ]}
+                
               >
-                <Input></Input>
+                <Input type="text" />
               </Form.Item>
           
               <Form.Item label="Heure" name="heure">
@@ -217,7 +235,7 @@ class StepFinder extends React.Component {
                   <div>
                     <input
                       {...getInputProps({
-                        placeholder: "Lieu de l'étape",
+                        placeholder: "Lieu de l'activité",
                         className: "location-search-input",
                       })}
                     />

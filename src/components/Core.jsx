@@ -152,7 +152,7 @@ class Core extends React.Component {
   
   /* Ajoute l'étape remontée par le composant StepFinder à la liste*/
   addEtape(etape) {
-    console.log("Nouvelle etape key : " + etape.key);
+    console.log("Sauvergarde etape key (0 pour une nouvelle étape): " + etape.key);
     
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
@@ -160,15 +160,27 @@ class Core extends React.Component {
     if(activityForDb.heure !== null){
       activityForDb.heure = activityForDb.heure.format("HH:mm");
     }
-    const activitiesRef  = db.ref("activities/pca/" + trip);
-    const newEntry = activitiesRef.push(activityForDb);
 
-    etape.key = newEntry.key;
-    
-    // Ajout de l'étape à la liste
+    //on récupére la liste pour la modifier
     var listLocal = this.state.activities;
-    listLocal.push(etape);
-    
+
+    //sauvegarde de l'étape en base. Si la clef est 0, c'est une nouvelle étape
+    if(etape.key === 0){
+      const activitiesRef  = db.ref("activities/pca/" + trip);
+      const newEntry = activitiesRef.push(activityForDb);
+      etape.key = newEntry.key;
+      
+      //Ajout de l'étape dans la liste avec la nouvelle clef
+      listLocal.push(etape);
+    }else{ //mmise à jour de l'étape en base
+      db.ref("activities/pca/" + trip).child(etape.key).update(activityForDb)
+  
+      //Mise à jour de l'oject dans la liste
+      let activityToUpdate = listLocal.find((act) => etape.key === act.key);    
+      Object.assign(activityToUpdate, etape)
+    }
+
+  
     this.refreshActivities(listLocal);
 
     //On centre la carte sur la nouvelle étape si ce n'est pas une day activity
@@ -303,9 +315,9 @@ class Core extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col span={16} className="RightPane">
+          <Col span={16}>
             <ListEtape
-              listV={this.state.activities}
+              activities={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
               setCalculatedDirection={this.setCalculatedDirection}
