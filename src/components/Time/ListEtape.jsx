@@ -44,8 +44,8 @@ class ListEtape extends React.Component {
     groupByDate(activities){
     
         var groupedByDate = [];
-
-        for (var i = 0; i < activities.length; i++) {
+        
+        for (let i = 0; i < activities.length; i++) {
             const goodday = groupedByDate.find((a) => a.etapeDay.isSame(activities[i].date, 'day'));
             if (goodday === undefined) {
                 groupedByDate.push({ etapeDay: activities[i].date, activities: [activities[i]] });

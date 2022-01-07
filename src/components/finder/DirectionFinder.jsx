@@ -53,11 +53,11 @@ class DirectionFinder extends React.Component {
   handleStartFound(placeFound){
     this.setState({ placeStartFound: placeFound });
   };
-   handleEndFound(placeFound){
+  handleEndFound(placeFound){
     this.setState({ placeEndFound: placeFound });
   };
   
-//############### validation ########################
+//############### Validation ########################
 
   /* Validation du formulaire */
   onFinish = async (formValues) => {
@@ -148,16 +148,27 @@ class DirectionFinder extends React.Component {
       newItem.lat = this.state.placeStartFound.lat || null;
       newItem.long = this.state.placeStartFound.lng || null;
     }
-    console.log(newItem);
-
+    
+    //Callback pour ajout de l'étape
     this.props.addEtape(newItem);
+
     this.setState({modalConfirmationLoading : false});
+    
+    //réinitialisation du formulaire
     this.setState({addressSearched: '' , 
-                    placeFound: {
+                    placeStartFound: {
+                      placeId: null,
                       googleFormattedAddress: "",
                       lat: null,
                       long: null,
-                    }});
+                    },
+                    placeEndFound: {
+                      placeId: null,
+                      googleFormattedAddress: "",
+                      lat: null,
+                      long: null,
+                    }
+                  });
     this.props.closeModal();
 
   };
