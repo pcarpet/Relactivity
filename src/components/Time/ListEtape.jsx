@@ -1,7 +1,8 @@
 import React from 'react';
 import './listEtape.scss';
-import StepFinder from './Stepfinder';
-import {List, Divider, Timeline, Button} from "antd";
+import StepFinder from '../finder/Stepfinder';
+import DirectionFinder from '../finder/DirectionFinder';
+import {List, Divider, Timeline} from "antd";
 import Etape from './Etape';
 
 
@@ -11,8 +12,14 @@ class ListEtape extends React.Component {
         super(props);
         this.state = {
             background: "violet",
-            direction: null,
-            modalData :{
+            modalStepData :{
+                isModify : false,
+                isVisible : false,
+                etapeDay : null,
+                timeOfDay : null,
+                activityToModify : null,
+            },
+            modalDirectionData :{
                 isModify : false,
                 isVisible : false,
                 etapeDay : null,
@@ -21,10 +28,10 @@ class ListEtape extends React.Component {
             }
 
         };
-        this.getStepToStepDirection = this.getStepToStepDirection.bind(this);
         this.displayDate = this.displayDate.bind(this);
         this.groupByDate = this.groupByDate.bind(this);
-        this.showModal = this.showModal.bind(this);
+        this.showStepModal = this.showStepModal.bind(this);
+        this.showDirectionModal = this.showDirectionModal.bind(this);
         this.modifyActivity = this.modifyActivity.bind(this);
         
     }
@@ -48,36 +55,6 @@ class ListEtape extends React.Component {
         return groupedByDate;
     }
 
-    getStepToStepDirection(firstStepKey) {
-        const depart = this.props.activities.find((etape) => etape.key === firstStepKey);
-
-
-        const arrivee = this.props.activities.find((etape) => etape.rank === depart.rank + 1);
-
-        // eslint-disable-next-line no-undef
-        const directionsService = new google.maps.DirectionsService();
-
-        directionsService.route({
-            origin: {
-                placeId: depart.googlePlaceId
-            },
-            destination: {
-                placeId: arrivee.googlePlaceId
-            },
-            // eslint-disable-next-line no-undef
-            travelMode: google.maps.TravelMode.DRIVING
-        }, (result, status) => {
-            console.log("Call direction services")
-            // eslint-disable-next-line no-undef
-            if (status === google.maps.DirectionsStatus.OK) { // On remonte le rendered dans la liste
-                this.props.setCalculatedDirection(firstStepKey, result);
-            } else {
-                console.error(`error fetching directions ${result}`);
-            }
-        });
-
-
-    }
 
     // TODO : Afficher uniquement la premiére occurence de la date
     displayDate(date) {
@@ -91,8 +68,18 @@ class ListEtape extends React.Component {
 
     }
 
-    showModal(etapeDay, timeOfDay){
-        this.setState({modalData : {
+    showStepModal(etapeDay, timeOfDay){
+        this.setState({modalStepData : {
+                            isModify : false,
+                            isVisible : true, 
+                            etapeDay : etapeDay,
+                            timeOfDay : timeOfDay,
+                            activityToModify : null,
+                        }})
+    }
+
+    showDirectionModal(etapeDay, timeOfDay){
+        this.setState({modalDirectionData : {
                             isModify : false,
                             isVisible : true, 
                             etapeDay : etapeDay,
@@ -101,8 +88,17 @@ class ListEtape extends React.Component {
                         }})
     }
     
-    closeModal = () => {
-        this.setState({modalData : { 
+    closeStepModal = () => {
+        this.setState({modalStepData : { 
+                        modalVisible : false ,
+                        etapeDay : null,
+                        timeOfDay : null,
+                        activityToModify : null,
+                    }});
+    }
+
+    closeDirectionModal = () => {
+        this.setState({modalDirectionData : { 
                         modalVisible : false ,
                         etapeDay : null,
                         timeOfDay : null,
@@ -113,7 +109,7 @@ class ListEtape extends React.Component {
     modifyActivity(key){
         const activity = this.props.activities.find((a) => key === a.key);
         
-        this.setState({modalData : { 
+        this.setState({modalStepData : { 
                                 isVisible : true ,
                                 isModify : true,
                                 etapeDay : activity.date,
@@ -128,12 +124,19 @@ class ListEtape extends React.Component {
     render() {
         return (
             <div>
-                {this.state.modalData.isVisible ?(
+                {this.state.modalStepData.isVisible ? (
                     <div className="StepFinder">
                         <StepFinder  
-                                    showModal={this.showModal}
-                                    closeModal={this.closeModal}
-                                    modalData={this.state.modalData} 
+                                    closeModal={this.closeStepModal}
+                                    modalData={this.state.modalStepData} 
+                                    addEtape={this.props.addEtape}  />
+                    </div>) : ''
+                }
+                {this.state.modalDirectionData.isVisible ?(
+                    <div className="StepFinder">
+                        <DirectionFinder 
+                                    closeModal={this.closeDirectionModal}
+                                    modalData={this.state.modalDirectionData} 
                                     addEtape={this.props.addEtape}  />
                     </div>) : ''
                 }
@@ -155,7 +158,8 @@ class ListEtape extends React.Component {
                                                 data={item}
                                                 cbBg={this.props.selectEtape}
                                                 getStepToStepDirection={this.getStepToStepDirection}
-                                                showModal={this.showModal}
+                                                showStepModal={this.showStepModal}
+                                                showDirectionModal={this.showDirectionModal}
                                                 deleteActivity={this.props.deleteActivity}
                                                 modifyActivity={this.modifyActivity}
                                             />

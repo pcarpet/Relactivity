@@ -30,7 +30,6 @@ class Core extends React.Component {
     this.addEtape = this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
     this.deleteActivity = this.deleteActivity.bind(this);
-    this.setCalculatedDirection = this.setCalculatedDirection.bind(this);
     this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
     this.refreshActivities = this.refreshActivities.bind(this);
     this.getDefaultPickerValue = this.getDefaultPickerValue.bind(this);
@@ -150,7 +149,7 @@ class Core extends React.Component {
 
   }
   
-  /* Ajoute l'étape remontée par le composant StepFinder à la liste*/
+  /* Ajoute ou met à jour l'étape remontée par le composant Finder à la liste*/
   addEtape(etape) {
     console.log("Sauvergarde etape key (0 pour une nouvelle étape): " + etape.key);
     
@@ -160,7 +159,10 @@ class Core extends React.Component {
     if(activityForDb.heure !== null){
       activityForDb.heure = activityForDb.heure.format("HH:mm");
     }
-
+    // Formatage des direction result pour pouvoir etre chagé en base
+    if(activityForDb.directionsResult !== null){ 
+      activityForDb.directionsResult = JSON.parse( JSON.stringify(activityForDb.directionsResult));
+    }
     //on récupére la liste pour la modifier
     var listLocal = this.state.activities;
 
@@ -320,7 +322,6 @@ class Core extends React.Component {
               activities={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
-              setCalculatedDirection={this.setCalculatedDirection}
               addEtape={this.addEtape}
             />
           </Col>

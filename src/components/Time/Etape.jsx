@@ -2,7 +2,7 @@ import React from 'react';
 import "./etape.scss";
 
 import { Row, Col,Icon, Button, Typography, Modal} from "antd";
-import { PlusCircleOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusCircleOutlined, EditOutlined, DeleteOutlined, CompassOutlined } from "@ant-design/icons";
 import Emoji from "a11y-react-emoji";
 
 const { Paragraph } = Typography;  
@@ -45,7 +45,7 @@ class Etape extends React.Component{
     const activity = dayActivite.find(e => e.activityType === timeOfDay);
     if (activity === undefined){
       return ( 
-            <PlusCircleOutlined onClick={() => this.props.showModal(this.props.data.etapeDay, timeOfDay)} />
+            <PlusCircleOutlined onClick={() => this.props.showStepModal(this.props.data.etapeDay, timeOfDay)} />
         );
     }else{
       return  (
@@ -82,7 +82,8 @@ class Etape extends React.Component{
               )
               )}
               <Row>
-                <PlusCircleOutlined onClick={() => this.props.showModal(this.props.data.etapeDay, timeOfDay)} />
+                <PlusCircleOutlined onClick={() => this.props.showStepModal(this.props.data.etapeDay, timeOfDay)} />
+                <CompassOutlined onClick={() => this.props.showDirectionModal(this.props.data.etapeDay, timeOfDay)} />
               </Row>
             </div>
     )

@@ -1,50 +1,70 @@
 import React from "react";
-import "./stepFinder.scss"
+import "./finder.scss"
 import "antd/dist/antd.css";
 import moment from "moment";
-import { DatePicker, TimePicker, Form, Button, Input, Radio, Modal } from "antd";
-import { Row, Col } from "antd";
-import Emoji from "a11y-react-emoji";
+import {TimePicker, Form, Button, Input, Modal } from "antd";
 import "moment/locale/fr";
+import PlaceAutocompleteInput from "./PlaceAutocompleteInput";
 
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from "react-places-autocomplete";
-import { ThemeProvider } from "styled-components";
-
-
-class StepFinder extends React.Component {
-
-            // modalData :{
-            //     isModify : false,
-            //     isVisible : false,
-            //     etapeDay : null,
-            //     timeOfDay : null,
-            //     activityToModify : null,
-            // }
+class DirectionFinder extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       modalConfirmationLoading : false,
-      addressSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
-      placeFound: {
+      addressStartSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
+      addressEndSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
+      placeStartFound: {
+        placeId: null,
+        googleFormattedAddress: "",
+        lat: null,
+        long: null,
+      },
+      placeEndFound: {
         placeId: null,
         googleFormattedAddress: "",
         lat: null,
         long: null,
       },
     };
+
+    this.handleStartFound = this.handleStartFound.bind(this);
+    this.handleEndFound = this.handleEndFound.bind(this);
   }
   
+//############### Initialisation du formulaire ########################
+
+  initFormValue(){
+    return {
+      nomEtape: this.props.modalData.activityToModify.nomEtape,
+      heure: this.props.modalData.activityToModify.heure,
+    };
+  }
   
+  getModalTitle(){
+    return "Ajouter un itinéraire  " + this.props.modalData.timeOfDay + " pour le " + this.props.modalData.etapeDay.format("DD/MM/YY") ;
+  }
+
+  
+
+  //############### Gestion des Inputs ########################
+  
+  //Appeler en callback par le Google place autocomplete
+  handleStartFound(placeFound){
+    this.setState({ placeStartFound: placeFound });
+  };
+   handleEndFound(placeFound){
+    this.setState({ placeEndFound: placeFound });
+  };
+  
+//############### validation ########################
+
   /* Validation du formulaire */
-  onFinish = (formValues) => {
+  onFinish = async (formValues) => {
     
     this.setState({modalConfirmationLoading : true});
     // Valeur par defaut si non renseigné
-    if (this.state.placeFound === null) {
+    if (this.state.placeStartFound === null) {
       this.setState({placeFound: [{
         address_components: [
           {
@@ -98,9 +118,17 @@ class StepFinder extends React.Component {
       }]})
     }
 
-    console.log("Ajout d'une activité pour le :", this.props.modalData.etapeDay.format("DD/MM/YYYY"));
+    console.log("Ajout d'un itinéraire pour le :", this.props.modalData.etapeDay.format("DD/MM/YYYY"));
     console.log("Success Formulaire Validé:", formValues);
-    console.log("GoogleFormattedAddress",this.state.placeFound.googleFormattedAddress);
+    console.log("GoogleFormattedAddress",this.state.placeStartFound.googleFormattedAddress);
+
+    // Récupération de l'itinéraire
+    let direction = null;
+    if(this.state.placeStartFound.placeId !== null && this.state.placeEndFound.placeId !== null){
+      direction = await this.getDirection(this.state.placeStartFound.placeId, this.state.placeEndFound.placeId);
+    }else{
+      console.error("Départ et / ou arrivée non renseignés")
+    }
 
     //Création du nouvel élément à sauvegarder
     let newItem = {
@@ -109,16 +137,16 @@ class StepFinder extends React.Component {
       date: this.props.modalData.etapeDay,
       heure: formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm")),
       nomEtape: formValues.nomEtape || null,
-
+      directionsResult : direction || null,
       selected: true,
     };
     //En cas de modification de l'étape sans changment d'adresse les éléments ne sont pas rechargés
-    if(this.state.placeFound.placeId !== null){
+    if(this.state.placeStartFound.placeId !== null){
       newItem.addressSearched = this.state.addressSearched || null;
-      newItem.googlePlaceId = this.state.placeFound.placeId || null;
-      newItem.googleFormattedAdress = this.state.placeFound.googleFormattedAddress || null;
-      newItem.lat = this.state.placeFound.lat || null;
-      newItem.long = this.state.placeFound.lng || null;
+      newItem.googlePlaceId = this.state.placeStartFound.placeId || null;
+      newItem.googleFormattedAdress = this.state.placeStartFound.googleFormattedAddress || null;
+      newItem.lat = this.state.placeStartFound.lat || null;
+      newItem.long = this.state.placeStartFound.lng || null;
     }
     console.log(newItem);
 
@@ -134,49 +162,32 @@ class StepFinder extends React.Component {
 
   };
 
+  // Appel au service google de direction pour retrouver le polyline d'itiniéraire
+  getDirection(startPlaceId, endPlaceId){
+
+      // const depart = this.props.activities.find((etape) => etape.key === firstStepKey);
+      // const arrivee = this.props.activities.find((etape) => etape.rank === depart.rank + 1);
+      // eslint-disable-next-line no-undef
+      const directionsService = new google.maps.DirectionsService();
+
+      const request = {
+          origin: {placeId : this.state.placeStartFound.placeId},
+          destination: {placeId: this.state.placeEndFound.placeId},
+          // eslint-disable-next-line no-undef
+          travelMode: google.maps.TravelMode.DRIVING
+      }
+
+      console.log("Appel du service Route...");
+      return directionsService.route(request);
+  }
+
   onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
 
-  //pour l'autocompletion
-  handleChange = (value) => {
-    this.setState({ addressSearched: value });
-  };
+  
 
-  // Appel des l'API place pour récupérer des l'infos sur le Place selectionné
-  handleSelect = async (value) => {
-    var results = null;
-    try {
-      results = await geocodeByAddress(value);
-    } catch (e) {
-      console.log("Error on GooglePlace Search");
-      console.log(e);
-    }
-    console.log(results);
-
-    const latLng = await getLatLng(results[0]);
-    
-    var placeFound = {
-      placeId: results[0].place_id,
-      googleFormattedAddress: results[0].formatted_address,
-      lat: latLng.lat,
-      lng: latLng.lng,
-    };
-    this.setState({ addressSearched: value });
-    this.setState({ placeFound: placeFound });
-  };
-
-  initFormValue(){
-    return {
-      nomEtape: this.props.modalData.activityToModify.nomEtape,
-      heure: this.props.modalData.activityToModify.heure,
-      };
-  }
-
-  getModalTitle(){
-    return "Ajouter une étape " + this.props.modalData.timeOfDay + " pour le " + this.props.modalData.etapeDay.format("DD/MM/YY") ;
-  }
-
+  
   render() {
     return (
         <Modal
@@ -188,7 +199,7 @@ class StepFinder extends React.Component {
             <Button key="back" onClick={this.props.closeModal}>
               Return
             </Button>,
-            <Button form="stepfinder" key="submit" type="primary" htmlType="submit">
+            <Button form="directionfinder" key="submit" type="primary" htmlType="submit">
                   {this.props.modalData.isModify ? 'Modifier' : 'Ajouter'}
             </Button>
           ]}
@@ -196,8 +207,8 @@ class StepFinder extends React.Component {
       
       <div className="step-finder-main">
         <Form
-          id="stepfinder"
-          name="AjoutEtape"
+          id="directionfinder"
+          name="AjoutDirection"
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           onFinish={this.onFinish}
@@ -220,47 +231,18 @@ class StepFinder extends React.Component {
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
         
-              <div>Lieu :</div>
-              <PlacesAutocomplete
-                value={this.state.addressSearched}
-                onChange={this.handleChange}
-                onSelect={this.handleSelect}
-              >
-                {({
-                  getInputProps,
-                  suggestions,
-                  getSuggestionItemProps,
-                  loading,
-                }) => (
-                  <div>
-                    <input
-                      {...getInputProps({
-                        placeholder: "Lieu de l'activité",
-                        className: "location-search-input",
-                      })}
-                    />
-                    <div className="autocomplete-dropdown-container">
-                      {loading && <div>Loading...</div>}
-                      {suggestions.map((suggestion) => {
-                        const className = suggestion.active
-                          ? "suggestion-item active"
-                          : "suggestion-item";
+              <div>Départ :</div>
+              <PlaceAutocompleteInput             
+                value={this.state.addressStartSearched}
+                handlePlaceFound={this.handleStartFound}
+              />
+              
+              <div>Arrivée :</div>
+              <PlaceAutocompleteInput             
+                value={this.state.addressEndSearched}
+                handlePlaceFound={this.handleEndFound}
+              />
 
-                        return (
-                          <div
-                            {...getSuggestionItemProps(suggestion, {
-                              className,
-                            })}
-                          >
-                            <span>{suggestion.description}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </PlacesAutocomplete>
-           
         </Form>
       </div>
       </Modal>
@@ -268,4 +250,4 @@ class StepFinder extends React.Component {
   }
 }
 
-export default StepFinder;
+export default DirectionFinder;
