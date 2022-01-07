@@ -1,14 +1,11 @@
 import React from 'react';
 import "./etape.scss";
-
-import { Row, Col,Icon, Button, Typography, Modal} from "antd";
+import { Row, Col} from "antd";
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined, CompassOutlined } from "@ant-design/icons";
-import Emoji from "a11y-react-emoji";
-
-const { Paragraph } = Typography;  
 
 class Etape extends React.Component{
-	constructor(props){
+
+  constructor(props){
 		super(props);
 
     this.state = { 

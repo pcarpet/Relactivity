@@ -160,7 +160,7 @@ class Core extends React.Component {
       activityForDb.heure = activityForDb.heure.format("HH:mm");
     }
     // Formatage des direction result pour pouvoir etre chagé en base
-    if(activityForDb.directionsResult !== null){ 
+    if(activityForDb.directionsResult !== null && activityForDb.directionsResult !== undefined){ 
       activityForDb.directionsResult = JSON.parse( JSON.stringify(activityForDb.directionsResult));
     }
     //on récupére la liste pour la modifier
@@ -281,26 +281,6 @@ class Core extends React.Component {
         this.setState({ position: [etape.lat, etape.long] });
       }
     }
-  }
-
-  //Ajouter l'itinéraire calculé dans le ListeEtape entre 2 étapes (rattaché l'étape de départ)
-  setCalculatedDirection(key, directionsResult) {
-    var listLocal = this.state.activities;
-    const index = listLocal.findIndex((etape) => etape.key === key);
-    listLocal[index].directionsResult = directionsResult;
-    // eslint-disable-next-line react/no-direct-mutation-state
-    this.state.focusOnPolylineId = key;
-    this.setState({ activities: listLocal });
-
-    //Mise à jour de la base de doonnées
-    db.ref("activities/pca/" + trip).child(key).update(
-      {directionsResult : JSON.parse( JSON.stringify(directionsResult))}
-    );
-
-    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
-    this.setState({ mapKey: this.state.mapKey + 1 });
-    // eslint-disable-next-line react/no-direct-mutation-state
-    this.state.focusOnPolylineId = undefined;
   }
 
 
