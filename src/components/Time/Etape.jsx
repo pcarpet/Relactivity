@@ -29,8 +29,12 @@ class Etape extends React.Component{
     this.props.getStepToStepDirection(this.state.key);
   }
 
-  onClickModify(key){
-    this.props.modifyActivity(key);
+  onClickModify(key, isDirection){
+    if(isDirection){
+      this.props.modifyDirection(key);
+    }else{
+      this.props.modifyActivity(key);
+    }
   }
 
   onClickDelete(key){
@@ -70,7 +74,7 @@ class Etape extends React.Component{
                     {(act.heure === undefined || act.heure === null) ? '' : act.heure.format("HH:mm") + ' - '}
                     {act.nomEtape} </Col>
                   <Col className="activite_icon">
-                    <EditOutlined onClick={() => this.onClickModify(act.key)}/>
+                    <EditOutlined onClick={() => this.onClickModify(act.key, (act.directionsResult !== undefined && act.directionsResult !== null))}/>
                   </Col>
                   <Col className="activite_icon">
                     <DeleteOutlined onClick={() => this.onClickDelete(act.key)}/>

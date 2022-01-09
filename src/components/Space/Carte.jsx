@@ -98,6 +98,7 @@ class Carte extends React.Component {
           onChildMouseEnter={this._onChildMouseEnter}
           onChildMouseLeave={this._onChildMouseLeave}
         >
+          {/* FIXME : les polynines ne s'actualise pas suite à une modif de direction */}
           {this.props.activitiesList.map((place) => (
             <Marker
               key={place.key}

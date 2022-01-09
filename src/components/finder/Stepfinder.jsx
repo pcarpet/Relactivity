@@ -124,6 +124,7 @@ class StepFinder extends React.Component {
       newItem.googlePlaceId = this.state.placeFound.placeId || null;
       newItem.googleFormattedAdress = this.state.placeFound.googleFormattedAddress || null;
       newItem.lat = this.state.placeFound.lat || null;
+      //FIXME : erreur de nom long
       newItem.long = this.state.placeFound.lng || null;
     }
     console.log(newItem);

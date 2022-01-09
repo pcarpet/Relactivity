@@ -2,8 +2,9 @@ import React from "react";
 import "./finder.scss"
 import "antd/dist/antd.css";
 import moment from "moment";
-import {TimePicker, Form, Button, Input, Modal } from "antd";
+import {TimePicker, Form, Button, Input, Modal, Radio } from "antd";
 import "moment/locale/fr";
+import Emoji from "a11y-react-emoji";
 import PlaceAutocompleteInput from "./PlaceAutocompleteInput";
 
 class DirectionFinder extends React.Component {
@@ -13,18 +14,18 @@ class DirectionFinder extends React.Component {
     this.state = {
       modalConfirmationLoading : false,
       addressStartSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
-      addressEndSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
+      addressEndSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdressEnd : '',
       placeStartFound: {
         placeId: null,
         googleFormattedAddress: "",
         lat: null,
-        long: null,
+        lng: null,
       },
       placeEndFound: {
         placeId: null,
         googleFormattedAddress: "",
         lat: null,
-        long: null,
+        lng: null,
       },
     };
 
@@ -35,10 +36,16 @@ class DirectionFinder extends React.Component {
 //############### Initialisation du formulaire ########################
 
   initFormValue(){
-    return {
-      nomEtape: this.props.modalData.activityToModify.nomEtape,
-      heure: this.props.modalData.activityToModify.heure,
-    };
+    let initvalue = {
+      travelMode : 'drive',
+    }
+    
+    if(this.props.modalData.isModify){
+      initvalue.nomEtape = this.props.modalData.activityToModify.nomEtape;
+      initvalue.heure = this.props.modalData.activityToModify.heure;
+    }
+
+    return initvalue;
   }
   
   getModalTitle(){
@@ -122,14 +129,6 @@ class DirectionFinder extends React.Component {
     console.log("Success Formulaire Validé:", formValues);
     console.log("GoogleFormattedAddress",this.state.placeStartFound.googleFormattedAddress);
 
-    // Récupération de l'itinéraire
-    let direction = null;
-    if(this.state.placeStartFound.placeId !== null && this.state.placeEndFound.placeId !== null){
-      direction = await this.getDirection(this.state.placeStartFound.placeId, this.state.placeEndFound.placeId);
-    }else{
-      console.error("Départ et / ou arrivée non renseignés")
-    }
-
     //Création du nouvel élément à sauvegarder
     let newItem = {
       key: this.props.modalData.isModify ? this.props.modalData.activityToModify.key : 0,
@@ -137,17 +136,54 @@ class DirectionFinder extends React.Component {
       date: this.props.modalData.etapeDay,
       heure: formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm")),
       nomEtape: formValues.nomEtape || null,
-      directionsResult : direction || null,
       selected: true,
     };
-    //En cas de modification de l'étape sans changment d'adresse les éléments ne sont pas rechargés
-    if(this.state.placeStartFound.placeId !== null){
-      newItem.addressSearched = this.state.addressSearched || null;
-      newItem.googlePlaceId = this.state.placeStartFound.placeId || null;
+
+    let startPlaceId = this.state.placeStartFound.placeId;
+    let endPlaceId = this.state.placeEndFound.placeId;
+
+
+    //On met à jour le départ si un nouvelle id a ete trouvé
+    if(startPlaceId !== null){
+      newItem.googlePlaceId = startPlaceId;
+      newItem.addressSearched = this.state.addressStartSearched || null;
       newItem.googleFormattedAdress = this.state.placeStartFound.googleFormattedAddress || null;
       newItem.lat = this.state.placeStartFound.lat || null;
       newItem.long = this.state.placeStartFound.lng || null;
     }
+    
+    //On met à jour le départ si un nouvelle id a ete trouvé
+    if(endPlaceId !== null){
+      newItem.googleFormattedAdressEnd = this.state.placeEndFound.googleFormattedAddress || null;
+    }
+
+    //en cas de modification du départ ou de l'arrivée on récupére l'ancien id
+    if(this.props.modalData.isModify){
+      //Si le départ est modifié et pas la destination
+      if(startPlaceId !== null && endPlaceId == null){
+        //On reprend l'ancien id de la destination pour l'itinéraire
+        endPlaceId = this.props.modalData.activityToModify.directionsResult.request.destination.placeId; //FIXME : variable n'existe aps
+      }
+      //Si la destination est modifié et pas le départ
+      if(startPlaceId == null && endPlaceId !== null){
+        //On reprend l'ancien id de départ
+        startPlaceId = this.props.modalData.activityToModify.directionsResult.request.origin.placeId;
+      }
+    }
+    
+    
+    // Récupération de l'itinéraire
+    let direction = null;
+    if(startPlaceId !== null && endPlaceId !== null){
+      direction = await this.getDirection(startPlaceId, endPlaceId);
+      newItem.directionsResult = direction || null;
+    }else if(this.props.modalData.isModify){
+      console.log("Pas de recalcul de l'itinétaire");
+    }else{
+      console.error("Départ et / ou arrivée non renseignés");
+    }
+
+   
     
     //Callback pour ajout de l'étape
     this.props.addEtape(newItem);
@@ -160,13 +196,13 @@ class DirectionFinder extends React.Component {
                       placeId: null,
                       googleFormattedAddress: "",
                       lat: null,
-                      long: null,
+                      lng: null,
                     },
                     placeEndFound: {
                       placeId: null,
                       googleFormattedAddress: "",
                       lat: null,
-                      long: null,
+                      lng: null,
                     }
                   });
     this.props.closeModal();
@@ -182,8 +218,8 @@ class DirectionFinder extends React.Component {
       const directionsService = new google.maps.DirectionsService();
 
       const request = {
-          origin: {placeId : this.state.placeStartFound.placeId},
-          destination: {placeId: this.state.placeEndFound.placeId},
+          origin: {placeId : startPlaceId},
+          destination: {placeId: endPlaceId},
           // eslint-disable-next-line no-undef
           travelMode: google.maps.TravelMode.DRIVING
       }
@@ -225,7 +261,7 @@ class DirectionFinder extends React.Component {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
           requiredMark={false}
-          initialValues={this.props.modalData.isModify ? this.initFormValue() : {}}
+          initialValues={this.initFormValue()}
         >
               <Form.Item
                 label="Description"
@@ -241,7 +277,28 @@ class DirectionFinder extends React.Component {
               <Form.Item label="Heure" name="heure">
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
-        
+              
+               <Form.Item name="travelMode" defaultValue="drive">
+                <Radio.Group>
+                  <Radio.Button value="walk">
+                    <Emoji symbol="🚶" label="walk" />
+                  </Radio.Button>
+                  <Radio.Button value="bicycling">
+                    <Emoji symbol="🚴🏻‍♀️" label="bicycling" />
+                  </Radio.Button>
+                  <Radio.Button value="drive">
+                    <Emoji symbol="🚗" label="drive" />
+                  </Radio.Button>
+                  <Radio.Button value="train">
+                    <Emoji symbol="🚄" label="train" />
+                  </Radio.Button>
+                  <Radio.Button value="plane">
+                    <Emoji symbol="✈️" label="plane" />
+                  </Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+
+
               <div>Départ :</div>
               <PlaceAutocompleteInput             
                 value={this.state.addressStartSearched}

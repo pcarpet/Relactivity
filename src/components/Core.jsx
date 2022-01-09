@@ -11,7 +11,8 @@ import {Row, Col} from "antd";
 const db = firebase.database();
 
 //const trip = "lombardie";
-const trip = "cotedor";
+//const trip = "cotedor";
+const trip = "fresnoy";
 
 class Core extends React.Component {
 

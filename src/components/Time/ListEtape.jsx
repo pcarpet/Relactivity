@@ -33,6 +33,7 @@ class ListEtape extends React.Component {
         this.showStepModal = this.showStepModal.bind(this);
         this.showDirectionModal = this.showDirectionModal.bind(this);
         this.modifyActivity = this.modifyActivity.bind(this);
+        this.modifyDirection = this.modifyDirection.bind(this);
         
     }
 
@@ -116,10 +117,19 @@ class ListEtape extends React.Component {
                                 timeOfDay : activity.activityType,
                                 activityToModify : activity,
                             }});
-
-
     }
     
+    modifyDirection(key){
+        const activity = this.props.activities.find((a) => key === a.key);
+        
+        this.setState({modalDirectionData : { 
+                                isVisible : true ,
+                                isModify : true,
+                                etapeDay : activity.date,
+                                timeOfDay : activity.activityType,
+                                activityToModify : activity,
+                            }});
+    }
     
     render() {
         return (
@@ -162,6 +172,7 @@ class ListEtape extends React.Component {
                                                 showDirectionModal={this.showDirectionModal}
                                                 deleteActivity={this.props.deleteActivity}
                                                 modifyActivity={this.modifyActivity}
+                                                modifyDirection={this.modifyDirection}
                                             />
                                         </Timeline.Item>
                                         
