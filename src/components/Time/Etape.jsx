@@ -74,7 +74,7 @@ class Etape extends React.Component{
                     {(act.heure === undefined || act.heure === null) ? '' : act.heure.format("HH:mm") + ' - '}
                     {act.nomEtape} </Col>
                   <Col className="activite_icon">
-                    <EditOutlined onClick={() => this.onClickModify(act.key, (act.directionsResult !== undefined && act.directionsResult !== null))}/>
+                    <EditOutlined onClick={() => this.onClickModify(act.key, (act.route !== undefined && act.route !== null))}/>
                   </Col>
                   <Col className="activite_icon">
                     <DeleteOutlined onClick={() => this.onClickDelete(act.key)}/>

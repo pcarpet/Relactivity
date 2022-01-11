@@ -13,8 +13,8 @@ class DirectionFinder extends React.Component {
     super(props);
     this.state = {
       modalConfirmationLoading : false,
-      addressStartSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
-      addressEndSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdressEnd : '',
+      addressStartSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.origin.googleFormattedAddress : '',
+      addressEndSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.destination.googleFormattedAddress : '',
       placeStartFound: {
         placeId: null,
         googleFormattedAddress: "",
@@ -145,16 +145,21 @@ class DirectionFinder extends React.Component {
 
     //On met à jour le départ si un nouvelle id a ete trouvé
     if(startPlaceId !== null){
-      newItem.googlePlaceId = startPlaceId;
-      newItem.addressSearched = this.state.addressStartSearched || null;
-      newItem.googleFormattedAdress = this.state.placeStartFound.googleFormattedAddress || null;
-      newItem.lat = this.state.placeStartFound.lat || null;
-      newItem.long = this.state.placeStartFound.lng || null;
+      newItem.origin = {
+        placeId: startPlaceId,
+        addressSearched: this.state.addressStartSearched || null,
+        googleFormattedAddress: this.state.placeStartFound.googleFormattedAddress || null,
+        lat: this.state.placeStartFound.lat || null,
+        long: this.state.placeStartFound.lng || null,
+      }
     }
     
     //On met à jour le départ si un nouvelle id a ete trouvé
     if(endPlaceId !== null){
-      newItem.googleFormattedAdressEnd = this.state.placeEndFound.googleFormattedAddress || null;
+      newItem.destination = {
+        googleFormattedAddress: this.state.placeEndFound.googleFormattedAddress || null,
+        placeId: endPlaceId,
+      }
     }
 
     //en cas de modification du départ ou de l'arrivée on récupére l'ancien id
@@ -162,21 +167,21 @@ class DirectionFinder extends React.Component {
       //Si le départ est modifié et pas la destination
       if(startPlaceId !== null && endPlaceId == null){
         //On reprend l'ancien id de la destination pour l'itinéraire
-        endPlaceId = this.props.modalData.activityToModify.directionsResult.request.destination.placeId; //FIXME : variable n'existe aps
+        endPlaceId = this.props.modalData.activityToModify.destination.placeId;
       }
       //Si la destination est modifié et pas le départ
       if(startPlaceId == null && endPlaceId !== null){
         //On reprend l'ancien id de départ
-        startPlaceId = this.props.modalData.activityToModify.directionsResult.request.origin.placeId;
+        startPlaceId = this.props.modalData.activityToModify.origin.placeId;
       }
     }
     
     
     // Récupération de l'itinéraire
-    let direction = null;
+    let route = null;
     if(startPlaceId !== null && endPlaceId !== null){
-      direction = await this.getDirection(startPlaceId, endPlaceId);
-      newItem.directionsResult = direction || null;
+      route = await this.getDirection(startPlaceId, endPlaceId);
+      newItem.route = route || null;
     }else if(this.props.modalData.isModify){
       console.log("Pas de recalcul de l'itinétaire");
     }else{

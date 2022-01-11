@@ -126,12 +126,6 @@ class Core extends React.Component {
           date: nd,
           heure: null,
           nomEtape: null,
-          //price: formValues.price || null,
-          googlePlace: null,
-          googlePlaceId: null,
-          googleFormattedAdress: null,
-          lat: null,
-          long: null,
           selected: false,
         };
         this.addEtape(dayActivity);
@@ -161,8 +155,8 @@ class Core extends React.Component {
       activityForDb.heure = activityForDb.heure.format("HH:mm");
     }
     // Formatage des direction result pour pouvoir etre chagé en base
-    if(activityForDb.directionsResult !== null && activityForDb.directionsResult !== undefined){ 
-      activityForDb.directionsResult = JSON.parse( JSON.stringify(activityForDb.directionsResult));
+    if(activityForDb.route !== null && activityForDb.route !== undefined){ 
+      activityForDb.route = JSON.parse( JSON.stringify(activityForDb.route));
     }
     //on récupére la liste pour la modifier
     var listLocal = this.state.activities;
@@ -195,7 +189,7 @@ class Core extends React.Component {
   deleteActivity(key){
     console.log("Supression de l'étape key : " + key);
     var listLocal = this.state.activities;
-    var startActivity = null;
+    //var startActivity = null;
     //On supprime la direction qui meme à cette étape si elle existe
    // const rank = listLocal.find((etape) => etape.key === key).rank;
     //if(rank>1){
@@ -211,9 +205,9 @@ class Core extends React.Component {
     
     //Supression en base
     db.ref("activities/pca/" + trip).child(key).remove();
-    if(startActivity !== null){
-      db.ref("activities/pca/" + trip).child(startActivity.key).update({directionsResult : null});
-    }
+    // if(startActivity !== null){
+    //   db.ref("activities/pca/" + trip).child(startActivity.key).update({directionsResult : null});
+    // }
 
     //Mise à jour du state
     this.refreshActivities(listLocal);
@@ -276,10 +270,11 @@ class Core extends React.Component {
 
     console.log("onselection " + idEtape);
     const activities = this.state.activities;
+    //TODO : Utiliser un find
     for (const etape of activities) {
       //Mise à jour de la position de la carte
       if (etape.key === idEtape) {
-        this.setState({ position: [etape.lat, etape.long] });
+        this.setState({ position: [etape.origin.lat, etape.origin.long] });
       }
     }
   }

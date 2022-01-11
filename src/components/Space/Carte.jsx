@@ -55,8 +55,8 @@ class Carte extends React.Component {
   }
 
   //FIXME : Attention la méthode est appelée 2x
-  loadDirectionsOnMap(directionsResult, key) {
-    const path = decodePolyline(directionsResult.routes[0].overview_polyline);
+  loadDirectionsOnMap(route, key) {
+    const path = decodePolyline(route.routes[0].overview_polyline);
     console.log("Draw Polyline: " + key);
        
     if (this.props.focusOnPolylineId === key) {
@@ -102,16 +102,16 @@ class Carte extends React.Component {
           {this.props.activitiesList.map((place) => (
             <Marker
               key={place.key}
-              lat={place.lat}
-              lng={place.long}
+              lat={place.origin.lat}
+              lng={place.origin.long}
               text={place.key + ""}
               isActive={place.selected}
             />
           ))}
           {/* Comment tout mettre dans une seul boucle ? */}
           {this.props.activitiesList
-            .filter((place) => place.directionsResult !== undefined && place.directionsResult !== null)
-            .map((place) => this.loadDirectionsOnMap(place.directionsResult, place.key))}
+            .filter((place) => place.route !== undefined && place.route !== null)
+            .map((place) => this.loadDirectionsOnMap(place.route, place.key))}
         </GoogleMapReact>
       </div>
     );

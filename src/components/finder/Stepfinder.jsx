@@ -12,12 +12,12 @@ class StepFinder extends React.Component {
     super(props);
     this.state = {
       modalConfirmationLoading : false,
-      addressSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.googleFormattedAdress : '',
+      addressSearched: this.props.modalData.isModify ? this.props.modalData.activityToModify.origin.googleFormattedAddress : '',
       placeFound: {
         placeId: null,
         googleFormattedAddress: "",
         lat: null,
-        long: null,
+        lng: null,
       },
     };
 
@@ -40,7 +40,7 @@ class StepFinder extends React.Component {
   
   //Appeler en callback par le Google place autocomplete
   handlePlaceFound(place){
-    this.setState({ placeFound: place });
+    this.setState({placeFound: place });
   };
 
  
@@ -120,12 +120,13 @@ class StepFinder extends React.Component {
     };
     //En cas de modification de l'étape sans changment d'adresse les éléments ne sont pas rechargés
     if(this.state.placeFound.placeId !== null){
-      newItem.addressSearched = this.state.addressSearched || null;
-      newItem.googlePlaceId = this.state.placeFound.placeId || null;
-      newItem.googleFormattedAdress = this.state.placeFound.googleFormattedAddress || null;
-      newItem.lat = this.state.placeFound.lat || null;
-      //FIXME : erreur de nom long
-      newItem.long = this.state.placeFound.lng || null;
+      newItem.origin = { 
+        addressSearched: this.state.addressSearched || null,
+        placeId: this.state.placeFound.placeId || null,
+        googleFormattedAddress: this.state.placeFound.googleFormattedAddress || null,
+        lat: this.state.placeFound.lat || null,
+        long: this.state.placeFound.lng || null,
+      }
     }
     console.log(newItem);
 
@@ -134,9 +135,10 @@ class StepFinder extends React.Component {
     //Réinitialisation 
     this.setState({addressSearched: '' , 
                     placeFound: {
+                      placeId: null,
                       googleFormattedAddress: "",
                       lat: null,
-                      long: null,
+                      lng: null,
                     }});
     this.props.closeModal();
 
