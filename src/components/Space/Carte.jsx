@@ -2,10 +2,7 @@ import React from 'react';
 import Marker from './Marker'
 import Polyline from './Polyline'
 import GoogleMapReact from 'google-map-react'; //https://github.com/google-map-react/google-map-react
-//import decodePolyline from "decode-google-map-polyline";
-//UNINSTZALL import { DirectionsRenderer } from "react-google-maps";
 import shouldPureComponentUpdate from 'react-pure-render/function';
-
 const decodePolyline = require("decode-google-map-polyline");
 
 class Carte extends React.Component {
@@ -23,6 +20,8 @@ class Carte extends React.Component {
   onMapLoaded(map, maps) {
     this.fitBounds(map, maps);
 
+    console.log("Map loaded");
+
     this.setState({
       // Je commente car je sais pas à quoi ca sert:
       // ...this.state,
@@ -33,6 +32,9 @@ class Carte extends React.Component {
   }
 
   fitBounds(map, maps) {
+
+    if (maps === undefined || maps == null) { return;}
+
     var bounds = new maps.LatLngBounds();
     if(this.props.activitiesList.length ===0){
       let initMapsZone = [{lat: 50.802448,long:-4.947507},
@@ -44,7 +46,7 @@ class Carte extends React.Component {
       }
     }else{
       for (let place of this.props.activitiesList) {
-        bounds.extend(new maps.LatLng(place.lat, place.long));
+        bounds.extend(new maps.LatLng(place.origin.lat, place.origin.long));
       }
     }
     map.fitBounds(bounds);
@@ -54,25 +56,38 @@ class Carte extends React.Component {
     console.log(x, y, lat, lng, event);
   }
 
+
+  displayActivitiesOnMap(place){
+
+      return (
+          <Marker 
+              key={place.key} 
+              lat={place.origin.lat} lng={place.origin.long}
+              text={place.key + ""}
+              isActive={place.selected}
+            />
+      )
+
+  }
+
   //FIXME : Attention la méthode est appelée 2x
-  loadDirectionsOnMap(route, key) {
+  //FIXME  les polylines créés ne sont pas supprimé
+  displayDirectionsOnMap(route) {
+
+    if(route !== undefined && route !== null){
+    const key = route.geocoded_waypoints[0].place_id + route.geocoded_waypoints[1].place_id
     const path = decodePolyline(route.routes[0].overview_polyline);
     console.log("Draw Polyline: " + key);
-       
-    if (this.props.focusOnPolylineId === key) {
-      console.log("Focus on plyline : " + key);
-      const bounds = new window.google.maps.LatLngBounds();
-      path.map((x) => {
-        bounds.extend(new window.google.maps.LatLng(x.lat, x.lng));
-        return "";
-      }); 
-      this.state.map && this.state.map.fitBounds(bounds);
-    }
     return <Polyline key={key} map={this.state.map} maps={this.state.maps} path={path} />;
+    }
+
+    return '';
+
   }
 
   onMapChange() {
     console.log("MAP mise à jours");
+    this.fitBounds(this.state.map, this.state.maps);
   }
 
   shouldComponentUpdate = shouldPureComponentUpdate;
@@ -82,14 +97,14 @@ class Carte extends React.Component {
       // Important! Always set the container height explicitly
       <div style={{ height: "85vh", width: "100%" }}>
         <GoogleMapReact
-          key={this.props.mapKey}
+          //key={this.props.mapKey}
           bootstrapURLKeys={{
             key: this.state.GOOGLE_MAPS_API,
             language: "fr",
             region: "fr_FR",
           }}
-          center={this.props.center}
-          zoom={this.props.zoom}
+          center={[48.85, 2.33]}
+          zoom={11}
           yesIWantToUseGoogleMapApiInternals={true}
           onGoogleApiLoaded={({ map, maps }) => this.onMapLoaded(map, maps)}
           onChange={this.onMapChange()}
@@ -98,20 +113,8 @@ class Carte extends React.Component {
           onChildMouseEnter={this._onChildMouseEnter}
           onChildMouseLeave={this._onChildMouseLeave}
         >
-          {/* FIXME : les polynines ne s'actualise pas suite à une modif de direction */}
-          {this.props.activitiesList.map((place) => (
-            <Marker
-              key={place.key}
-              lat={place.origin.lat}
-              lng={place.origin.long}
-              text={place.key + ""}
-              isActive={place.selected}
-            />
-          ))}
-          {/* Comment tout mettre dans une seul boucle ? */}
-          {this.props.activitiesList
-            .filter((place) => place.route !== undefined && place.route !== null)
-            .map((place) => this.loadDirectionsOnMap(place.route, place.key))}
+          {this.props.activitiesList.map(place => this.displayActivitiesOnMap(place))}
+          {this.props.activitiesList.map(place => this.displayDirectionsOnMap(place.route))}
         </GoogleMapReact>
       </div>
     );

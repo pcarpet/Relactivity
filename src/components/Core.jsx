@@ -22,10 +22,6 @@ class Core extends React.Component {
     this.state = {
       activities: [],
       defaultPickerValue : [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
-      focusOnPolylineId: undefined,
-      mapKey: 0,
-      position: [48.85, 2.33],
-      zoom: 11
     };
 
     this.addEtape = this.addEtape.bind(this);
@@ -200,9 +196,6 @@ class Core extends React.Component {
     //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
     listLocal = listLocal.filter(e => e.key !== key);
     
-    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
-    this.setState({ mapKey: this.state.mapKey + 1 });
-    
     //Supression en base
     db.ref("activities/pca/" + trip).child(key).remove();
     // if(startActivity !== null){
@@ -220,10 +213,7 @@ class Core extends React.Component {
   
     //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
     listLocal = listLocal.filter(e => !keys.includes(e.key));
-    
-    //FIXME : Si je ne fait pas un setState du Zoom le polyline avec le directionResult ne s'affiche pas sur la carte
-    this.setState({ mapKey: this.state.mapKey + 1 });
-    
+       
     //Supression en base
     for(const key of keys){
       db.ref("activities/pca/" + trip).child(key).remove();
@@ -268,15 +258,15 @@ class Core extends React.Component {
 
     this.setState({ ListV: selectionList });
 
-    console.log("onselection " + idEtape);
-    const activities = this.state.activities;
-    //TODO : Utiliser un find
-    for (const etape of activities) {
-      //Mise à jour de la position de la carte
-      if (etape.key === idEtape) {
-        this.setState({ position: [etape.origin.lat, etape.origin.long] });
-      }
-    }
+    // console.log("onselection " + idEtape);
+    // const activities = this.state.activities;
+    // //TODO : Utiliser un find
+    // for (const etape of activities) {
+    //   //Mise à jour de la position de la carte
+    //   if (etape.key === idEtape) {
+    //     this.setState({ position: [etape.origin.lat, etape.origin.long] });
+    //   }
+    // }
   }
 
 
@@ -303,11 +293,7 @@ class Core extends React.Component {
           </Col>
           <Col span={8}>
             <Carte
-              mapKey={this.state.mapKey}
               activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
-              focusOnPolylineId={this.state.focusOnPolylineId}
-              center={this.state.position}
-              zoom={this.state.zoom}
             />
           </Col>
         </Row>
