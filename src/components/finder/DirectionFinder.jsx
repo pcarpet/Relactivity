@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React from "react";
 import "./finder.scss"
 import "antd/dist/antd.css";
@@ -27,6 +28,7 @@ class DirectionFinder extends React.Component {
         lat: null,
         lng: null,
       },
+      messageErreur:'',
     };
 
     this.handleStartFound = this.handleStartFound.bind(this);
@@ -43,6 +45,7 @@ class DirectionFinder extends React.Component {
     if(this.props.modalData.isModify){
       initvalue.nomEtape = this.props.modalData.activityToModify.nomEtape;
       initvalue.heure = this.props.modalData.activityToModify.heure;
+      initvalue.travelMode = this.props.modalData.activityToModify.travelModeInputValue;
     }
 
     return initvalue;
@@ -69,6 +72,7 @@ class DirectionFinder extends React.Component {
   /* Validation du formulaire */
   onFinish = async (formValues) => {
     
+    this.setState({messageErreur:''})
     this.setState({modalConfirmationLoading : true});
     // Valeur par defaut si non renseigné
     if (this.state.placeStartFound === null) {
@@ -129,13 +133,21 @@ class DirectionFinder extends React.Component {
     console.log("Success Formulaire Validé:", formValues);
     console.log("GoogleFormattedAddress",this.state.placeStartFound.googleFormattedAddress);
 
+    //Conversion de l'heure en moment
+    const heure = formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm"));
+    let dateTimeStg = this.props.modalData.etapeDay.format("YYYYMMDD");
+    if(heure !== null) dateTimeStg = dateTimeStg.concat('T', heure.format("HHmm"));
+    const dateTime = moment(dateTimeStg);
+    console.log(dateTime);
+
     //Création du nouvel élément à sauvegarder
     let newItem = {
       key: this.props.modalData.isModify ? this.props.modalData.activityToModify.key : 0,
       activityType : this.props.modalData.timeOfDay,
       date: this.props.modalData.etapeDay,
-      heure: formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm")),
+      heure: heure,
       nomEtape: formValues.nomEtape || null,
+      travelModeInputValue : formValues.travelMode,
       selected: true,
     };
 
@@ -174,13 +186,22 @@ class DirectionFinder extends React.Component {
         //On reprend l'ancien id de départ
         startPlaceId = this.props.modalData.activityToModify.origin.placeId;
       }
+
+      //Si on change uniquement le travelmode
+      if(endPlaceId == null && startPlaceId == null && formValues.travelMode !== this.props.modalData.activityToModify.travelModeInputValue){
+        //On reprend l'ancien id de départ
+        startPlaceId = this.props.modalData.activityToModify.origin.placeId;
+        endPlaceId = this.props.modalData.activityToModify.destination.placeId;
+      }
+
     }
     
     
     // Récupération de l'itinéraire
     let route = null;
     if(startPlaceId !== null && endPlaceId !== null){
-      route = await this.getDirection(startPlaceId, endPlaceId);
+      route = await this.getDirection(formValues.travelMode, startPlaceId, endPlaceId, dateTime)
+                            .catch(e => {this.setState({messageErreur:'Itinéraire introuvable!'}); throw e;});
       newItem.route = route || null;
     }else if(this.props.modalData.isModify){
       console.log("Pas de recalcul de l'itinétaire");
@@ -215,18 +236,39 @@ class DirectionFinder extends React.Component {
   };
 
   // Appel au service google de direction pour retrouver le polyline d'itiniéraire
-  getDirection(startPlaceId, endPlaceId){
+  getDirection(travelModeInput, startPlaceId, endPlaceId, dateTime){
 
-      // const depart = this.props.activities.find((etape) => etape.key === firstStepKey);
-      // const arrivee = this.props.activities.find((etape) => etape.rank === depart.rank + 1);
-      // eslint-disable-next-line no-undef
+    let travelMode;
+    let transitOptions;
+    switch(travelModeInput){
+      case 'walk':
+        travelMode = google.maps.TravelMode.WALKING;
+        break;
+      case 'bicycling':
+        travelMode = google.maps.TravelMode.BICYCLING;
+        break;
+      case 'drive':
+        travelMode = google.maps.TravelMode.DRIVING;
+        break;
+      case 'train':
+        travelMode = google.maps.TravelMode.TRANSIT;
+        transitOptions = {
+          departureTime: dateTime !== undefined ? dateTime.toDate() : null,
+          modes: [google.maps.TransitMode.TRAIN],
+          routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS,
+        }
+        break;
+      default:
+        console.error(`Sorry, ${travelMode} is not a supported travel mode.`);
+    }
+
       const directionsService = new google.maps.DirectionsService();
 
       const request = {
           origin: {placeId : startPlaceId},
           destination: {placeId: endPlaceId},
-          // eslint-disable-next-line no-undef
-          travelMode: google.maps.TravelMode.DRIVING
+          travelMode: travelMode,
+          transitOptions: transitOptions,
       }
 
       console.log("Appel du service Route...");
@@ -297,9 +339,9 @@ class DirectionFinder extends React.Component {
                   <Radio.Button value="train">
                     <Emoji symbol="🚄" label="train" />
                   </Radio.Button>
-                  <Radio.Button value="plane">
+                  {/* <Radio.Button value="plane">
                     <Emoji symbol="✈️" label="plane" />
-                  </Radio.Button>
+                  </Radio.Button> */}
                 </Radio.Group>
               </Form.Item>
 
@@ -315,6 +357,7 @@ class DirectionFinder extends React.Component {
                 value={this.state.addressEndSearched}
                 handlePlaceFound={this.handleEndFound}
               />
+              <div className="error">{this.state.messageErreur}</div>
 
         </Form>
       </div>
