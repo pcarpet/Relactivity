@@ -4,7 +4,7 @@ import firebase from "../firebase.js";
 import moment from "moment";
 import TripList from './TripList';
 import Periode from './Periode';
-import ListEtape from './time/ListEtape';
+import TimeLine from './time/TimeLine';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
 
@@ -359,7 +359,7 @@ class Core extends React.Component {
         </Row>
         <Row>
           <Col span={16}>
-            <ListEtape
+            <TimeLine
               activities={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}

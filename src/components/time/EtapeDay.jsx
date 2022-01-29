@@ -1,9 +1,9 @@
 import React from 'react';
-import "./etape.scss";
+import "./etapeDay.scss";
 import { Row, Col} from "antd";
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined, CompassOutlined } from "@ant-design/icons";
 
-class Etape extends React.Component{
+class EtapeDay extends React.Component{
 
   constructor(props){
 		super(props);
@@ -117,4 +117,4 @@ class Etape extends React.Component{
 	}
 }
 
-export default Etape;
+export default EtapeDay;

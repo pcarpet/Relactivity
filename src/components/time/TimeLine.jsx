@@ -1,12 +1,12 @@
 import React from 'react';
-import './listEtape.scss';
-import StepFinder from '../finder/Stepfinder';
-import DirectionFinder from '../finder/DirectionFinder';
+import './timeLine.scss';
+import StepFinder from './finder/Stepfinder';
+import DirectionFinder from './finder/DirectionFinder';
 import {List, Divider, Timeline} from "antd";
-import Etape from './Etape';
+import EtapeDay from './EtapeDay';
 
 
-class ListEtape extends React.Component {
+class TimeLine extends React.Component {
 
     constructor(props) {
         super(props);
@@ -165,7 +165,7 @@ class ListEtape extends React.Component {
                                 <div key={item.etapeDay.format()}>
                                         {this.displayDate(item.etapeDay)}
                                         <Timeline.Item key={item.etapeDay} className="timeLineItem etape">
-                                            <Etape 
+                                            <EtapeDay 
                                                 data={item}
                                                 cbBg={this.props.selectEtape}
                                                 getStepToStepDirection={this.getStepToStepDirection}
@@ -190,4 +190,4 @@ class ListEtape extends React.Component {
 }
 
 
-export default ListEtape;
+export default TimeLine;
