@@ -54,6 +54,9 @@ class Etape extends React.Component{
                 <Col className="activite resto">
                   {activity.nomEtape}
                 </Col>
+                 <Col className="activite_icon">
+                    <EditOutlined onClick={() => this.onClickModify(activity.key, false)}/>
+                  </Col>
                 <Col className="activite_icon">
                   <DeleteOutlined onClick={() => this.onClickDelete(activity.key)}/>
                 </Col>

@@ -2,7 +2,7 @@ import React from "react";
 import "./finder.scss"
 import "antd/dist/antd.css";
 import moment from "moment";
-import {TimePicker, Form, Button, Input, Modal } from "antd";
+import {TimePicker, Form, Button, Input, Modal, InputNumber } from "antd";
 import "moment/locale/fr";
 import PlaceAutocompleteInput from "./PlaceAutocompleteInput";
 
@@ -33,7 +33,11 @@ class StepFinder extends React.Component {
     }
   
     getModalTitle(){
-      return "Ajouter une étape " + this.props.modalData.timeOfDay + " pour le " + this.props.modalData.etapeDay.format("DD/MM/YY") ;
+      return (this.props.modalData.isModify ? "Modifier l'" : "Ajouter une ") 
+      + "étape " 
+      + this.props.modalData.timeOfDay 
+      + " pour le " 
+      + this.props.modalData.etapeDay.format("DD/MM/YY") ;
     }
     
   //############### Gestion des Inputs ########################
@@ -115,7 +119,6 @@ class StepFinder extends React.Component {
       date: this.props.modalData.etapeDay,
       heure: formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm")),
       nomEtape: formValues.nomEtape || null,
-
       selected: true,
     };
     //En cas de modification de l'étape sans changment d'adresse les éléments ne sont pas rechargés
@@ -129,8 +132,33 @@ class StepFinder extends React.Component {
       }
     }
     console.log(newItem);
+    
+    //FIMME : en cas de modification uniquement du nb de nuit il n'y a pas d'emplacement
+    //Pour chaque nuit suplémentaire d'une activité hotel on ajoute une étape
+    //On clone le new item avant le addEtapte sinon il est mis à jour par le core avec un ID
+    for(var i = 1; i < formValues.nbnuits; i++){
+      
+      var nextNight = Object.assign({},newItem);
+      // 0 car obligatoirement un nouveau jour
+      nextNight.key = 0;
+      // ON passe au jour suivant
+      nextNight.date = nextNight.date.clone().add(i, 'days');
 
+      //Si le place id est null sur le formulaire, c'est forcement que l'on est en modif et que l'emplacement n'a pas changé, donc on reprend celui d'origin.
+      if(this.state.placeFound.placeId === null)
+        nextNight.origin = this.props.modalData.activityToModify.origin;
+      
+      //On suprime les nuits déja existante... et ouai balek
+      this.props.deleteActivityByDateAndType(nextNight.date,'hotel')
+      //et on créer les nouvelles nuits
+      this.props.addEtape(nextNight);
+    }
+      
+
+    //Ajout de l'étape dans la BDD et lide courante
     this.props.addEtape(newItem);
+
+
     this.setState({modalConfirmationLoading : false});
     //Réinitialisation 
     this.setState({addressSearched: '' , 
@@ -184,7 +212,6 @@ class StepFinder extends React.Component {
                 rules={[
                   { required: true, message: "Donne un nom à ton étape" },
                 ]}
-                
               >
                 <Input type="text" />
               </Form.Item>
@@ -198,7 +225,13 @@ class StepFinder extends React.Component {
                 value={this.state.addressSearched}
                 handlePlaceFound={this.handlePlaceFound}
             />
-           
+
+              {this.props.modalData.timeOfDay === 'hotel' ?
+                <Form.Item label="Nombre de nuits" name="nbnuits"> 
+                  <InputNumber min={1} max={100} defaultValue={1}/>
+                </Form.Item>
+                : ''
+              }
         </Form>
       </div>
       </Modal>
