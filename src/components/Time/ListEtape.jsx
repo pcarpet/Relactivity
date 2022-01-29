@@ -139,7 +139,8 @@ class ListEtape extends React.Component {
                         <StepFinder  
                                     closeModal={this.closeStepModal}
                                     modalData={this.state.modalStepData} 
-                                    addEtape={this.props.addEtape}  />
+                                    addEtape={this.props.addEtape}
+                                    deleteActivityByDateAndType={this.props.deleteActivityByDateAndType}  />
                     </div>) : ''
                 }
                 {this.state.modalDirectionData.isVisible ?(
