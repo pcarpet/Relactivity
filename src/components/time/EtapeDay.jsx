@@ -1,9 +1,9 @@
 import React from 'react';
-import "./etape.scss";
+import "./etapeDay.scss";
 import { Row, Col} from "antd";
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined, CompassOutlined } from "@ant-design/icons";
 
-class Etape extends React.Component{
+class EtapeDay extends React.Component{
 
   constructor(props){
 		super(props);
@@ -54,6 +54,9 @@ class Etape extends React.Component{
                 <Col className="activite resto">
                   {activity.nomEtape}
                 </Col>
+                 <Col className="activite_icon">
+                    <EditOutlined onClick={() => this.onClickModify(activity.key, false)}/>
+                  </Col>
                 <Col className="activite_icon">
                   <DeleteOutlined onClick={() => this.onClickDelete(activity.key)}/>
                 </Col>
@@ -114,4 +117,4 @@ class Etape extends React.Component{
 	}
 }
 
-export default Etape;
+export default EtapeDay;

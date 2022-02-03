@@ -22,7 +22,8 @@ class Core extends React.Component {
     super(props);
     
     this.state = {
-      trips : [],
+      loading: false,
+      trips: [],
       selectedTrip: null,
       activities: [],
       defaultPickerValue : [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
@@ -38,6 +39,7 @@ class Core extends React.Component {
     this.handleTripSelection = this.handleTripSelection.bind(this);
     this.createNewTrip = this.createNewTrip.bind(this);
     this.deleteTrip = this.deleteTrip.bind(this);
+    this.deleteActivityByDateAndType = this.deleteActivityByDateAndType.bind(this);
 
   }
 
@@ -47,7 +49,7 @@ class Core extends React.Component {
   }
   
   loadTripsFromDb(){
-    
+    this.setState({loading : true});
     let tripsFromDb = [];
     db.ref("activities/pca").get().then((snapshot) => {
       if (snapshot.exists()) {
@@ -62,7 +64,7 @@ class Core extends React.Component {
       this.setState({selectedTrip:tripsFromDb[0]});
       
       this.loadActivitiesFromDb(tripsFromDb[0]);
-      
+      this.setState({loading : false});
     });
   }
   
@@ -220,24 +222,43 @@ class Core extends React.Component {
     //Mise à jour du state
     this.refreshActivities(listLocal);
   }
-      
+    
   //Obligé de faire une fonction multiple car le setState de la liste des activité dans le refresh ne la met pas à jour et les élements supprimés reviennent
   deleteActivities(keys){
     console.log("Supression des étape key : " + keys);
-    var listLocal = this.state.activities;
-    
-    //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
-    listLocal = listLocal.filter(e => !keys.includes(e.key));
-    
     //Supression en base
     for(const key of keys){
       db.ref("activities/pca/" + this.state.selectedTrip).child(key).remove();
     }
     
+    var listLocal = this.state.activities;
+    
+    //On filtre la liste d'activité pour retirer la key de l'activité à supprimer
+    listLocal = listLocal.filter(e => !keys.includes(e.key));
+    
     //Mise à jour du state
     this.refreshActivities(listLocal);
   }
-      
+  
+   deleteActivityByDateAndType(etapeDay, timeOfDay){
+    console.log("Supression de l'étape du : " + etapeDay.format("DD/MM/YY") + " de type : " + timeOfDay);
+    
+    //On filtre la liste d'activité pour retrouver les activités à supprimer: normalement il ne devrait y en avoir qu'une
+    const activityKeysToDelete = this.state.activities
+                                      .filter(e => e.date.isSame(etapeDay, 'day') && e.activityType === timeOfDay)
+                                      .map(e => e.key);
+    
+    //Supression en base
+    for(const activityKey of activityKeysToDelete){
+      console.log("Supression de l'activité : " + activityKey);
+      db.ref(`activities/pca/${this.state.selectedTrip}`).child(activityKey).remove();
+    } 
+    
+    //On vire les activité supprimé
+    const activitiesTarget = this.state.activities.filter(e => !activityKeysToDelete.includes(e.key));;
+    //Mise à jour du state
+    this.refreshActivities(activitiesTarget);
+  }
       
   //Retrie les activité par date et set la liste
   refreshActivities(listLocal){
@@ -313,6 +334,11 @@ class Core extends React.Component {
       return (
         <div className="Core">
         <Row>
+          <Col>
+            {this.state.loading ? "LOADING......" : ''}
+          </Col>
+        </Row>
+        <Row>
           <Col span={8}>
             <TripList 
               selectedTrip={this.state.selectedTrip}
@@ -333,10 +359,11 @@ class Core extends React.Component {
         </Row>
         <Row>
           <Col span={16}>
-            <ListEtape
+            <TimeLine
               activities={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
+              deleteActivityByDateAndType={this.deleteActivityByDateAndType}
               addEtape={this.addEtape}
             />
           </Col>
