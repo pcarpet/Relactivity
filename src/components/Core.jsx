@@ -4,8 +4,8 @@ import firebase from "../firebase.js";
 import moment from "moment";
 import TripList from './TripList';
 import Periode from './Periode';
-import ListEtape from './time/ListEtape';
-import Carte from './space/Carte';
+import ListEtape from './Time/ListEtape';
+import Carte from './Space/Carte';
 import {Row, Col} from "antd";
 
 
