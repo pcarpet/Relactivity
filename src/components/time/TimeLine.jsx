@@ -157,6 +157,7 @@ class TimeLine extends React.Component {
                     <Timeline mode="left">
                         <List split={false}
                             dataSource={this.groupByDate(this.props.activities)}
+                            locale={{emptyText: 'Veuillez saisir les dates de votre trip'}}
                             rowKey={
                                 (item) => item.etapeDay
                             }

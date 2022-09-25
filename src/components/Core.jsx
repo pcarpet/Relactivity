@@ -1,6 +1,7 @@
 import React from 'react';
 import './core.scss'
-import firebase from "../firebase.js";
+import {database} from "../firebase.js";
+import { get, ref, push, update, child, remove } from "firebase/database";
 import moment from "moment";
 import TripList from './TripList';
 import Periode from './Periode';
@@ -10,11 +11,10 @@ import {Row, Col} from "antd";
 
 
 
-const db = firebase.database();
+const db = database;
 
-//const trip = "lombardie";
-//const trip = "cotedor";
-
+const user = "pca";
+//const user = "selenium";
 
 class Core extends React.Component {
 
@@ -51,11 +51,13 @@ class Core extends React.Component {
   loadTripsFromDb(){
     this.setState({loading : true});
     let tripsFromDb = [];
-    db.ref("activities/pca").get().then((snapshot) => {
+    get(ref(db,`activities/${user}`)).then((snapshot) => {
       if (snapshot.exists()) {
         snapshot.forEach(activity => {
           tripsFromDb.push(activity.key);
         });
+      }else{
+        console.log("No data available");
       }
       
       console.log(tripsFromDb);
@@ -73,7 +75,7 @@ class Core extends React.Component {
     
     //  console.log("Chargement des données de la base");
     
-    db.ref("activities/pca/" + tripKey).get().then((snapshot) => {
+    get(ref(db,`activities/${user}/${tripKey}`)).then((snapshot) => {
       if (snapshot.exists()) {
         
         var activitiesConverted = [];
@@ -186,14 +188,15 @@ class Core extends React.Component {
     
     //sauvegarde de l'étape en base. Si la clef est 0, c'est une nouvelle étape
     if(etape.key === 0){
-      const activitiesRef  = db.ref("activities/pca/" + this.state.selectedTrip);
-      const newEntry = activitiesRef.push(activityForDb);
+      const activitiesRef  = ref(db,`activities/${user}/${this.state.selectedTrip}`);
+      const newEntry = push(activitiesRef, activityForDb);
       etape.key = newEntry.key;
       
       //Ajout de l'étape dans la liste avec la nouvelle clef
       listLocal.push(etape);
-    }else{ //mmise à jour de l'étape en base
-      db.ref("activities/pca/" + this.state.selectedTrip).child(etape.key).update(activityForDb)
+    }else{ //mise à jour de l'étape en base
+      update(child(ref(db,`activities/${user}/${this.state.selectedTrip}`), etape.key), activityForDb);
+      //db.ref(`activities/${user}/${this.state.selectedTrip}`).child(etape.key).update(activityForDb)
       
       //Mise à jour de l'oject dans la liste
       let activityToUpdate = listLocal.find((act) => etape.key === act.key);    
@@ -217,7 +220,7 @@ class Core extends React.Component {
     listLocal = listLocal.filter(e => e.key !== key);
       
     //Supression en base
-    db.ref("activities/pca/" + this.state.selectedTrip).child(key).remove();
+    remove(child(ref(db,`activities/${user}/${this.state.selectedTrip}`),key));
      
     //Mise à jour du state
     this.refreshActivities(listLocal);
@@ -228,7 +231,7 @@ class Core extends React.Component {
     console.log("Supression des étape key : " + keys);
     //Supression en base
     for(const key of keys){
-      db.ref("activities/pca/" + this.state.selectedTrip).child(key).remove();
+      remove(child(ref(db,`activities/${user}/${this.state.selectedTrip}`),key));
     }
     
     var listLocal = this.state.activities;
@@ -251,7 +254,7 @@ class Core extends React.Component {
     //Supression en base
     for(const activityKey of activityKeysToDelete){
       console.log("Supression de l'activité : " + activityKey);
-      db.ref(`activities/pca/${this.state.selectedTrip}`).child(activityKey).remove();
+      remove(child(ref(db,`activities/${user}/${this.state.selectedTrip}`),activityKey));
     } 
     
     //On vire les activité supprimé
@@ -303,6 +306,7 @@ class Core extends React.Component {
   }
   
   createNewTrip(newTrip){
+    console.log("Création du trip: " + this.state.newTrip);
     let trips = this.state.trips;
     trips.push(newTrip);
     this.setState({ 
@@ -318,7 +322,8 @@ class Core extends React.Component {
     const tripToDelete = this.state.selectedTrip;
 
     //Supression de la base
-    db.ref("activities/pca/" + tripToDelete).remove();
+    //db.ref(`activities/${user}/${tripToDelete}`).remove();
+    remove(ref(db,`activities/${user}/${tripToDelete}`));
     let trips = this.state.trips;
     trips = trips.filter(t => t !== tripToDelete);
 
