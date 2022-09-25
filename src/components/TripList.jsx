@@ -23,7 +23,6 @@ class TripList extends React.Component {
     }
 
     addTrip(){
-        console.log(this.state.newTrip);
         this.props.createNewTrip(this.state.newTrip);
         this.swichAdd();
     }
