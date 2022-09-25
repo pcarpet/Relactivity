@@ -5,8 +5,8 @@ import { get, ref, push, update, child, remove } from "firebase/database";
 import moment from "moment";
 import TripList from './TripList';
 import Periode from './Periode';
-import ListEtape from './Time/ListEtape';
-import Carte from './Space/Carte';
+import TimeLine from './time/TimeLine';
+import Carte from './space/Carte';
 import {Row, Col} from "antd";
 
 
