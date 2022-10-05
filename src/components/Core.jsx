@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import './core.scss'
 import {database} from "../firebase.js";
 import { get, ref, push, update, child, remove } from "firebase/database";
@@ -8,20 +8,21 @@ import Periode from './Periode';
 import TimeLine from './time/TimeLine';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
-
-
+import { UserContext } from "./auth/UserContext"
 
 const db = database;
 
 const user = "pca";
-//const user = "selenium";
 
 class Core extends React.Component {
-
+  
+  
   constructor(props) {
     super(props);
     
+    
     this.state = {
+      //userUid: currentUser.uid,
       loading: false,
       trips: [],
       selectedTrip: null,

@@ -9,7 +9,6 @@ import { getAuth } from "firebase/auth";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  //apiKey: "AIzaSyA-paxKcGlRKuPpL0KsEjXEypojqeVVqFs",
   authDomain: "tripopo.firebaseapp.com",
   databaseURL: "https://tripopo-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "tripopo",
@@ -26,4 +25,4 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 
-export { database, auth};
+export { database , auth};
