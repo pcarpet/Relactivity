@@ -36,7 +36,6 @@ export default function AuthBar()
                     className="btn btn-danger ms-2">
                     Log Out
                 </Button>
-                {currentUser.uid}
             </div>
     
     )
