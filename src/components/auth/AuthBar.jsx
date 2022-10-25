@@ -23,20 +23,24 @@ export default function AuthBar()
         }
     }
 
-    return (
-       
-            <div>
-                <Button
-                    onClick={() => toggleModals("signIn")}
-                    className="btn btn-primary ms-2">
-                    Sign In
-                </Button>
-                <Button
-                    onClick={logOut}
-                    className="btn btn-danger ms-2">
-                    Log Out
-                </Button>
-            </div>
-    
-    )
+   
+
+    if(!currentUser){
+        return( 
+        <Button    
+            onClick={() => toggleModals("signIn")}
+            className="btn btn-primary ms-2">
+            Sign In
+        </Button>
+        );
+    }else{
+        return(
+            <Button
+                onClick={logOut}
+                className="btn btn-danger ms-2">
+                Log Out
+            </Button>
+        );
+    }
+
 }
