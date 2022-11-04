@@ -8,20 +8,19 @@ import Periode from './Periode';
 import TimeLine from './time/TimeLine';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
-
-
+import { UserContext } from "./auth/UserContext"
 
 const db = database;
 
-const user = "pca";
-//const user = "selenium";
-
 class Core extends React.Component {
-
-  constructor(props) {
+  
+  static contextType = UserContext;
+  
+  constructor(props, context) {
     super(props);
-    
+
     this.state = {
+      userUid: context.currentUser.uid,
       loading: false,
       trips: [],
       selectedTrip: null,
@@ -45,13 +44,15 @@ class Core extends React.Component {
 
 
   componentDidMount() {
-    this.loadTripsFromDb(); 
+    this.loadTripsFromDb();
   }
   
   loadTripsFromDb(){
+    
+
     this.setState({loading : true});
     let tripsFromDb = [];
-    get(ref(db,`activities/${user}`)).then((snapshot) => {
+    get(ref(db,`activities/${this.state.userUid}`)).then((snapshot) => {
       if (snapshot.exists()) {
         snapshot.forEach(activity => {
           tripsFromDb.push(activity.key);
@@ -75,7 +76,7 @@ class Core extends React.Component {
     
     //  console.log("Chargement des données de la base");
     
-    get(ref(db,`activities/${user}/${tripKey}`)).then((snapshot) => {
+    get(ref(db,`activities/${this.state.userUid}/${tripKey}`)).then((snapshot) => {
       if (snapshot.exists()) {
         
         var activitiesConverted = [];
@@ -188,14 +189,14 @@ class Core extends React.Component {
     
     //sauvegarde de l'étape en base. Si la clef est 0, c'est une nouvelle étape
     if(etape.key === 0){
-      const activitiesRef  = ref(db,`activities/${user}/${this.state.selectedTrip}`);
+      const activitiesRef  = ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`);
       const newEntry = push(activitiesRef, activityForDb);
       etape.key = newEntry.key;
       
       //Ajout de l'étape dans la liste avec la nouvelle clef
       listLocal.push(etape);
     }else{ //mise à jour de l'étape en base
-      update(child(ref(db,`activities/${user}/${this.state.selectedTrip}`), etape.key), activityForDb);
+      update(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`), etape.key), activityForDb);
       //db.ref(`activities/${user}/${this.state.selectedTrip}`).child(etape.key).update(activityForDb)
       
       //Mise à jour de l'oject dans la liste
@@ -220,7 +221,7 @@ class Core extends React.Component {
     listLocal = listLocal.filter(e => e.key !== key);
       
     //Supression en base
-    remove(child(ref(db,`activities/${user}/${this.state.selectedTrip}`),key));
+    remove(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`),key));
      
     //Mise à jour du state
     this.refreshActivities(listLocal);
@@ -231,7 +232,7 @@ class Core extends React.Component {
     console.log("Supression des étape key : " + keys);
     //Supression en base
     for(const key of keys){
-      remove(child(ref(db,`activities/${user}/${this.state.selectedTrip}`),key));
+      remove(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`),key));
     }
     
     var listLocal = this.state.activities;
@@ -254,7 +255,7 @@ class Core extends React.Component {
     //Supression en base
     for(const activityKey of activityKeysToDelete){
       console.log("Supression de l'activité : " + activityKey);
-      remove(child(ref(db,`activities/${user}/${this.state.selectedTrip}`),activityKey));
+      remove(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`),activityKey));
     } 
     
     //On vire les activité supprimé
@@ -323,7 +324,7 @@ class Core extends React.Component {
 
     //Supression de la base
     //db.ref(`activities/${user}/${tripToDelete}`).remove();
-    remove(ref(db,`activities/${user}/${tripToDelete}`));
+    remove(ref(db,`activities/${this.state.userUid}/${tripToDelete}`));
     let trips = this.state.trips;
     trips = trips.filter(t => t !== tripToDelete);
 

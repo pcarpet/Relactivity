@@ -182,7 +182,7 @@ class StepFinder extends React.Component {
     return (
         <Modal
         title={this.getModalTitle()}
-        visible={true}
+        open={true}
         confirmLoading={this.state.confirmLoading}
         onCancel={this.props.closeModal}
         footer={[

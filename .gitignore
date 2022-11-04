@@ -206,6 +206,7 @@ node_modules
 workspace.code-workspace
 package-lock.json
 .env
+.env.local
 package-lock.json
 .vscode/launch.json
 .DS_Store
