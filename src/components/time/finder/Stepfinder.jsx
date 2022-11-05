@@ -1,5 +1,5 @@
 import React from "react";
-import "./finder.scss"
+import "./finder.css"
 import "antd/dist/antd.css";
 import moment from "moment";
 import {TimePicker, Form, Button, Input, Modal, InputNumber } from "antd";

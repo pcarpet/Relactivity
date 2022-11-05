@@ -1,5 +1,4 @@
 import React from 'react';
-import './periode.scss'
 import {DatePicker, Space, Tooltip, Button} from 'antd';
 import { EditOutlined, CheckCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
 import locale from "antd/es/date-picker/locale/fr_FR";

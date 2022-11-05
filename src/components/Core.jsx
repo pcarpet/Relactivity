@@ -1,5 +1,5 @@
 import React from 'react';
-import './core.scss'
+import './core.css'
 import {database} from "../firebase.js";
 import { get, ref, push, update, child, remove } from "firebase/database";
 import moment from "moment";

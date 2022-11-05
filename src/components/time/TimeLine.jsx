@@ -1,5 +1,5 @@
 import React from 'react';
-import './timeLine.scss';
+import './timeLine.css';
 import StepFinder from './finder/Stepfinder';
 import DirectionFinder from './finder/DirectionFinder';
 import {List, Divider, Timeline} from "antd";

@@ -1,5 +1,5 @@
 import React from 'react';
-import "./etapeDay.scss";
+import "./etapeDay.css";
 import { Row, Col} from "antd";
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined, CompassOutlined } from "@ant-design/icons";
 

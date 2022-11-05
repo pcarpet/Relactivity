@@ -13,6 +13,5 @@
 }
 
 .etape{
-        // TODO : on doit pouvoir faire mieux que forcer avec important
         display: list-item !important;
 }
