@@ -11,3 +11,41 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.hover-underline-animation {
+  color: #d3dce0;
+}
+
+.hover-underline-animation:hover {
+  text-decoration: underline;
+}
+
+.hover-underline-animation:after {
+  content: '';
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #f3f3f3;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.hover-underline-animation:hover:after {
+  text-decoration: underline;
+  transform: scaleX(1.1);
+  transform-origin: bottom left;
+}
+
+.myBar.ant-layout-header {
+  height: 32px;
+  line-height: 32px;
+}
+
+.appTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f3f3f3;
+
+}

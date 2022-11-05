@@ -1,6 +1,7 @@
 import './App.css';
 import {Routes, Route} from 'react-router-dom';
 import React from 'react';
+import {Layout} from 'antd';
 import Core from './components/Core';
 import AuthBar from './components/auth/AuthBar';
 //import SignUpModal from './components/auth/SignUpModal';
@@ -8,19 +9,26 @@ import SignInModal from './components/auth/SignInModal';
 import Private from './Private'
 require('dotenv').config();
 
+
+const { Header, Content } = Layout;
+
 class App extends React.Component {
 		
 	render(){
 	    return (
-		<div className="App">
+		<Layout className="App">
 			<SignInModal/>
-			<AuthBar/>
-			<Routes>
-				<Route path='/private' element={<Private/>} >
-					<Route path="/private/private-home" element={<Core />} />
-				</Route>
-			</Routes>
-	    </div>
+			<Header className="myBar">
+				<AuthBar/>
+			</Header>
+			<Content>
+				<Routes>
+					<Route path='/private' element={<Private/>} >
+						<Route path="/private/private-home" element={<Core />} />
+					</Route>
+				</Routes>
+			</Content>
+	    </Layout>
 	    );
 	}
   
