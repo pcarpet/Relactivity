@@ -338,14 +338,15 @@ class Core extends React.Component {
     
   render() {
       return (
-        <div className="Core">
+        <div className="core">
         <Row>
           <Col>
             {this.state.loading ? "LOADING......" : ''}
           </Col>
         </Row>
-        <Row>
-          <Col span={8}>
+        <Row className="underHeader">
+          <Col span={1}> Mes voyages : </Col>
+          <Col span={7}>
             <TripList 
               selectedTrip={this.state.selectedTrip}
               handleTripSelection={this.handleTripSelection}
@@ -355,13 +356,15 @@ class Core extends React.Component {
             />
           </Col>
   
-          <Col span={8}>
+          <Col span={12}>
+            Période : 
             <Periode  
               defaultPickerValue={this.state.defaultPickerValue} 
               updateDefaultPickerValue={this.getDefaultPickerValue}
               updateListOfDays={this.updateListOfDays}
             />
           </Col>
+          <Col span={4}/>
         </Row>
         <Row>
           <Col span={16}>
@@ -374,9 +377,9 @@ class Core extends React.Component {
             />
           </Col>
           <Col span={8}>
-            <Carte
+            {/* <Carte
               activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
-            />
+            /> */}
           </Col>
         </Row>
       </div>
