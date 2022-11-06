@@ -105,6 +105,8 @@ class Menu extends React.Component {
                         <Input disabled={!this.state.isAddTrip}  />
                     </Form.Item>
 
+
+                    {/* FIXEME : Actualisation auto de la date de fin : https://ant.design/components/date-picker/ : Select range dates in 7 days */}
                     <Form.Item label="Période" name="dateRange">
                         <RangePicker 
                                 key={this.generateRangePickerKey(this.props.defaultPickerValue)} 
