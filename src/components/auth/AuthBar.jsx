@@ -37,7 +37,7 @@ export default function AuthBar()
             );
         }else{
             return(
-                <a onClick={logOut} className="hover-underline-animation" >
+                <a href="" onClick={logOut} className="hover-underline-animation" >
                     <LogoutOutlined style={{}}/>  Log OUT
                 </a>
  
