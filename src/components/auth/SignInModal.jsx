@@ -54,7 +54,9 @@ export default function SignInModal() {
             id="signInForm"
             //ref={formRef}
             onFinish={handleForm}
-            className="sign-in-form">
+            className="sign-in-form"
+            layout="vertical"
+            >
 
               <Form.Item
                 label="Adresse email"

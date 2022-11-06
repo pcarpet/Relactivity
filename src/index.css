@@ -14,7 +14,7 @@ code {
 
 
 .hover-underline-animation {
-  color: #d3dce0;
+  color: transparent;
 }
 
 .hover-underline-animation:hover {
@@ -27,7 +27,6 @@ code {
   height: 2px;
   bottom: 0;
   left: 0;
-  background-color: #f3f3f3;
   transform-origin: bottom right;
   transition: transform 0.25s ease-out;
 }

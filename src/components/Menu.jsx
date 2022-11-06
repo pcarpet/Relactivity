@@ -1,6 +1,6 @@
 import React from 'react';
 import {DatePicker, Row, Col, Tooltip, Button, Input, Modal, Form, Select} from 'antd';
-import { EditOutlined, CheckCircleOutlined, CloseCircleOutlined, PlusCircleOutlined, DeleteOutlined} from '@ant-design/icons';
+import { PlusCircleOutlined, DeleteOutlined} from '@ant-design/icons';
 import locale from "antd/es/date-picker/locale/fr_FR";
 import moment from "moment";
 import './menu.css';
@@ -33,6 +33,7 @@ class Menu extends React.Component {
         if(this.state.isAddTrip){
             this.props.createNewTrip({tripName: formValues.tripName, dateRange: formValues.dateRange});
         }else{
+            //Update du nom du trip non implémenter
             this.props.updateListOfDays(formValues.dateRange);
         }
         this.closeModal();
@@ -72,7 +73,7 @@ class Menu extends React.Component {
     
     getTrips(trips){
         return (
-          trips.map((trip) => <Option key={trip} value={trip}>{trip}</Option>)
+          trips.map((trip) => <Option  key={trip} value={trip}>{trip}</Option>)
         )
     }
 
@@ -80,16 +81,16 @@ class Menu extends React.Component {
     displayModal(){
         return(
             <Modal 
-            onCancel={() => this.closeModal()}
-            open={true}
-            footer={[
-            <Button key="back" onClick={() => this.closeModal()}>
-                Annuler
-            </Button>,
-            <Button form="tripForm" key="submit" type="primary" htmlType="submit">
-                    Valider
-            </Button>
-            ]}
+                onCancel={() => this.closeModal()}
+                open={true}
+                footer={[
+                <Button key="back" onClick={() => this.closeModal()}>
+                    Annuler
+                </Button>,
+                <Button form="tripForm" key="submit" type="primary" htmlType="submit">
+                        Valider
+                </Button>
+                ]}
             >
             
                 <Form 
@@ -125,9 +126,9 @@ class Menu extends React.Component {
            
         <Row className="underHeader">
             
-            <Col span={4}>              </Col>
+            <Col span={2}>              </Col>
         
-            <Col span={12}>
+            <Col span={8}>
                 {this.state.isOpenModal?this.displayModal():''}
 
                 <Button className="voyageTitleBouton" onClick={() => this.openModal()}>
@@ -137,28 +138,28 @@ class Menu extends React.Component {
                 -
                 <span>{this.props.defaultPickerValue[1].format("DD MMM")}</span>
                 </Button>
-            </Col>
-                
-            <Col span={2}>
-                Mes voyages :       
-                <Select value={this.props.selectedTrip} 
-                            style={{ width: 150, textalign: 'left' }} 
-                            onChange={this.props.handleTripSelection} 
+                <Select 
+                    className="tripSelector ant-select-customize-input"
+                    //value={this.props.selectedTrip} 
+                    //style={{ width: 150, textalign: 'left' }} 
+                    onChange={this.props.handleTripSelection}
+                    dropdownMatchSelectWidth={false}
                     >
                     {this.getTrips(this.props.trips)}
                 </Select>
-            </Col>    
-            <Col span={1}>
-                <Tooltip title="Ajouter un nouveau trip">
-                    <Button type="primary" shape="circle" icon={<PlusCircleOutlined />} onClick={() => this.openModalforNewTrip()} />
-                </Tooltip>
             </Col>
+                
             <Col span={1}>
                 <Tooltip title="Suprimer un  trip">
-                        <Button type="primary" shape="circle" icon={<DeleteOutlined/>} onClick={() => this.delete()} />
+                        <Button className="boutonMenu" size="large" type="primary" shape="circle" icon={<DeleteOutlined/>} onClick={() => this.delete()} />
                 </Tooltip>
             </Col>
-            <Col span={4}/>
+            <Col span={1}>
+                <Tooltip title="Ajouter un nouveau trip">
+                    <Button className="boutonMenu" size="large" type="primary" shape="circle" icon={<PlusCircleOutlined />} onClick={() => this.openModalforNewTrip()} />
+                </Tooltip>
+            </Col>
+            <Col span={12}/>
         </Row>
             
        );

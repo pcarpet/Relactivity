@@ -4,7 +4,7 @@ import { signOut } from "firebase/auth"
 import { useNavigate } from 'react-router-dom'
 import { auth } from "../../firebase.js";
 import {  Button, Row, Col } from "antd";
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, LoginOutlined } from "@ant-design/icons";
 
 
 export default function AuthBar()
@@ -29,17 +29,15 @@ export default function AuthBar()
     const getSignInOrOutButton = () => {
         if(!currentUser){
             return( 
-            <Button    
-                onClick={() => toggleModals("signIn")}
-                className="btn btn-primary ms-2">
-                Sign In
+            <Button onClick={() => toggleModals("signIn")} className="hover-underline-animation">
+                <LoginOutlined /> Connexion
             </Button>
             );
         }else{
             return(
-                <a href="" onClick={logOut} className="hover-underline-animation" >
-                    <LogoutOutlined style={{}}/>  Log OUT
-                </a>
+                <Button onClick={logOut} className="hover-underline-animation" >
+                    <LogoutOutlined />  Déconnexion
+                </Button>
  
             );
         }

@@ -388,9 +388,9 @@ class Core extends React.Component {
             />
           </Col>
           <Col span={8}>
-            {/* <Carte
+            <Carte
               activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
-            /> */}
+            />
           </Col>
         </Row>
       </div>
