@@ -63,10 +63,11 @@ class Menu extends React.Component {
                 dateRange: [moment(), moment().add(7, 'days')],
             };
         }else{
+            console.log(this.props.defaultPickerValue);
             //Initialisation avec le voyage actuel
             return {
+                tripPeriode: [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
                 tripName: this.props.selectedTrip,
-                dateRange: this.props.defaultPickerValue,
             };
         }
     }
@@ -107,9 +108,8 @@ class Menu extends React.Component {
 
 
                     {/* FIXEME : Actualisation auto de la date de fin : https://ant.design/components/date-picker/ : Select range dates in 7 days */}
-                    <Form.Item label="Période" name="dateRange">
+                    <Form.Item label="Période" name="tripPeriode">
                         <RangePicker 
-                                key={this.generateRangePickerKey(this.props.defaultPickerValue)} 
                                 format='DD/MM/YYYY'
                                 locale={locale}
                                 allowClear={false}

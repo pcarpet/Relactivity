@@ -7,7 +7,6 @@ import AuthBar from './components/auth/AuthBar';
 //import SignUpModal from './components/auth/SignUpModal';
 import SignInModal from './components/auth/SignInModal';
 import Private from './Private'
-require('dotenv').config();
 
 
 const { Header, Content } = Layout;

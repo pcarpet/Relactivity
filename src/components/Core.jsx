@@ -24,6 +24,7 @@ class Core extends React.Component {
       trips: [],
       selectedTrip: null,
       activities: [],
+      //FIXME mettre automatiquement les dates
       dateRangeLimit : [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
     };
 
