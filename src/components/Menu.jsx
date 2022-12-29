@@ -66,6 +66,7 @@ class Menu extends React.Component {
             console.log(this.props.defaultPickerValue);
             //Initialisation avec le voyage actuel
             return {
+                //https://github.com/ant-design/ant-design/issues/39876
                 tripPeriode: [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
                 tripName: this.props.selectedTrip,
             };
