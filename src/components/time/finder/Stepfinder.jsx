@@ -53,59 +53,10 @@ class StepFinder extends React.Component {
     
     this.setState({modalConfirmationLoading : true});
     
-    //FIXME-MOCKUP-WARNIIIING --- Valeur par defaut si non renseigné
-    if (this.state.placeFound === null) {
-      this.setState({placeFound: [{
-        address_components: [
-          {
-            long_name: "Melun",
-            short_name: "Melun",
-            types: ["locality", "political"],
-          },
-          {
-            long_name: "Seine-et-Marne",
-            short_name: "Seine-et-Marne",
-            types: ["administrative_area_level_2", "political"],
-          },
-          {
-            long_name: "Île-de-France",
-            short_name: "IDF",
-            types: ["administrative_area_level_1", "political"],
-          },
-          {
-            long_name: "France",
-            short_name: "FR",
-            types: ["country", "political"],
-          },
-          {
-            long_name: "77000",
-            short_name: "77000",
-            types: ["postal_code"],
-          },
-        ],
-        formatted_address: "77000 Melun, France",
-        geometry: {
-          bounds: {
-            south: 48.52352699999999,
-            west: 2.628541,
-            north: 48.5607479,
-            east: 2.6819179,
-          },
-          location: {
-            lat: 48.542105,
-            lng: 2.6554,
-          },
-          location_type: "APPROXIMATE",
-          viewport: {
-            south: 48.52352699999999,
-            west: 2.628541,
-            north: 48.5607479,
-            east: 2.6819179,
-          },
-        },
-        place_id: "ChIJnwKcN2L65UcRUFSMaMOCCwQ",
-        types: ["locality", "political"],
-      }]})
+    //FIXME: Afficer l'erreur grace au Form (cf. render)
+    if (this.state.placeFound.placeId === null && (this.state.addressSearched === null || this.state.addressSearched === '')) {
+     console.error("La localisation est obligatoire");
+     return;
     }
 
     console.log("Ajout d'une activité pour le :", this.props.modalData.etapeDay.format("DD/MM/YYYY"));
@@ -220,11 +171,13 @@ class StepFinder extends React.Component {
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
         
-              <div>Lieu :</div>
-              <PlaceAutocompleteInput             
-                value={this.state.addressSearched}
-                handlePlaceFound={this.handlePlaceFound}
-            />
+              <div>Lieu :</div> 
+                {/* FIXME : Il faudrait utiliser une interface sur le PlaceAutocompleteInput pour qu'il soit prit en compte par le Form.Item */}
+                <PlaceAutocompleteInput             
+                  value={this.state.addressSearched}
+                  handlePlaceFound={this.handlePlaceFound}
+                />
+       
 
               {this.props.modalData.timeOfDay === 'hotel' ?
                 <Form.Item label="Nombre de nuits" name="nbnuits"> 
