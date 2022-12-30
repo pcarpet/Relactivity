@@ -92,8 +92,14 @@ class Core extends React.Component {
           var activityFromDb = activity.val();
           activityFromDb.key = activity.key;
           activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
-          if(activityFromDb.heure){
-            activityFromDb.heure = moment(activityFromDb.heure, "HH:mm");
+          if(activityFromDb.heureDebut){
+            activityFromDb.heureDebut = moment(activityFromDb.heureDebut, "HH:mm");
+          }
+          if(activityFromDb.heureFin){
+            activityFromDb.heureFin = moment(activityFromDb.heureFin, "HH:mm");
+          }
+          if(activityFromDb.duree){
+            activityFromDb.duree = moment(activityFromDb.duree, "HH:mm");
           }
           activitiesConverted.push(activityFromDb);
           
@@ -119,8 +125,14 @@ class Core extends React.Component {
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
     activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
-    if(activityForDb.heure !== null){
-      activityForDb.heure = activityForDb.heure.format("HH:mm");
+    if(activityForDb.heureDebut !== null){
+      activityForDb.heureDebut = activityForDb.heureDebut.format("HH:mm");
+    }
+    if(activityForDb.heureFin !== null){
+      activityForDb.heureFin = activityForDb.heureFin.format("HH:mm");
+    }
+    if(activityForDb.duree !== null){
+      activityForDb.duree = activityForDb.duree.format("HH:mm");
     }
     // Formatage des direction result pour pouvoir etre chagé en base
     if(activityForDb.route !== null && activityForDb.route !== undefined){ 
@@ -305,7 +317,7 @@ class Core extends React.Component {
     
     //Tri des étapes par chronologie
     listLocal.sort(function (a, b) {
-      if (a.date - b.date === 0) { return a.heure - b.heure;};
+      if (a.date - b.date === 0) { return a.heureDebut - b.heureDebut;};
       return a.date - b.date;
     });
     //Recalcul du rank (ben c'est mieu que la position dans un array)
