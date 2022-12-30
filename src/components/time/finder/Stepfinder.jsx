@@ -28,7 +28,9 @@ class StepFinder extends React.Component {
     initFormValue(){
       return {
         nomEtape: this.props.modalData.activityToModify.nomEtape,
-        heure: this.props.modalData.activityToModify.heure,
+        heureDebut: this.props.modalData.activityToModify.heureDebut,
+        heureFin: this.props.modalData.activityToModify.heureFin,
+        duree: this.props.modalData.activityToModify.duree,
         };
     }
   
@@ -63,16 +65,18 @@ class StepFinder extends React.Component {
     console.log("Success Formulaire Validé:", formValues);
     console.log("GoogleFormattedAddress",this.state.placeFound.googleFormattedAddress);
 
-    //Création du nouvel élément à sauvegarder
+    //Création du nouvel élément à sauvegarder sans la localisation
     let newItem = {
       key: this.props.modalData.isModify ? this.props.modalData.activityToModify.key : 0,
       activityType : this.props.modalData.timeOfDay,
       date: this.props.modalData.etapeDay,
-      heure: formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm")),
       nomEtape: formValues.nomEtape || null,
+      heureDebut: formValues.heureDebut === undefined ? null : (formValues.heureDebut === null ? null : moment(formValues.heureDebut.format("HH:mm"), "HH:mm")),
+      heureFin: formValues.heureFin === undefined ? null : (formValues.heureFin === null ? null : moment(formValues.heureFin.format("HH:mm"), "HH:mm")),
+      duree: formValues.duree === undefined ? null : (formValues.duree === null ? null : moment(formValues.duree.format("HH:mm"), "HH:mm")),
       selected: true,
     };
-    //En cas de modification de l'étape sans changment d'adresse les éléments ne sont pas rechargés
+    //Sauvegarde de la localisation. En cas de modification de l'étape sans recherche d'adresse, les éléments de localisation ne sont pas rechargés
     if(this.state.placeFound.placeId !== null){
       newItem.origin = { 
         addressSearched: this.state.addressSearched || null,
@@ -106,7 +110,7 @@ class StepFinder extends React.Component {
     }
       
 
-    //Ajout de l'étape dans la BDD et lide courante
+    //Ajout de l'étape dans la BDD et liste courante
     this.props.addEtape(newItem);
 
 
@@ -167,10 +171,18 @@ class StepFinder extends React.Component {
                 <Input type="text" />
               </Form.Item>
           
-              <Form.Item label="Heure" name="heure">
+              <Form.Item label="Heure Début" name="heureDebut">
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
         
+              <Form.Item label="Heure Fin" name="heureFin">
+                <TimePicker minuteStep={5} format="HH:mm" />
+              </Form.Item>
+
+              <Form.Item label="Durée" name="duree">
+                <TimePicker minuteStep={5} format="HH:mm" />
+              </Form.Item>
+
               <div>Lieu :</div> 
                 {/* FIXME : Il faudrait utiliser une interface sur le PlaceAutocompleteInput pour qu'il soit prit en compte par le Form.Item */}
                 <PlaceAutocompleteInput             

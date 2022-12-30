@@ -74,7 +74,7 @@ class EtapeDay extends React.Component{
               {activies.map((act) => (
                 <Row>
                   <Col className="activite" onClick={() => this.onClickItem(act.key)}> 
-                    {(act.heure === undefined || act.heure === null) ? '' : act.heure.format("HH:mm") + ' - '}
+                    {(act.heureDebut === undefined || act.heureDebut === null) ? '' : act.heureDebut.format("HH:mm") + ' - '}
                     {act.nomEtape} </Col>
                   <Col className="activite_icon">
                     <EditOutlined onClick={() => this.onClickModify(act.key, (act.route !== undefined && act.route !== null))}/>
