@@ -5,6 +5,7 @@ import { get, ref, push, update, child, remove } from "firebase/database";
 import moment from "moment";
 import Menu from './Menu';
 import TimeLine from './time/TimeLine';
+import ActivitiesCalendar from './calendar/ActivitiesCalendar';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
 import { UserContext } from "./auth/UserContext"
@@ -392,18 +393,19 @@ class Core extends React.Component {
  
         <Row>
           <Col span={16}>
-            <TimeLine
+            <ActivitiesCalendar activities={this.state.activities} />
+           {/*  <TimeLine
               activities={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
               deleteActivityByDateAndType={this.deleteActivityByDateAndType}
               addEtape={this.addEtape}
-            />
+            /> */}
           </Col>
           <Col span={8}>
-            <Carte
+            {/* <Carte
               activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
-            />
+            /> */}
           </Col>
         </Row>
       </div>
