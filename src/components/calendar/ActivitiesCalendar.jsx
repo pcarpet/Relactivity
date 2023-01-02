@@ -19,8 +19,8 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 type: 'timeGrid',
                 //duration: { days: 3 },
                 visibleRange:{
-                    start: '2023-02-12',
-                    end: '2023-02-16'
+                    start: this.props.dateRange[0].format('YYYY-MM-DD'),
+                    end: this.props.dateRange[1].add(1,'days').format('YYYY-MM-DD')
                 },
                 buttonText: '5 days'
                 }
