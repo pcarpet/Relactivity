@@ -12,8 +12,8 @@ class StepFinder extends React.Component {
     super(props);
     this.state = {
       modalConfirmationLoading : false,
-      eventStartDate : moment(this.props.eventToCreate.startStr, moment.ISO_8601),
-      eventEndDate : moment(this.props.eventToCreate.endStr, moment.ISO_8601),
+      eventStartDate : this.props.isModify ? this.props.activityToModify.startDate : moment(this.props.eventToCreate.startStr, moment.ISO_8601),
+      eventEndDate : this.props.isModify ? this.props.activityToModify.endDate : moment(this.props.eventToCreate.endStr, moment.ISO_8601),
       addressSearched: this.props.isModify ? this.props.activityToModify.origin.googleFormattedAddress : '',
       placeFound: {
         placeId: null,
@@ -27,27 +27,25 @@ class StepFinder extends React.Component {
   }
   
   //############### Initialisaiton du formulaire ########################
-    initFormValueModify(){
-      return {
-        nomEtape: this.props.activityToModify.nomEtape,
-        heureDebut:this.props.activityToModify.startDate,
-        heureFin: this.props.activityToModify.endDate,
-        duree: this.props.activityToModify.duree,
-      };
-    }
-
-    initFormValueCreate(){
-      return {
+    initFormValue(){
+      //Init global pour Créatoin et modification
+      let initForm = {
         heureDebut: this.state.eventStartDate,
         heureFin: this.state.eventEndDate,
-      };
+      }
+      // reprise des élément de l'event pour modificaiton
+      if(this.props.isModify){
+        initForm.nomEtape = this.props.activityToModify.nomEtape;
+      }
+      return initForm;
     }
-  
-    //TODO : Formater la date
+
+   
+
     getModalTitle(){
-      return (this.props.isModify ? 
-        "Modifier l'activité pour le " + this.props.activityToModify.date.format("DD/MM/YY") 
-        : "Ajouter une activité pour le " + this.state.eventStartDate.format("dddd DD MMM"));
+      return ((this.props.isModify ? 
+        "Modifier l'activité pour le "
+        : "Ajouter une activité pour le " ) + this.state.eventStartDate.format("dddd DD MMM"));
     }
     
   //############### Gestion des Inputs ########################
@@ -77,7 +75,6 @@ class StepFinder extends React.Component {
     //Création du nouvel élément à sauvegarder sans la localisation
     let newItem = {
       key: this.props.isModify ? this.props.activityToModify.key : 0,
-      //activityType : this.props.modalData.timeOfDay,
       startDate: this.state.eventStartDate
                       .hours(formValues.heureDebut.hours())
                       .minutes(formValues.heureDebut.minutes()),
@@ -103,7 +100,7 @@ class StepFinder extends React.Component {
     console.log(newItem);
     
     //FIMME : Création d'un evenement récurrent
-    
+
     //Pour chaque nuit suplémentaire d'une activité hotel on ajoute une étape
     //On clone le new item avant le addEtapte sinon il est mis à jour par le core avec un ID
     /* for(var i = 1; i < formValues.nbnuits; i++){
@@ -125,7 +122,7 @@ class StepFinder extends React.Component {
     } */
       
 
-    //Ajout de l'étape dans la BDD et liste courante
+    //Ajout de l'étape dans la BDD ou modification et màj liste d'activité
     this.props.addEtape(newItem);
 
 
@@ -174,7 +171,7 @@ class StepFinder extends React.Component {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFailed}
           requiredMark={false}
-          initialValues={this.props.isModify ? this.initFormValueModify() : this.initFormValueCreate()}
+          initialValues={this.initFormValue() }
         >
               <Form.Item
                 label="Description"
@@ -190,6 +187,7 @@ class StepFinder extends React.Component {
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>
         
+              {/*TODO: Mettre automatiquement à jour l'heure de fin suite à une modification de l'heure de début */}
               <Form.Item label="Heure Fin" name="heureFin">
                 <TimePicker minuteStep={5} format="HH:mm" />
               </Form.Item>

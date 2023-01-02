@@ -150,9 +150,10 @@ class Core extends React.Component {
     
     this.refreshActivities(listLocal);
     
+    //FIXE ME : Ca fait 2 Set Sate c'est ultra couteu : 
     //On centre la carte sur la nouvelle étape si ce n'est pas une day activity
-    if(etape.activityType !== 'day')
-    this.selectEtape(etape.key);
+    /* if(etape.activityType !== 'day')
+    this.selectEtape(etape.key); */
     
   }
 
@@ -331,9 +332,7 @@ class Core extends React.Component {
         ligne.selected = false;
       }
     }
-    
-    this.setState({ ListV: selectionList });
-    
+    this.setState({ activities: selectionList });
   }
       
   handleTripSelection(selectedTrip){
@@ -384,6 +383,7 @@ class Core extends React.Component {
             <ActivitiesCalendar 
               activities={this.state.activities}
               addEtape={this.addEtape}
+              deleteActivity={this.deleteActivity}
             />
            {/*  <TimeLine
               activities={this.state.activities}

@@ -17,7 +17,7 @@ class Finder extends React.Component {
                     <StepFinder  
                         isModify={this.props.isModify}
                         eventToCreate={this.props.event}
-                        activityToModify={this.props.activity} //notimplemented
+                        activityToModify={this.props.activityActivityToModify} //notimplemented
                         closeModal={this.props.closeModal}
                         addEtape={this.props.addEtape}
                     />
