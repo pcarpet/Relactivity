@@ -92,15 +92,9 @@ class Core extends React.Component {
           //Ajout et convertion des activité de la base
           var activityFromDb = activity.val();
           activityFromDb.key = activity.key;
-          activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
-          if(activityFromDb.heureDebut){
-            activityFromDb.heureDebut = moment(activityFromDb.heureDebut, "HH:mm");
-          }
-          if(activityFromDb.heureFin){
-            activityFromDb.heureFin = moment(activityFromDb.heureFin, "HH:mm");
-          }
-          if(activityFromDb.duree){
-            activityFromDb.duree = moment(activityFromDb.duree, "HH:mm");
+          activityFromDb.startDate = moment(activityFromDb.startDate, "YYYY-MM-DDTHH:mm");
+          if(activityFromDb.endDate){
+            activityFromDb.endDate = moment(activityFromDb.endDate, "YYYY-MM-DDTHH:mm");
           }
           activitiesConverted.push(activityFromDb);
           
@@ -125,16 +119,11 @@ class Core extends React.Component {
     
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
-    activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
-    if(activityForDb.heureDebut !== null){
-      activityForDb.heureDebut = activityForDb.heureDebut.format("HH:mm");
+    activityForDb.startDate = activityForDb.startDate.format("YYYY-MM-DDTHH:mm");
+    if(activityForDb.endDate !== null){
+      activityForDb.endDate = activityForDb.endDate.format("YYYY-MM-DDTHH:mm");
     }
-    if(activityForDb.heureFin !== null){
-      activityForDb.heureFin = activityForDb.heureFin.format("HH:mm");
-    }
-    if(activityForDb.duree !== null){
-      activityForDb.duree = activityForDb.duree.format("HH:mm");
-    }
+
     // Formatage des direction result pour pouvoir etre chagé en base
     if(activityForDb.route !== null && activityForDb.route !== undefined){ 
       activityForDb.route = JSON.parse( JSON.stringify(activityForDb.route));
@@ -250,7 +239,7 @@ class Core extends React.Component {
   // retrouve la date la plus ancienne et la plus récente de la liste d'activité
   updateDateRangeLimit(){
     var allDates = [];
-    allDates = this.state.activities.map((act) => act.date);
+    allDates = this.state.activities.map((act) => act.startDate);
     
     const maxDate = moment.max(allDates);
     const minDate = moment.min(allDates);
@@ -282,7 +271,7 @@ class Core extends React.Component {
     //Ajout des activités pour les jours manquant (activité fictive)
     var newDates = [];
     for(const d of periodeList){
-      if(this.state.activities.find((activities) => activities.date.isSame(d, 'day'))===undefined){
+      if(this.state.activities.find((activities) => activities.startDate.isSame(d, 'day'))===undefined){
         newDates.push(d);
       }
     }
@@ -304,7 +293,7 @@ class Core extends React.Component {
     //Suppression de toutes les activités hors période !!!! WARNING : ca peut tout niquer en 2 2 !!!!
     var activitiesKeysToDelete = [];
     for(const act of this.state.activities){
-      if(periodeList.find((d) => d.isSame(act.date, 'day'))===undefined){
+      if(periodeList.find((d) => d.isSame(act.startDate, 'day'))===undefined){
         activitiesKeysToDelete.push(act.key)
       }
     }
@@ -318,14 +307,13 @@ class Core extends React.Component {
     
     //Tri des étapes par chronologie
     listLocal.sort(function (a, b) {
-      if (a.date - b.date === 0) { return a.heureDebut - b.heureDebut;};
-      return a.date - b.date;
+      return a.startDate - b.startDate;
     });
     //Recalcul du rank (ben c'est mieu que la position dans un array)
     //Le rank commence à 1
-    for (var i = 0; i < listLocal.length; i++) {
+   /*  for (var i = 0; i < listLocal.length; i++) {
       listLocal[i].rank = i + 1;
-    }
+    } */
     
     console.log(listLocal);
     this.setState({ activities: listLocal });
@@ -393,7 +381,10 @@ class Core extends React.Component {
  
         <Row>
           <Col span={16}>
-            <ActivitiesCalendar activities={this.state.activities} />
+            <ActivitiesCalendar 
+              activities={this.state.activities}
+              addEtape={this.addEtape}
+            />
            {/*  <TimeLine
               activities={this.state.activities}
               selectEtape={this.selectEtape}
