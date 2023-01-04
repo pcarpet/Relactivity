@@ -19,8 +19,8 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 type: 'timeGrid',
                 //duration: { days: 3 },
                 visibleRange:{
-                    start: this.props.dateRange[0].format('YYYY-MM-DD'),
-                    end: this.props.dateRange[1].add(1,'days').format('YYYY-MM-DD')
+                    start: this.props.selectedTrip.dateRange[0].format('YYYY-MM-DD'),
+                    end: this.props.selectedTrip.dateRange[1].clone().add(1,'days').format('YYYY-MM-DD')
                 },
                 buttonText: '5 days'
                 }
@@ -42,6 +42,20 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
 
     }
   
+    getCustomView(selectedTrip){
+        return({
+            dayTimeGridFourDay :{
+            type: 'timeGrid',
+            //duration: { days: 3 },
+            visibleRange:{
+                start: selectedTrip.dateRange[0].format('YYYY-MM-DD'),
+                end: selectedTrip.dateRange[1].clone().add(1,'days').format('YYYY-MM-DD')
+            },
+            buttonText: '5 days'
+            }
+        })
+    }
+
     mapActivitiesToEvent(activities) {
 
         const events = activities.map(a => {
@@ -128,7 +142,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 locale='fr'
                 initialView="dayTimeGridFourDay"
                 headerToolbar={this.state.customHeaderToolbar}
-                views={this.state.customview}
+                views={this.getCustomView(this.props.selectedTrip)}
                 allDaySlot={true}
                 selectable={true}
                 selectMirror={true}

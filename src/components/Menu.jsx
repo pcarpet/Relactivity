@@ -30,12 +30,8 @@ class Menu extends React.Component {
     }
 
     handleForm = (formValues) => {
-        if(this.state.isAddTrip){
-            this.props.createNewTrip({tripName: formValues.tripName, dateRange: formValues.dateRange});
-        }else{
-            //Update du nom du trip non implémenter
-            //this.props.updateListOfDays(formValues.dateRange);
-        }
+        const key = this.state.isAddTrip?0:this.props.selectedTrip.key;
+        this.props.createNewTrip({key: key,name: formValues.tripName, dateRange: formValues.dateRange});
         this.closeModal();
     }
 
@@ -63,11 +59,10 @@ class Menu extends React.Component {
                 dateRange: [moment(), moment().add(7, 'days')],
             };
         }else{
-            console.log(this.props.defaultPickerValue);
             //Initialisation avec le voyage actuel
             return {
                 //https://github.com/ant-design/ant-design/issues/39876
-                tripPeriode: [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
+                dateRange: [this.props.selectedTrip.dateRange[0], this.props.selectedTrip.dateRange[1]],
                 tripName: this.props.selectedTrip.name,
             };
         }
@@ -75,7 +70,7 @@ class Menu extends React.Component {
     
     getTripsList(trips){
         return (
-          trips.map((trip) => <Option  key={trip.key} value={trip.name}>{trip.name}</Option>)
+          trips.map((trip) => <Option  key={trip.key} value={trip.key}>{trip.name}</Option>)
         )
     }
 
@@ -104,7 +99,7 @@ class Menu extends React.Component {
                     <Form.Item label="Nom du voyage" name="tripName"
                         rules={[{ required: true, message: "Nom obligatoire" },]}
                         >
-                        <Input disabled={!this.state.isAddTrip}  />
+                        <Input />
                     </Form.Item>
 
 
@@ -129,9 +124,10 @@ class Menu extends React.Component {
            
         <Row className="underHeader">
             
+
             {this.state.isOpenModal?this.displayModal():''}
-            <Col span={2}>              </Col>
-        
+            <Col span={2}>              
+            </Col>
             {(this.props.selectedTrip !== null && this.props.selectedTrip !== undefined) ? 
             (
                 <>
@@ -140,6 +136,7 @@ class Menu extends React.Component {
                     <Button className="voyageTitleBouton" onClick={() => this.openModal()}>
 
                         <span>{this.props.selectedTrip.name}</span>|
+
                         <span>{this.props.selectedTrip.dateRange[0].format("DD MMM")}</span>
                         -<span>{this.props.selectedTrip.dateRange[1].format("DD MMM")}</span>
                     </Button>
