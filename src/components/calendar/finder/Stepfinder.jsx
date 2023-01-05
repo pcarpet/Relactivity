@@ -2,7 +2,7 @@ import React from "react";
 import "./finder.css"
 import "antd/dist/antd.css";
 import moment from "moment";
-import {TimePicker, Form, Button, Input, Modal, InputNumber } from "antd";
+import {TimePicker, Form, Input, InputNumber } from "antd";
 import "moment/locale/fr";
 import PlaceAutocompleteInput from "./PlaceAutocompleteInput";
 
@@ -11,7 +11,6 @@ class StepFinder extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalConfirmationLoading : false,
       eventStartDate : this.props.isModify ? this.props.activityToModify.startDate : moment(this.props.eventToCreate.startStr, moment.ISO_8601),
       eventEndDate : this.props.isModify ? this.props.activityToModify.endDate : moment(this.props.eventToCreate.endStr, moment.ISO_8601),
       addressSearched: this.props.isModify ? this.props.activityToModify.origin.googleFormattedAddress : '',
@@ -40,14 +39,6 @@ class StepFinder extends React.Component {
       return initForm;
     }
 
-   
-
-    getModalTitle(){
-      return ((this.props.isModify ? 
-        "Modifier l'activité pour le "
-        : "Ajouter une activité pour le " ) + this.state.eventStartDate.format("dddd DD MMM"));
-    }
-    
   //############### Gestion des Inputs ########################
   
   //Appeler en callback par le Google place autocomplete
@@ -59,7 +50,7 @@ class StepFinder extends React.Component {
   /* Validation du formulaire */
   onFinish = (formValues) => {
     
-    this.setState({modalConfirmationLoading : true});
+    this.props.finderLoading(true);
     
     //FIXME: Afficer l'erreur grace au Form (cf. render)
     if (this.state.placeFound.placeId === null && (this.state.addressSearched === null || this.state.addressSearched === '')) {
@@ -125,8 +116,9 @@ class StepFinder extends React.Component {
     //Ajout de l'étape dans la BDD ou modification et màj liste d'activité
     this.props.addEtape(newItem);
 
+    alert('bite');
 
-    this.setState({modalConfirmationLoading : false});
+    this.props.finderLoading(false);
     //Réinitialisation 
     this.setState({addressSearched: '' , 
                     placeFound: {
@@ -147,20 +139,7 @@ class StepFinder extends React.Component {
 
   render() {
     return (
-        <Modal
-        title={this.getModalTitle()}
-        open={true}
-        confirmLoading={this.state.confirmLoading}
-        onCancel={this.props.closeModal}
-        footer={[
-            <Button key="back" onClick={this.props.closeModal}>
-              Return
-            </Button>,
-            <Button form="stepfinder" key="submit" type="primary" htmlType="submit">
-                  {this.props.isModify ? 'Modifier' : 'Ajouter'}
-            </Button>
-          ]}
-      >
+        
       
       <div className="step-finder-main">
         <Form
@@ -209,7 +188,7 @@ class StepFinder extends React.Component {
 
         </Form>
       </div>
-      </Modal>
+
     );
   }
 }

@@ -33,7 +33,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
             openModal: false,
             openModalToModify: null,
             selectedEvent: null,
-            activityActivityToModify: null,
+            activityToModify: null,
         }
 
         this.closeFinderModal = this.closeFinderModal.bind(this);
@@ -87,7 +87,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
     
     modifyActivity = (key) => {
         const activity = this.props.activities.find((a) => key === a.key);
-        this.setState({activityActivityToModify: activity, openModal: true, openModalToModify: true});
+        this.setState({activityToModify: activity, openModal: true, openModalToModify: true});
     }
 
     deleteActivity = (key) => {
@@ -99,7 +99,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
             openModal: false,
             selectedEvent: null,  
             openModalToModify: null,
-            activityActivityToModify: null});
+            activityToModify: null});
     }
 
     renderEventContent(eventInfo){
@@ -132,7 +132,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 openModal={this.state.openModal}
                 isModify={this.state.openModalToModify}
                 event={this.state.selectedEvent}
-                activityActivityToModify={this.state.activityActivityToModify}
+                activityToModify={this.state.activityToModify}
                 closeModal={this.closeFinderModal}
                 addEtape={this.props.addEtape}
             />
