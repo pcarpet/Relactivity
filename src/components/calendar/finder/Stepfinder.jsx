@@ -116,8 +116,6 @@ class StepFinder extends React.Component {
     //Ajout de l'étape dans la BDD ou modification et màj liste d'activité
     this.props.addEtape(newItem);
 
-    alert('bite');
-
     this.props.finderLoading(false);
     //Réinitialisation 
     this.setState({addressSearched: '' , 
