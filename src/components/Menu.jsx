@@ -30,12 +30,8 @@ class Menu extends React.Component {
     }
 
     handleForm = (formValues) => {
-        if(this.state.isAddTrip){
-            this.props.createNewTrip({tripName: formValues.tripName, dateRange: formValues.dateRange});
-        }else{
-            //Update du nom du trip non implémenter
-            this.props.updateListOfDays(formValues.dateRange);
-        }
+        const key = this.state.isAddTrip?0:this.props.selectedTrip.key;
+        this.props.createNewTrip({key: key,name: formValues.tripName, dateRange: formValues.dateRange});
         this.closeModal();
     }
 
@@ -63,19 +59,18 @@ class Menu extends React.Component {
                 dateRange: [moment(), moment().add(7, 'days')],
             };
         }else{
-            console.log(this.props.defaultPickerValue);
             //Initialisation avec le voyage actuel
             return {
                 //https://github.com/ant-design/ant-design/issues/39876
-                tripPeriode: [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
-                tripName: this.props.selectedTrip,
+                dateRange: [this.props.selectedTrip.dateRange[0], this.props.selectedTrip.dateRange[1]],
+                tripName: this.props.selectedTrip.name,
             };
         }
     }
     
-    getTrips(trips){
+    getTripsList(trips){
         return (
-          trips.map((trip) => <Option  key={trip} value={trip}>{trip}</Option>)
+          trips.map((trip) => <Option  key={trip.key} value={trip.key}>{trip.name}</Option>)
         )
     }
 
@@ -104,12 +99,12 @@ class Menu extends React.Component {
                     <Form.Item label="Nom du voyage" name="tripName"
                         rules={[{ required: true, message: "Nom obligatoire" },]}
                         >
-                        <Input disabled={!this.state.isAddTrip}  />
+                        <Input />
                     </Form.Item>
 
 
                     {/* FIXEME : Actualisation auto de la date de fin : https://ant.design/components/date-picker/ : Select range dates in 7 days */}
-                    <Form.Item label="Période" name="tripPeriode">
+                    <Form.Item label="Période" name="dateRange">
                         <RangePicker 
                                 format='DD/MM/YYYY'
                                 locale={locale}
@@ -129,34 +124,39 @@ class Menu extends React.Component {
            
         <Row className="underHeader">
             
-            <Col span={2}>              </Col>
-        
-            <Col span={8}>
-                {this.state.isOpenModal?this.displayModal():''}
 
-                <Button className="voyageTitleBouton" onClick={() => this.openModal()}>
-                <span>{this.props.selectedTrip}</span>
-                |
-                <span>{this.props.defaultPickerValue[0].format("DD MMM")}</span>
-                -
-                <span>{this.props.defaultPickerValue[1].format("DD MMM")}</span>
-                </Button>
-                <Select 
-                    className="tripSelector ant-select-customize-input"
-                    //value={this.props.selectedTrip} 
-                    //style={{ width: 150, textalign: 'left' }} 
-                    onChange={this.props.handleTripSelection}
-                    dropdownMatchSelectWidth={false}
-                    >
-                    {this.getTrips(this.props.trips)}
-                </Select>
+            {this.state.isOpenModal?this.displayModal():''}
+            <Col span={2}>              
             </Col>
-                
-            <Col span={1}>
-                <Tooltip title="Suprimer un  trip">
-                        <Button className="boutonMenu" size="large" type="primary" shape="circle" icon={<DeleteOutlined/>} onClick={() => this.delete()} />
-                </Tooltip>
-            </Col>
+            {(this.props.selectedTrip !== null && this.props.selectedTrip !== undefined) ? 
+            (
+                <>
+                <Col span={8}>
+
+                    <Button className="voyageTitleBouton" onClick={() => this.openModal()}>
+
+                        <span>{this.props.selectedTrip.name}</span>|
+
+                        <span>{this.props.selectedTrip.dateRange[0].format("DD MMM")}</span>
+                        -<span>{this.props.selectedTrip.dateRange[1].format("DD MMM")}</span>
+                    </Button>
+                    <Select 
+                        className="tripSelector ant-select-customize-input"
+                        //value={this.props.selectedTrip} 
+                        //style={{ width: 150, textalign: 'left' }} 
+                        onChange={this.props.handleTripSelection}
+                        dropdownMatchSelectWidth={false}
+                        >
+                        {this.getTripsList(this.props.trips)}
+                    </Select>
+                </Col>
+                <Col span={1}>
+                    <Tooltip title="Suprimer un  trip">
+                            <Button className="boutonMenu" size="large" type="primary" shape="circle" icon={<DeleteOutlined/>} onClick={() => this.delete()} />
+                    </Tooltip>
+                </Col>
+                </>
+            ):'Créer un voyage :'}
             <Col span={1}>
                 <Tooltip title="Ajouter un nouveau trip">
                     <Button className="boutonMenu" size="large" type="primary" shape="circle" icon={<PlusCircleOutlined />} onClick={() => this.openModalforNewTrip()} />

@@ -10,7 +10,7 @@ class EtapeDay extends React.Component{
 
     this.state = { 
       etapeLocal: this.props.data,
-   };
+    };
     this.onClickItem = this.onClickItem.bind(this);
     this.onClickDirection = this.onClickDirection.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);

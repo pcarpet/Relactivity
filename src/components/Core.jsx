@@ -5,9 +5,11 @@ import { get, ref, push, update, child, remove } from "firebase/database";
 import moment from "moment";
 import Menu from './Menu';
 import TimeLine from './time/TimeLine';
+import ActivitiesCalendar from './calendar/ActivitiesCalendar';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
 import { UserContext } from "./auth/UserContext"
+import { ThemeConsumer } from 'styled-components';
 
 const db = database;
 
@@ -22,19 +24,14 @@ class Core extends React.Component {
       userUid: context.currentUser.uid,
       loading: false,
       trips: [],
-      selectedTrip: null,
+      selectedTrip: null, //{key : null, name: null, dateRange: []}
       activities: [],
-      //FIXME mettre automatiquement les dates
-      dateRangeLimit : [moment("2021-12-23","YYYY-MM-DD"), moment("2021-12-27","YYYY-MM-DD")],
     };
 
     this.addEtape = this.addEtape.bind(this);
     this.selectEtape = this.selectEtape.bind(this);
     this.deleteActivity = this.deleteActivity.bind(this);
     this.loadActivitiesFromDb = this.loadActivitiesFromDb.bind(this);
-    this.refreshActivities = this.refreshActivities.bind(this);
-    this.updateDateRangeLimit = this.updateDateRangeLimit.bind(this);
-    this.updateListOfDays = this.updateListOfDays.bind(this);
     this.handleTripSelection = this.handleTripSelection.bind(this);
     this.createNewTrip = this.createNewTrip.bind(this);
     this.deleteTrip = this.deleteTrip.bind(this);
@@ -55,14 +52,14 @@ class Core extends React.Component {
   //#################    READ     ###################
 
   loadTripsFromDb(){
-    
 
     this.setState({loading : true});
     let tripsFromDb = [];
-    get(ref(db,`activities/${this.state.userUid}`)).then((snapshot) => {
+    get(ref(db,`${this.state.userUid}`)).then((snapshot) => {
       if (snapshot.exists()) {
-        snapshot.forEach(activity => {
-          tripsFromDb.push(activity.key);
+        snapshot.forEach(trip => {
+          let tripValue = trip.val();
+          tripsFromDb.push({key : trip.key, name : tripValue.name, dateRange : tripValue.dateRange.map(dr => moment(dr,"YYYY-MM-DD"))});
         });
       }else{
         console.log("No data available");
@@ -70,10 +67,11 @@ class Core extends React.Component {
       
       console.log(tripsFromDb);
 
-      this.setState({trips:tripsFromDb});
-      this.setState({selectedTrip:tripsFromDb[0]});
-      
-      this.loadActivitiesFromDb(tripsFromDb[0]);
+      if(tripsFromDb.length > 0){
+        this.setState({trips:tripsFromDb, selectedTrip:tripsFromDb[0]});
+        this.loadActivitiesFromDb(tripsFromDb[0].key);
+      }
+
       this.setState({loading : false});
     });
   }
@@ -83,7 +81,7 @@ class Core extends React.Component {
     
     //  console.log("Chargement des données de la base");
     
-    get(ref(db,`activities/${this.state.userUid}/${tripKey}`)).then((snapshot) => {
+    get(ref(db,`${this.state.userUid}/${tripKey}/activities`)).then((snapshot) => {
       if (snapshot.exists()) {
         
         var activitiesConverted = [];
@@ -91,22 +89,15 @@ class Core extends React.Component {
           //Ajout et convertion des activité de la base
           var activityFromDb = activity.val();
           activityFromDb.key = activity.key;
-          activityFromDb.date = moment(activityFromDb.date, "YYYY-MM-DD");
-          if(activityFromDb.heureDebut){
-            activityFromDb.heureDebut = moment(activityFromDb.heureDebut, "HH:mm");
-          }
-          if(activityFromDb.heureFin){
-            activityFromDb.heureFin = moment(activityFromDb.heureFin, "HH:mm");
-          }
-          if(activityFromDb.duree){
-            activityFromDb.duree = moment(activityFromDb.duree, "HH:mm");
+          activityFromDb.startDate = moment(activityFromDb.startDate, "YYYY-MM-DDTHH:mm");
+          if(activityFromDb.endDate){
+            activityFromDb.endDate = moment(activityFromDb.endDate, "YYYY-MM-DDTHH:mm");
           }
           activitiesConverted.push(activityFromDb);
           
         })
-        
-        this.refreshActivities(activitiesConverted);
-        
+
+        this.setState({ activities: activitiesConverted});
       } else {
         console.log("No data available");
       }
@@ -118,22 +109,55 @@ class Core extends React.Component {
 
   //#################    CREATE / UPDATE     ###################
 
+
+  //Créer le nouveau trip
+  //FIXME : SUr l'ajout d'un nouveau trip le calendrier ne se met pas à jours
+  createNewTrip(newTrip){
+    console.log("Création / update du trip: " + newTrip.name);
+    
+    let newTripToSave = {
+      name : newTrip.name,
+      dateRange : newTrip.dateRange,
+    };
+    
+    //Copy pour le formatage des dates
+    var newTripToSaveDb = Object.assign({},newTripToSave);
+    newTripToSaveDb.dateRange = newTripToSaveDb.dateRange.map(t => t.format("YYYY-MM-DD"));
+
+    console.log(newTripToSaveDb);
+
+    let trips = this.state.trips;
+    
+    const tripRef  = ref(db,`${this.state.userUid}/`);
+    if(newTrip.key === 0){
+      const newEntry = push(tripRef, newTripToSaveDb);
+      newTripToSave.key = newEntry.key;
+      //Ajout du nouveau trip
+      trips.push(newTripToSave);
+      this.setState({selectedTrip: newTripToSave,trips : trips});
+    }else{
+      update(ref(db,`${this.state.userUid}/${newTrip.key}`), newTripToSaveDb);
+      let tripToUpdate = trips.find(t => t.key === newTrip.key);
+      newTripToSave.key = newTrip.key;
+      Object.assign(tripToUpdate, newTripToSave);
+      this.setState({selectedTrip: newTripToSave,trips : trips});
+      this.removeOutOfRangeActivities();
+    }
+    //On ajoute la clef qui vient d'être sauvegardé
+ 
+  }
+
  /* Ajoute ou met à jour l'étape remontée par le composant Finder à la liste*/
   addEtape(etape) {
     console.log("Sauvergarde etape key (0 pour une nouvelle étape): " + etape.key);
     
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
-    activityForDb.date = activityForDb.date.format("YYYY-MM-DD");
-    if(activityForDb.heureDebut !== null){
-      activityForDb.heureDebut = activityForDb.heureDebut.format("HH:mm");
+    activityForDb.startDate = activityForDb.startDate.format("YYYY-MM-DDTHH:mm");
+    if(activityForDb.endDate !== null){
+      activityForDb.endDate = activityForDb.endDate.format("YYYY-MM-DDTHH:mm");
     }
-    if(activityForDb.heureFin !== null){
-      activityForDb.heureFin = activityForDb.heureFin.format("HH:mm");
-    }
-    if(activityForDb.duree !== null){
-      activityForDb.duree = activityForDb.duree.format("HH:mm");
-    }
+
     // Formatage des direction result pour pouvoir etre chagé en base
     if(activityForDb.route !== null && activityForDb.route !== undefined){ 
       activityForDb.route = JSON.parse( JSON.stringify(activityForDb.route));
@@ -142,32 +166,28 @@ class Core extends React.Component {
     var listLocal = this.state.activities;
     
     //sauvegarde de l'étape en base. Si la clef est 0, c'est une nouvelle étape
+  
+    const activitiesRef  = ref(db,`${this.state.userUid}/${this.state.selectedTrip.key}/activities`);
     if(etape.key === 0){
-      const activitiesRef  = ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`);
       const newEntry = push(activitiesRef, activityForDb);
       etape.key = newEntry.key;
       
       //Ajout de l'étape dans la liste avec la nouvelle clef
       listLocal.push(etape);
     }else{ //mise à jour de l'étape en base
-      update(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`), etape.key), activityForDb);
+      update(child(activitiesRef, etape.key), activityForDb);
         
       //Mise à jour de l'oject dans la liste
       let activityToUpdate = listLocal.find((act) => etape.key === act.key);    
       Object.assign(activityToUpdate, etape)
     }
     
-    
-    this.refreshActivities(listLocal);
-    
+    this.setState({ activities: listLocal });
+    //FIXE ME : Ca fait 2 Set Sate c'est ultra couteu : 
     //On centre la carte sur la nouvelle étape si ce n'est pas une day activity
-    if(etape.activityType !== 'day')
-    this.selectEtape(etape.key);
+    /* if(etape.activityType !== 'day')
+    this.selectEtape(etape.key); */
     
-  }
-
-  updateTripName(oldName, newName) {
-
   }
 
   //#################    DELETE     ###################
@@ -180,10 +200,10 @@ class Core extends React.Component {
     listLocal = listLocal.filter(e => e.key !== key);
       
     //Supression en base
-    remove(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`),key));
+    remove(child(ref(db,`${this.state.userUid}/${this.state.selectedTrip.key}/activities`),key));
      
     //Mise à jour du state
-    this.refreshActivities(listLocal);
+    this.setState({ activities: listLocal });
   }
     
   //Obligé de faire une fonction multiple car le setState de la liste des activité dans le refresh ne la met pas à jour et les élements supprimés reviennent
@@ -191,7 +211,7 @@ class Core extends React.Component {
     console.log("Supression des étape key : " + keys);
     //Supression en base
     for(const key of keys){
-      remove(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`),key));
+      remove(child(ref(db,`${this.state.userUid}/${this.state.selectedTrip.key}/activities`),key));
     }
     
     var listLocal = this.state.activities;
@@ -200,7 +220,7 @@ class Core extends React.Component {
     listLocal = listLocal.filter(e => !keys.includes(e.key));
     
     //Mise à jour du state
-    this.refreshActivities(listLocal);
+    this.setState({ activities: listLocal });
   }
   
    deleteActivityByDateAndType(etapeDay, timeOfDay){
@@ -214,24 +234,24 @@ class Core extends React.Component {
     //Supression en base
     for(const activityKey of activityKeysToDelete){
       console.log("Supression de l'activité : " + activityKey);
-      remove(child(ref(db,`activities/${this.state.userUid}/${this.state.selectedTrip}`),activityKey));
+      remove(child(ref(db,`${this.state.userUid}/${this.state.selectedTrip.key}/activities`),activityKey));
     } 
     
     //On vire les activité supprimé
     const activitiesTarget = this.state.activities.filter(e => !activityKeysToDelete.includes(e.key));;
     //Mise à jour du state
-    this.refreshActivities(activitiesTarget);
+    this.setState({ activities: activitiesTarget });
   }
 
   deleteTrip(){
     
-    const tripToDelete = this.state.selectedTrip;
+    //On supprime le trip courant
+    const tripToDelete = this.state.selectedTrip.key;
 
     //Supression de la base
-    //db.ref(`activities/${user}/${tripToDelete}`).remove();
-    remove(ref(db,`activities/${this.state.userUid}/${tripToDelete}`));
+    remove(ref(db,`${this.state.userUid}/${tripToDelete}`));
     let trips = this.state.trips;
-    trips = trips.filter(t => t !== tripToDelete);
+    trips = trips.filter(t => t.key !== tripToDelete);
 
     this.setState({ 
       trips : trips,
@@ -246,29 +266,17 @@ class Core extends React.Component {
   //####### !!!!  ACTITIVIES MANIPULATIONS  !!!!!!!  ###############
   //################################################################
 
-  // retrouve la date la plus ancienne et la plus récente de la liste d'activité
-  updateDateRangeLimit(){
-    var allDates = [];
-    allDates = this.state.activities.map((act) => act.date);
-    
-    const maxDate = moment.max(allDates);
-    const minDate = moment.min(allDates);
-    
-    const range = [minDate, maxDate];
-    
-    this.setState({dateRangeLimit: range});
-  }
-  
   // On s'assure que la liste contient des activités pour les jours de la période (création d'activités fictives)
   // On va supprimmer toutes les activités liés au jours hors de la période !!!
-  updateListOfDays(dateRange){
+  removeOutOfRangeActivities(){
     
-    const debut = dateRange[0];
-    const fin = dateRange[1];
+    const debut = this.state.selectedTrip.dateRange[0];
+    const fin = this.state.selectedTrip.dateRange[1];
     
     console.log(debut);
     
     var day = debut.clone();
+    //Liste des jour compris dans la période
     var periodeList = [];
     
     while(day.isSameOrBefore(fin)){
@@ -278,60 +286,18 @@ class Core extends React.Component {
     
     console.log(periodeList);
     
-    //Ajout des activités pour les jours manquant (activité fictive)
-    var newDates = [];
-    for(const d of periodeList){
-      if(this.state.activities.find((activities) => activities.date.isSame(d, 'day'))===undefined){
-        newDates.push(d);
-      }
-    }
-    
-    console.log(newDates);
-    for(const nd of newDates){
-      var dayActivity = {
-        key: 0,
-        activityType : 'day',
-        date: nd,
-        heure: null,
-        nomEtape: null,
-        selected: false,
-      };
-      this.addEtape(dayActivity);
-    }
-    
-    
     //Suppression de toutes les activités hors période !!!! WARNING : ca peut tout niquer en 2 2 !!!!
     var activitiesKeysToDelete = [];
     for(const act of this.state.activities){
-      if(periodeList.find((d) => d.isSame(act.date, 'day'))===undefined){
+      if(periodeList.find((d) => d.isSame(act.startDate, 'day'))===undefined){
         activitiesKeysToDelete.push(act.key)
       }
     }
+    
     this.deleteActivities(activitiesKeysToDelete);
-    
-    
+     
   }
   
-  //Retrie les activité par date et set la liste
-  refreshActivities(listLocal){
-    
-    //Tri des étapes par chronologie
-    listLocal.sort(function (a, b) {
-      if (a.date - b.date === 0) { return a.heureDebut - b.heureDebut;};
-      return a.date - b.date;
-    });
-    //Recalcul du rank (ben c'est mieu que la position dans un array)
-    //Le rank commence à 1
-    for (var i = 0; i < listLocal.length; i++) {
-      listLocal[i].rank = i + 1;
-    }
-    
-    console.log(listLocal);
-    this.setState({ activities: listLocal });
-    
-    this.updateDateRangeLimit();
-  }
-
   /* Déclanchement de la sélection d'un étape */
   selectEtape(idEtape) {
     var selectionList = this.state.activities;
@@ -342,35 +308,16 @@ class Core extends React.Component {
         ligne.selected = false;
       }
     }
-    
-    this.setState({ ListV: selectionList });
-    
+    this.setState({ activities: selectionList });
   }
       
-  handleTripSelection(selectedTrip){
-    console.log("Chargement des activités pour :" + selectedTrip);
+  handleTripSelection(selectedTripKey){
+    const selectedTrip = this.state.trips.find(a => a.key === selectedTripKey);
+    console.log("Trip seected : " + selectedTrip.name)
     this.setState({selectedTrip: selectedTrip});
-    this.loadActivitiesFromDb(selectedTrip);
+    this.loadActivitiesFromDb(selectedTrip.key);
   }
   
-  //Créer le nouveau trip
-  createNewTrip(newTrip){
-    console.log("Création du trip: " + newTrip.tripName);
-    console.log(newTrip.dateRange);
-    let trips = this.state.trips;
-    trips.push(newTrip.tripName);
-    this.setState({ 
-      selectedTrip: newTrip.tripName,
-      trips : trips,
-      activities: [],
-      dateRangeLimit: newTrip.dateRange, 
-    });
-    //Création et enregistrement en base des activités vide pour chaque jour
-    this.updateListOfDays(newTrip.dateRange);
-  }
-
-
-    
   render() {
       return (
         <div className="core">
@@ -380,32 +327,37 @@ class Core extends React.Component {
           </Col>
         </Row>
         <Menu 
-             defaultPickerValue={this.state.dateRangeLimit} 
              selectedTrip={this.state.selectedTrip}
              trips={this.state.trips}
              handleTripSelection={this.handleTripSelection}
              createNewTrip={this.createNewTrip}
              deleteTrip={this.deleteTrip}
-             updateDefaultPickerValue={this.updateDateRangeLimit}
-             updateListOfDays={this.updateListOfDays}
             />
  
+        {this.state.selectedTrip !== null ? (
         <Row>
           <Col span={16}>
-            <TimeLine
+            <ActivitiesCalendar
+              selectedTrip={this.state.selectedTrip}
+              activities={this.state.activities}
+              addEtape={this.addEtape}
+              deleteActivity={this.deleteActivity}
+            />
+           {/*  <TimeLine
               activities={this.state.activities}
               selectEtape={this.selectEtape}
               deleteActivity={this.deleteActivity}
               deleteActivityByDateAndType={this.deleteActivityByDateAndType}
               addEtape={this.addEtape}
-            />
+            /> */}
           </Col>
           <Col span={8}>
-            <Carte
+            {/* <Carte
               activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
-            />
+            /> */}
           </Col>
         </Row>
+        ):''}
       </div>
     );
   }
