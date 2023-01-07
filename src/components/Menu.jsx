@@ -1,9 +1,10 @@
 import React from 'react';
 import {DatePicker, Row, Col, Tooltip, Button, Input, Modal, Form, Select} from 'antd';
 import { PlusCircleOutlined, DeleteOutlined} from '@ant-design/icons';
+import dayjs from "dayjs";
 import locale from "antd/es/date-picker/locale/fr_FR";
-import moment from "moment";
 import './menu.css';
+
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -56,7 +57,7 @@ class Menu extends React.Component {
             //Initialisation pour un nouveau voyage
             return {
                 tripName: "",
-                dateRange: [moment(), moment().add(7, 'days')],
+                dateRange: [dayjs(), dayjs().add(7, 'day')],
             };
         }else{
             //Initialisation avec le voyage actuel

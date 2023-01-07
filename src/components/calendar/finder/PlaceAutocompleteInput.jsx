@@ -6,20 +6,14 @@ class PlaceAutocompleteInput extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {value : this.props.value}
-    }
+        this.state = {value : this.props.value}  
+      }
 
     //pour l'autocompletion
     handleChange = (value) => {
         this.setState({ value: value });
     };
 
-    handleSelect = address => {
-        geocodeByAddress(address)
-        .then(results => getLatLng(results[0]))
-        .then(latLng => console.log('Success', latLng))
-        .catch(error => console.error('Error on GooglePlace Search', error));
-    };
 
      // Appel des l'API place pour récupérer des l'infos sur le Place selectionné
     handleSelect = async (sugestedAdress) => {
@@ -42,6 +36,7 @@ class PlaceAutocompleteInput extends React.Component {
             googleFormattedAddress: results[0].formatted_address,
             lat: latLng.lat,
             lng: latLng.lng,
+            sugestedAdress: sugestedAdress,
         };
 
         this.setState({ value: sugestedAdress });

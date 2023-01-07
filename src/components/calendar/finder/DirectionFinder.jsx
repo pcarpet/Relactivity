@@ -1,12 +1,10 @@
 /* eslint-disable no-undef */
 import React from "react";
 import "./finder.css"
-import "antd/dist/antd.css";
-import moment from "moment";
 import {TimePicker, Form, Button, Input, Modal, Radio } from "antd";
-import "moment/locale/fr";
 import Emoji from "a11y-react-emoji";
 import PlaceAutocompleteInput from "./PlaceAutocompleteInput";
+import dayjs from "dayjs";
 
 class DirectionFinder extends React.Component {
 
@@ -134,18 +132,18 @@ class DirectionFinder extends React.Component {
     console.log("GoogleFormattedAddress",this.state.placeStartFound.googleFormattedAddress);
 
     //Conversion de l'heure en moment
-    const heure = formValues.heure === undefined ? null : (formValues.heure === null ? null : moment(formValues.heure.format("HH:mm"), "HH:mm"));
+    /* const heure = formValues.heure === undefined ? null : (formValues.heure === null ? null : dayjs(formValues.heure.format("HH:mm"), "HH:mm"));
     let dateTimeStg = this.props.modalData.etapeDay.format("YYYYMMDD");
     if(heure !== null) dateTimeStg = dateTimeStg.concat('T', heure.format("HHmm"));
-    const dateTime = moment(dateTimeStg);
-    console.log(dateTime);
+    const dateTime = dayjs(dateTimeStg);
+    console.log(dateTime); */
 
     //Création du nouvel élément à sauvegarder
     let newItem = {
       key: this.props.modalData.isModify ? this.props.modalData.activityToModify.key : 0,
       activityType : this.props.modalData.timeOfDay,
       date: this.props.modalData.etapeDay,
-      heure: heure,
+      heure: dayjs(),
       nomEtape: formValues.nomEtape || null,
       travelModeInputValue : formValues.travelMode,
       selected: true,
