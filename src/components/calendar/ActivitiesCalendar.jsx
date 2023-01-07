@@ -2,8 +2,6 @@ import React from 'react'
 import FullCalendar from '@fullcalendar/react' // must go before plugins
 import timeGridPlugin from '@fullcalendar/timegrid' // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import momentPlugin  from '@fullcalendar/moment'
-import moment from "moment";
 import Finder from './finder/Finder';
 import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
 
@@ -14,17 +12,6 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
         super(props);
         
         this.state = { 
-            customview :{
-                dayTimeGridFourDay :{
-                type: 'timeGrid',
-                //duration: { days: 3 },
-                visibleRange:{
-                    start: this.props.selectedTrip.dateRange[0].format('YYYY-MM-DD'),
-                    end: this.props.selectedTrip.dateRange[1].clone().add(1,'days').format('YYYY-MM-DD')
-                },
-                buttonText: '5 days'
-                }
-            },
             customHeaderToolbar :{
                 left: null,
                 //center: "title",
@@ -49,7 +36,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
             //duration: { days: 3 },
             visibleRange:{
                 start: selectedTrip.dateRange[0].format('YYYY-MM-DD'),
-                end: selectedTrip.dateRange[1].clone().add(1,'days').format('YYYY-MM-DD')
+                end: selectedTrip.dateRange[1].add(1,'day').format('YYYY-MM-DD')
             },
             buttonText: '5 days'
             }
@@ -79,15 +66,13 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
     }
 
     createNewEvent(info){
-        //alert('selected ' + info.startStr + ' to ' + info.endStr);
         const selectedEvent = {startStr: info.startStr,endStr: info.endStr} 
-        this.setState({selectedEvent: selectedEvent, openModal: true, openModalToModify: false});
-
+        this.setState({selectedEvent: selectedEvent, openModal: true, openModalToModify: false, activityToModify: null});
     }
     
     modifyActivity = (key) => {
         const activity = this.props.activities.find((a) => key === a.key);
-        this.setState({activityToModify: activity, openModal: true, openModalToModify: true});
+        this.setState({activityToModify: activity, openModal: true, openModalToModify: true, selectedEvent: null});
     }
 
     deleteActivity = (key) => {
@@ -128,7 +113,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
     render() {
         return (
         <>
-            <Finder 
+            <Finder
                 openModal={this.state.openModal}
                 isModify={this.state.openModalToModify}
                 event={this.state.selectedEvent}
@@ -138,7 +123,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
             />
 
             <FullCalendar
-                plugins={[ timeGridPlugin, interactionPlugin, momentPlugin]}
+                plugins={[ timeGridPlugin, interactionPlugin]}
                 locale='fr'
                 initialView="dayTimeGridFourDay"
                 headerToolbar={this.state.customHeaderToolbar}

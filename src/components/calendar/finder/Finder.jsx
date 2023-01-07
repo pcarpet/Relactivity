@@ -1,10 +1,10 @@
 import React from "react";
 import StepFinder from "./Stepfinder";
+import dayjs from "dayjs";
+import 'dayjs/locale/fr';
 import { Menu, Button, Modal } from 'antd';
 import { PushpinOutlined, NodeIndexOutlined } from '@ant-design/icons';
-import moment from "moment";
 import "./finder.css"
-
 
 
 //Les keys du menu sont les id des formulaires des finders
@@ -28,7 +28,7 @@ class Finder extends React.Component {
         super(props);
         this.state ={
             finderType: 'stepfinder',
-            confirmLoading: false
+            confirmLoading: false,
         }
 
         this.finderLoading = this.finderLoading.bind(this)
@@ -40,12 +40,13 @@ class Finder extends React.Component {
     }
 
     getModalTitle(){
+        console.log(this.props.activityToModify)
         return (this.props.isModify ? 
-          "Modifier l'activité pour le " + this.props.activityActivityToModify.startDate.format("dddd DD MMM")
-          : "Ajouter une activité pour le "  + moment(this.props.event.startStr, moment.ISO_8601).format("dddd DD MMM"));
+          "Modifier l'activité pour le " + this.props.activityToModify.startDate.locale('fr').format("dddd DD MMM","fr")
+          : "Ajouter une activité pour le "  + dayjs(this.props.event.startStr).locale('fr').format("dddd DD MMM", "fr"));
     }
     
-    finderLoading(l){
+    finderLoading = (l) => {
         this.setState({confirmLoading : l});
     }
 
@@ -53,10 +54,12 @@ class Finder extends React.Component {
         switch (finderType) {
             case 'stepfinder':
                 return(
-                    <StepFinder  
+                    <StepFinder
+                    //On bricole la génération d'une clef pour réinitialiser le composant sinon le init du Form ne met pas à jour.
+                    key={this.props.isModify?this.props.activityToModify.key:dayjs().unix()}
                     isModify={this.props.isModify}
                     eventToCreate={this.props.event}
-                    activityToModify={this.props.activityToModify} //notimplemented
+                    activityToModify={this.props.activityToModify}
                     closeModal={this.props.closeModal}
                     addEtape={this.props.addEtape}
                     finderLoading={this.finderLoading}
@@ -70,12 +73,15 @@ class Finder extends React.Component {
                                     addEtape={this.props.addEtape}  /> */
                     
                 )
+            default :
+                    console.error('Type de finder / formulaire non reconnu');
                 
         }
     }
 
     render() {
         return (
+            
             <Modal
             title={this.props.openModal ? this.getModalTitle():''}
             open={this.props.openModal} 

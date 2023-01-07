@@ -2,16 +2,19 @@ import React from 'react';
 import './core.css'
 import {database} from "../firebase.js";
 import { get, ref, push, update, child, remove } from "firebase/database";
-import moment from "moment";
 import Menu from './Menu';
-import TimeLine from './time/TimeLine';
 import ActivitiesCalendar from './calendar/ActivitiesCalendar';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
 import { UserContext } from "./auth/UserContext"
 import { ThemeConsumer } from 'styled-components';
+import dayjs from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import customSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 const db = database;
+dayjs.extend(customParseFormat);
+dayjs.extend(customSameOrBefore);
 
 class Core extends React.Component {
   
@@ -59,7 +62,7 @@ class Core extends React.Component {
       if (snapshot.exists()) {
         snapshot.forEach(trip => {
           let tripValue = trip.val();
-          tripsFromDb.push({key : trip.key, name : tripValue.name, dateRange : tripValue.dateRange.map(dr => moment(dr,"YYYY-MM-DD"))});
+          tripsFromDb.push({key : trip.key, name : tripValue.name, dateRange : tripValue.dateRange.map(dr => dayjs(dr,"YYYY-MM-DD"))});
         });
       }else{
         console.log("No data available");
@@ -79,7 +82,7 @@ class Core extends React.Component {
   //Chargement des donnée de la base
   loadActivitiesFromDb(tripKey){
     
-    //  console.log("Chargement des données de la base");
+    console.log("Chargement des données de la base");
     
     get(ref(db,`${this.state.userUid}/${tripKey}/activities`)).then((snapshot) => {
       if (snapshot.exists()) {
@@ -89,14 +92,15 @@ class Core extends React.Component {
           //Ajout et convertion des activité de la base
           var activityFromDb = activity.val();
           activityFromDb.key = activity.key;
-          activityFromDb.startDate = moment(activityFromDb.startDate, "YYYY-MM-DDTHH:mm");
+          activityFromDb.startDate = dayjs(activityFromDb.startDate, "YYYY-MM-DDTHH:mm");
           if(activityFromDb.endDate){
-            activityFromDb.endDate = moment(activityFromDb.endDate, "YYYY-MM-DDTHH:mm");
+            activityFromDb.endDate = dayjs(activityFromDb.endDate, "YYYY-MM-DDTHH:mm");
           }
           activitiesConverted.push(activityFromDb);
           
         })
 
+        console.log('Loaded activities', activitiesConverted)
         this.setState({ activities: activitiesConverted});
       } else {
         console.log("No data available");
@@ -122,7 +126,7 @@ class Core extends React.Component {
     
     //Copy pour le formatage des dates
     var newTripToSaveDb = Object.assign({},newTripToSave);
-    newTripToSaveDb.dateRange = newTripToSaveDb.dateRange.map(t => t.format("YYYY-MM-DD"));
+    newTripToSaveDb.dateRange = newTripToSaveDb.dateRange.map(t => t.toISOString());
 
     console.log(newTripToSaveDb);
 
@@ -153,9 +157,9 @@ class Core extends React.Component {
     
     var activityForDb = Object.assign({},etape);
     //TODO : faire une fonction utils pour formater les dates
-    activityForDb.startDate = activityForDb.startDate.format("YYYY-MM-DDTHH:mm");
+    activityForDb.startDate = activityForDb.startDate.toISOString();
     if(activityForDb.endDate !== null){
-      activityForDb.endDate = activityForDb.endDate.format("YYYY-MM-DDTHH:mm");
+      activityForDb.endDate = activityForDb.endDate.toISOString();
     }
 
     // Formatage des direction result pour pouvoir etre chagé en base
@@ -273,15 +277,17 @@ class Core extends React.Component {
     const debut = this.state.selectedTrip.dateRange[0];
     const fin = this.state.selectedTrip.dateRange[1];
     
-    console.log(debut);
-    
-    var day = debut.clone();
+    console.log('debut',debut);
+    console.log('fin',fin);
+    var day = debut;
+    console.log('day',day);
     //Liste des jour compris dans la période
     var periodeList = [];
     
     while(day.isSameOrBefore(fin)){
-      periodeList.push(day.clone());
-      day.add(1, 'days');
+      periodeList.push(day);
+      console.log('day',day);
+      day = day.add(1, 'day');
     }
     
     console.log(periodeList);
