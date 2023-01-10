@@ -11,7 +11,9 @@ class PlaceAutocompleteInput extends React.Component {
 
     //pour l'autocompletion
     handleChange = (value) => {
+        console.log('valeur input lieu :', value);
         this.setState({ value: value });
+        this.props.handlePlaceInputValue(value);
     };
 
 

@@ -30,11 +30,15 @@ function StepFinder (props) {
 
   //############### Gestion des Inputs ########################
   
-  //Appeler en callback par le Google place autocomplete
+  //Appeler en callback par le Google place autocomplete sur sélection du résultat
   const handlePlaceFound = (place) => {
     setPlaceFound(place);
   };
 
+   //Appeler en callback par le Place autcomplete pour prendre la valeur saisie
+   const handlePlaceInputValue = (value) => {
+    setAddressSearched(value);
+  };
  
   /* Validation du formulaire */
   const onFinish = (formValues, props) => {
@@ -45,7 +49,6 @@ function StepFinder (props) {
     props.finderLoading(true);
     
     console.log('addressSearched', addressSearched);
-    console.log('placeFound.placeId', placeFound.placeId);
 
     //FIXME: Afficer l'erreur grace au Form (cf. render))
     if ((props.isModify && addressSearched === '') || (!props.isModify && placeFound.placeId === null) ) {
@@ -53,11 +56,11 @@ function StepFinder (props) {
      return;
     }
 
-    console.log("GoogleFormattedAddress",placeFound.googleFormattedAddress);
 
     //Création du nouvel élément à sauvegarder sans la localisation
     let newItem = {
       key: props.isModify ? props.activityToModify.key : 0,
+      type: 'step',
       startDate: (props.isModify ? props.activityToModify.startDate : dayjs(props.eventToCreate.startStr))
                       .hour(formValues.heureDebut.hour())
                       .minute(formValues.heureDebut.minute()),
@@ -68,7 +71,7 @@ function StepFinder (props) {
       selected: true,
     };
     //Sauvegarde de la localisation. En cas de modification de l'étape sans recherche d'adresse, les éléments de localisation ne sont pas rechargés
-    if(placeFound.placeId !== null){
+    if(placeFound !== undefined && placeFound.placeId !== null){
       newItem.origin = { 
         addressSearched: addressSearched || null,
         placeId: placeFound.placeId || null,
@@ -108,7 +111,7 @@ function StepFinder (props) {
         wrapperCol={{ span: 16 }}
         onFinish={(values) => onFinish(values, props)}
         onFinishFailed={onFinishFailed}
-        requiredMark={false}
+        requiredMark={true}
         initialValues={initFormValue(props)}
       >
             <Form.Item
@@ -139,6 +142,7 @@ function StepFinder (props) {
               <PlaceAutocompleteInput             
                 value={addressSearched}
                 handlePlaceFound={handlePlaceFound}
+                handlePlaceInputValue={handlePlaceInputValue}
               />
       
               <Form.Item label="Nombre de nuits" name="nbnuits"> 

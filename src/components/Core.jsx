@@ -7,7 +7,6 @@ import ActivitiesCalendar from './calendar/ActivitiesCalendar';
 import Carte from './space/Carte';
 import {Row, Col} from "antd";
 import { UserContext } from "./auth/UserContext"
-import { ThemeConsumer } from 'styled-components';
 import dayjs from "dayjs";
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import customSameOrBefore from 'dayjs/plugin/isSameOrBefore';

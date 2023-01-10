@@ -1,5 +1,6 @@
 import React from "react";
 import StepFinder from "./Stepfinder";
+import DirectionFinder from "./DirectionFinder";
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
 import { Menu, Button, Modal } from 'antd';
@@ -7,35 +8,27 @@ import { PushpinOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import "./finder.css"
 
 
-//Les keys du menu sont les id des formulaires des finders
-const finderMenuItems = [
-    {
-      label: 'Activité',
-      key: 'stepfinder',
-      icon: <PushpinOutlined />,
-    },
-    {
-      label: 'Itinéraire',
-      key: 'directionfinder',
-      icon: <NodeIndexOutlined />,
-    }]
-
-
-
 class Finder extends React.Component {
 
     constructor(props) {
         super(props);
         this.state ={
-            finderType: 'stepfinder',
+            finderType: this.props.isModify ? this.props.activityToModify.type + 'finder' : 'stepfinder',
             confirmLoading: false,
         }
 
         this.finderLoading = this.finderLoading.bind(this)
     }
 
+/*     getFinderType(type){
+        return  this.props.isModify ? this.props.activityToModify.type + 'finder' : 'stepfinder',
+    } */
+
     onMenuClick = (e) => {
         console.log('event', e);
+        console.log('finderType', this.state.finderType);
+        if(this.state.finderType === e.key) return ;
+
         this.setState({finderType: e.key});
     }
 
@@ -50,13 +43,28 @@ class Finder extends React.Component {
         this.setState({confirmLoading : l});
     }
 
+//Les keys du menu sont les id des formulaires des finders
+    getFinderMenuItem(isModify, type){
+        return [
+            {
+            label: 'Activité',
+            key: 'stepfinder',
+            icon: <PushpinOutlined />,
+            disabled: isModify && type !== 'stepfinder'
+            },
+            {
+            label: 'Itinéraire',
+            key: 'directionfinder',
+            icon: <NodeIndexOutlined />,
+            disabled: isModify && type !== 'directionfinder'
+            }]
+    }
+
     renderFinder(finderType){
         switch (finderType) {
             case 'stepfinder':
                 return(
                     <StepFinder
-                    //On bricole la génération d'une clef pour réinitialiser le composant sinon le init du Form ne met pas à jour.
-                    key={this.props.isModify?this.props.activityToModify.key:dayjs().unix()}
                     isModify={this.props.isModify}
                     eventToCreate={this.props.event}
                     activityToModify={this.props.activityToModify}
@@ -66,11 +74,15 @@ class Finder extends React.Component {
                     />
                 )
             case 'directionfinder':
-                return('toto'
-                       /*  <DirectionFinder 
-                                    closeModal={this.closeDirectionModal}
-                                    modalData={this.state.modalData} 
-                                    addEtape={this.props.addEtape}  /> */
+                return(
+                    <DirectionFinder 
+                        isModify={this.props.isModify}
+                        eventToCreate={this.props.event}
+                        activityToModify={this.props.activityToModify}
+                        closeModal={this.props.closeModal}
+                        addEtape={this.props.addEtape}  
+                        finderLoading={this.finderLoading}
+                    />
                     
                 )
             default :
@@ -81,7 +93,7 @@ class Finder extends React.Component {
 
     render() {
         return (
-            
+    
             <Modal
             title={this.props.openModal ? this.getModalTitle():''}
             open={this.props.openModal} 
@@ -103,11 +115,11 @@ class Finder extends React.Component {
                     onClick={this.onMenuClick}
                     selectedKeys={[this.state.finderType]}
                     mode="horizontal" 
-                    items={finderMenuItems} 
-                    />
-                <div className="StepFinder">
-                    {this.renderFinder(this.state.finderType)}
-                </div>
+                    items={this.getFinderMenuItem(this.props.isModify, this.state.finderType)} 
+                />
+                    <div className="StepFinder">
+                        {this.renderFinder(this.state.finderType)}
+                    </div>
             </Modal>
         );
     }
