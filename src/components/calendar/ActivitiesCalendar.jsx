@@ -3,6 +3,7 @@ import FullCalendar from '@fullcalendar/react' // must go before plugins
 import timeGridPlugin from '@fullcalendar/timegrid' // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import Finder from './finder/Finder';
+import dayjs from "dayjs";
 import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
 
 
@@ -114,6 +115,8 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
         return (
         <>
             <Finder
+                //On bricole la génération d'une clef pour réinitialiser le composant sinon le init du Form ne met pas à jour et reste sur la derniere instance.
+                key={this.state.openModalToModify?this.state.activityToModify.key:dayjs().unix()}
                 openModal={this.state.openModal}
                 isModify={this.state.openModalToModify}
                 event={this.state.selectedEvent}
