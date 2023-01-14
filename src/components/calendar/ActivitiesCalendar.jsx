@@ -51,6 +51,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 title: a.nomEtape,
                 start: a.startDate.toISOString(),
                 end: a.endDate.toISOString(),
+                borderColor: a.selected ? '#00ff00':'',
                 extendedProps: {
                     activitykey: a.key,
                     //On passe les fonctions directement dans l'event car le renderEventContent n'est pas capable de voir le contexte de cette class
@@ -60,7 +61,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
             }
         });
 
-        console.log(events);
+        //console.log(events);
 
         return events;
 
@@ -110,6 +111,10 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
         )
     }
 
+    eventClick = (eventInfo) => {
+        console.log('click on event', eventInfo.event.extendedProps.activitykey)
+        this.props.selectEtape(eventInfo.event.extendedProps.activitykey);
+    }
 
     render() {
         return (
@@ -137,9 +142,11 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 slotMinTime='07:00:00'
                 slotMaxTime='22:00:00'
                 slotDuration='00:30:00'
+                eventBackgroundColor='#3788d8'
                 select={(info) => this.createNewEvent(info)}
                 events={this.mapActivitiesToEvent(this.props.activities)}
                 eventContent={this.renderEventContent}
+                eventClick={this.eventClick}
                 
             />
         </>

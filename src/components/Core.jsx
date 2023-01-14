@@ -304,15 +304,12 @@ class Core extends React.Component {
   }
   
   /* Déclanchement de la sélection d'un étape */
-  selectEtape(idEtape) {
-    var selectionList = this.state.activities;
-    for (const ligne of selectionList) {
-      if (ligne.key === idEtape) {
-        ligne.selected = true;
-      } else {
-        ligne.selected = false;
-      }
-    }
+  selectEtape = (idEtape) => {
+    let selectionList = [];
+    // Map et non mutable, il n'affecte pasle state
+    selectionList = this.state.activities.map( a => { a.selected = false; return a; }  )
+    //Find est mutable ca met à jour tout seul
+    selectionList.find((k) => k.key === idEtape).selected = true;
     this.setState({ activities: selectionList });
   }
       
@@ -341,25 +338,19 @@ class Core extends React.Component {
  
         {this.state.selectedTrip !== null ? (
         <Row>
-          <Col span={16}>
+          <Col span={14}>
             <ActivitiesCalendar
               selectedTrip={this.state.selectedTrip}
               activities={this.state.activities}
               addEtape={this.addEtape}
               deleteActivity={this.deleteActivity}
-            />
-           {/*  <TimeLine
-              activities={this.state.activities}
               selectEtape={this.selectEtape}
-              deleteActivity={this.deleteActivity}
-              deleteActivityByDateAndType={this.deleteActivityByDateAndType}
-              addEtape={this.addEtape}
-            /> */}
+            />
           </Col>
-          <Col span={8}>
-            {/* <Carte
-              activitiesList={this.state.activities.filter(a => a.activityType !== 'day')}
-            /> */}
+          <Col span={10}>
+            <Carte
+              activitiesList={this.state.activities}
+            /> 
           </Col>
         </Row>
         ):''}

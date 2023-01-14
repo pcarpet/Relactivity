@@ -78,7 +78,6 @@ function DirectionFinder (props) {
       endDate: newEndDate,
       nomEtape: formValues.nomEtape || null,
       travelModeInputValue : formValues.travelMode,
-      selected: true,
     };
 
     let startPlaceId = placeStartFound.placeId || null;

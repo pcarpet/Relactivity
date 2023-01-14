@@ -60,6 +60,7 @@ class Carte extends React.Component {
 
   displayActivityOnMap(place){
 
+      console.log('place', place);
       return (
           <Marker 
               key={place.key} 
@@ -72,13 +73,12 @@ class Carte extends React.Component {
   }
 
   //FIXME : Attention la méthode est appelée 2x
-  displayDirectionsOnMap(act) {
+  displayDirectionsOnMap = (act) => {
 
     const routes = act
         .filter(act => act.route !== undefined && act.route !== null)
         .map(act => {
           const key  = act.route.geocoded_waypoints[0].place_id + act.route.request.travelMode + act.route.geocoded_waypoints[1].place_id ;
-      
           return {key: key, value: act.route};
         });
     
@@ -94,6 +94,7 @@ class Carte extends React.Component {
     
     
     //création des Polyline
+
     for(const route of routes){
       console.log(route.key)
 
@@ -102,15 +103,14 @@ class Carte extends React.Component {
         const path = decodePolyline(route.value.routes[0].overview_polyline);
         polylines[route.key] = this.renderPolylines(this.state.maps,path);
         polylines[route.key].setMap(this.state.map);
-        this.setState({polylines : polylines})
       }
     }
-
-    return '';
+    
+    //this.setState({polylines : polylines})
 
   }
 
-  renderPolylines (maps, path) {
+  renderPolylines = (maps, path) => {
 
     if (maps === undefined || maps == null) { return;}
 

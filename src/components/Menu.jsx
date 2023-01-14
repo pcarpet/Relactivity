@@ -103,14 +103,13 @@ class Menu extends React.Component {
                         <Input />
                     </Form.Item>
 
-
                     {/* FIXEME : Actualisation auto de la date de fin : https://ant.design/components/date-picker/ : Select range dates in 7 days */}
                     <Form.Item label="Période" name="dateRange">
                         <RangePicker 
-                                format='DD/MM/YYYY'
-                                locale={locale}
-                                allowClear={false}
-                                />
+                            format='DD/MM/YYYY'
+                            locale={locale}
+                            allowClear={false}
+                            />
                     </Form.Item>
 
                 </Form>

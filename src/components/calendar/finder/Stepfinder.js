@@ -68,7 +68,6 @@ function StepFinder (props) {
                       .hour(formValues.heureFin.hour())
                       .minute(formValues.heureFin.minute()),
       nomEtape: formValues.nomEtape || null,
-      selected: true,
     };
     //Sauvegarde de la localisation. En cas de modification de l'étape sans recherche d'adresse, les éléments de localisation ne sont pas rechargés
     if(placeFound !== undefined && placeFound.placeId !== null){
