@@ -186,6 +186,8 @@ class Core extends React.Component {
     }
     
     this.setState({ activities: listLocal });
+    
+    this.selectEtape(etape.key)
     //FIXE ME : Ca fait 2 Set Sate c'est ultra couteu : 
     //On centre la carte sur la nouvelle étape si ce n'est pas une day activity
     /* if(etape.activityType !== 'day')

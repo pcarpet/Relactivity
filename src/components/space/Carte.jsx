@@ -35,8 +35,11 @@ class Carte extends React.Component {
 
     if (maps === undefined || maps == null) { return;}
 
+    let activities = this.props.activitiesList;   
+
+
     var bounds = new maps.LatLngBounds();
-    if(this.props.activitiesList.length ===0){
+    if(activities.length ===0){
       // C'est la FRANCE monsieur
       let initMapsZone = [{lat: 50.802448,long:-4.947507},
                           {lat: 42.559802,long:-4.947507},
@@ -46,7 +49,13 @@ class Carte extends React.Component {
         bounds.extend(new maps.LatLng(place.lat, place.long));
       }
     }else{
-      for (let place of this.props.activitiesList) {
+
+      //Si il y a une activité sélectioné on zoom dessus
+     if(activities.find(a => a.selected) !== undefined){
+        activities = activities.filter(a => a.selected);
+      } 
+
+      for (let place of activities) {
         bounds.extend(new maps.LatLng(place.origin.lat, place.origin.long));
       }
     }
