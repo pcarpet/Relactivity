@@ -70,11 +70,14 @@ class Carte extends React.Component {
   displayActivityOnMap(place){
 
       console.log('place', place);
-      return (
+
+    
+
+     return (
           <Marker 
               key={place.key} 
               lat={place.origin.lat} lng={place.origin.long}
-              text={place.key + ""}
+              text={place.startDate.locale('fr').format("ddd DD/MM - hh:mm","fr")}
               isActive={place.selected}
             />
       )

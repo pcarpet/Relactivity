@@ -8,14 +8,14 @@ https://github.com/google-map-react/google-map-react-examples/blob/master/src/ex
 */
 
 
-const Wrapper = styled.div`
+const Pin = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
   width: 18px;
   height: 18px;
-  background-color: ${(props) => (props.isActive ? "#0f0" : "#f00")};
-  border: 2px solid #f00;   
+  background-color: ${(props) => (props.isActive ? "#0f0" : "#3788d8")};
+  border: 1px solid #000;   
   border-radius: 100%;
   user-select: none;
   transform: translate(-50%, -50%);
@@ -25,12 +25,35 @@ const Wrapper = styled.div`
   }
 `;
 
+const InfoPop = styled.div`
+    position: relative;
+    transform: translate(-10px, -40px);
+    float : left;
+    white-space:nowrap;
+    padding: 0.5em 1em;
+    background-color: #fff;
+    border-radius: 0.5em;
+    &:after {
+      content:""; 
+      border-left:7px solid transparent;
+      border-right:7px solid transparent;
+      border-top: 10px solid #fff;
+      position: absolute;
+      top: 22px;
+      left: 4px;
+    }
+`;
+
 const Marker = ({ text, onClick, isActive }) => (
-  <Wrapper
-        alt={text}
-        onClick={onClick}
-        isActive={isActive}
-  />
+  <>
+    <Pin
+    onClick={onClick}
+    isActive={isActive}
+    />
+    <InfoPop >
+      {text}
+    </InfoPop>
+  </>
 );
 
 Marker.defaultProps = {
