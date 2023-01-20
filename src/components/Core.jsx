@@ -352,7 +352,7 @@ class Core extends React.Component {
           <Col span={10}>
             <Carte
               activitiesList={this.state.activities}
-            /> 
+            />
           </Col>
         </Row>
         ):''}

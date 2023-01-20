@@ -8,7 +8,7 @@ import { PushpinOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import "./finder.css"
 
 
-class Finder extends React.Component {
+class EventModal extends React.Component {
 
     constructor(props) {
         super(props);
@@ -127,4 +127,4 @@ class Finder extends React.Component {
 
 }
 
-export default Finder;
+export default EventModal;

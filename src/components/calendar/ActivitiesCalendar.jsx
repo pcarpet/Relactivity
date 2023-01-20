@@ -2,7 +2,7 @@ import React from 'react'
 import FullCalendar from '@fullcalendar/react' // must go before plugins
 import timeGridPlugin from '@fullcalendar/timegrid' // a plugin!
 import interactionPlugin from '@fullcalendar/interaction'; // for selectable
-import Finder from './finder/Finder';
+import EventModal from './finder/EventModal';
 import dayjs from "dayjs";
 import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
 
@@ -27,7 +27,6 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
         this.closeFinderModal = this.closeFinderModal.bind(this);
         this.modifyActivity = this.modifyActivity.bind(this);
         this.deleteActivity = this.deleteActivity.bind(this);
-
     }
   
     getCustomView(selectedTrip){
@@ -66,6 +65,28 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
         return events;
 
     }
+
+    eventDrop = (eventDropInfo) => {
+        let newItem = {
+            key: eventDropInfo.oldEvent.extendedProps.activitykey,
+            startDate: dayjs(eventDropInfo.event.startStr),
+            endDate: dayjs(eventDropInfo.event.endStr)
+        };
+        //modification et màj liste d'activité
+        this.props.addEtape(newItem);
+    }
+
+    eventResize = (eventResizeInfo ) => {
+        let newItem = {
+            key: eventResizeInfo.oldEvent.extendedProps.activitykey,
+            startDate: dayjs(eventResizeInfo.oldEvent.start.getTime() + eventResizeInfo.startDelta.milliseconds),
+            endDate: dayjs(eventResizeInfo.oldEvent.end.getTime() + eventResizeInfo.endDelta.milliseconds)
+        };
+        //modification et màj liste d'activité
+        this.props.addEtape(newItem);
+    }
+
+  
 
     createNewEvent(info){
         const selectedEvent = {startStr: info.startStr,endStr: info.endStr} 
@@ -119,7 +140,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
     render() {
         return (
         <>
-            <Finder
+            <EventModal
                 //On bricole la génération d'une clef pour réinitialiser le composant sinon le init du Form ne met pas à jour et reste sur la derniere instance.
                 key={this.state.openModalToModify?this.state.activityToModify.key:dayjs().unix()}
                 openModal={this.state.openModal}
@@ -139,6 +160,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 allDaySlot={true}
                 selectable={true}
                 selectMirror={true}
+                editable={true}
                 slotMinTime='07:00:00'
                 slotMaxTime='22:00:00'
                 slotDuration='00:30:00'
@@ -147,6 +169,8 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 events={this.mapActivitiesToEvent(this.props.activities)}
                 eventContent={this.renderEventContent}
                 eventClick={this.eventClick}
+                eventDrop={this.eventDrop}
+                eventResize={this.eventResize}
                 
             />
         </>
