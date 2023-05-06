@@ -4,6 +4,7 @@ import GoogleMapReact from 'google-map-react'; //https://github.com/google-map-r
 import shouldPureComponentUpdate from 'react-pure-render/function';
 const decodePolyline = require("decode-google-map-polyline");
 
+
 class Carte extends React.Component {
   constructor(props) {
     super(props);
@@ -14,8 +15,31 @@ class Carte extends React.Component {
       maps: null,
       GMAPS_API_KEY: "AIzaSyCsEisE6ttI_E8imbal3A4PdXJkLf9a0zc",
       polylines : [],
+      options : {
+        styles: [{
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [
+            { visibility: "on" }
+          ]
+        }]
+      /*   mapTypeControlOptions: {
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+          position: google.maps.ControlPosition.TOP_RIGHT
+        } */
+      },
+      mapOptions : {
+        mapId: 'e8fbc944e4790e01'
+        /* fullscreenControl: false,
+        zoomControl: false,
+        streetViewControl: false,
+        mapTypeControl: false, */
+      }
     };
   }
+
+
+
 
   onMapLoaded(map, maps) {
     this.fitBounds(map, maps);
@@ -112,9 +136,12 @@ class Carte extends React.Component {
 
       if(polylines[route.key] === undefined){
         //console.log("Création d'un nouveau polyline")
-        const path = decodePolyline(route.value.routes[0].overview_polyline);
-        polylines[route.key] = this.renderPolylines(this.state.maps,path);
-        polylines[route.key].setMap(this.state.map);
+        let path = decodePolyline(route.value.routes[0].overview_polyline);
+        let polyline = this.renderPolylines(this.state.maps,path);
+        if(polyline ==! null){
+          polylines[route.key] = polyline;
+          polylines[route.key].setMap(this.state.map);
+        }
       }
     }
     
@@ -124,7 +151,7 @@ class Carte extends React.Component {
 
   renderPolylines = (maps, path) => {
 
-    if (maps === undefined || maps == null) { return;}
+    if (maps === undefined || maps == null) { return null;}
 
     let nonGeodesicPolyline = new maps.Polyline({
       path: path,
@@ -156,6 +183,7 @@ class Carte extends React.Component {
             language: "fr",
             region: "fr_FR",
           }}
+          options={this.state.mapOptions}
           center={[48.85, 2.33]}
           zoom={11}
           yesIWantToUseGoogleMapApiInternals={true}
@@ -165,6 +193,8 @@ class Carte extends React.Component {
           onChildClick={this._onChildClick}
           onChildMouseEnter={this._onChildMouseEnter}
           onChildMouseLeave={this._onChildMouseLeave}
+          //mapId="e8fbc944e4790e01"
+
         >
           {this.props.activitiesList.map(place => this.displayActivityOnMap(place))}
           {this.displayDirectionsOnMap(this.props.activitiesList)}
