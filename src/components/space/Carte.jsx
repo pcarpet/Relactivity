@@ -88,6 +88,9 @@ class Carte extends React.Component {
 
   _onClick({ x, y, lat, lng, event }) {
     console.log(x, y, lat, lng, event);
+    console.log("Is event:" + "placeId" in event)
+    
+
   }
 
 
@@ -190,10 +193,10 @@ class Carte extends React.Component {
           onGoogleApiLoaded={({ map, maps }) => this.onMapLoaded(map, maps)}
           onChange={this.onMapChange()}
           onBoundsChange={this._onBoundsChange}
-          onChildClick={this._onChildClick}
+          //onChildClick={this._onChildClick}
+          onClick={this._onClick}
           onChildMouseEnter={this._onChildMouseEnter}
           onChildMouseLeave={this._onChildMouseLeave}
-          //mapId="e8fbc944e4790e01"
 
         >
           {this.props.activitiesList.map(place => this.displayActivityOnMap(place))}
