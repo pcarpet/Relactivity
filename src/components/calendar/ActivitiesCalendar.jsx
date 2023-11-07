@@ -162,7 +162,7 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 selectMirror={true}
                 editable={true}
                 slotMinTime='07:00:00'
-                slotMaxTime='22:00:00'
+                slotMaxTime='23:00:00'
                 slotDuration='00:30:00'
                 eventBackgroundColor='#3788d8'
                 select={(info) => this.createNewEvent(info)}
