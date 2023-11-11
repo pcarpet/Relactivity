@@ -28,6 +28,7 @@ class Core extends React.Component {
       trips: [],
       selectedTrip: null, //{key : null, name: null, dateRange: []}
       activities: [],
+      poiData: {types : []}
     };
 
     this.addEtape = this.addEtape.bind(this);
@@ -38,6 +39,7 @@ class Core extends React.Component {
     this.createNewTrip = this.createNewTrip.bind(this);
     this.deleteTrip = this.deleteTrip.bind(this);
     this.deleteActivityByDateAndType = this.deleteActivityByDateAndType.bind(this);
+    
 
   }
 
@@ -322,6 +324,10 @@ class Core extends React.Component {
     this.loadActivitiesFromDb(selectedTrip.key);
   }
   
+  displayPoiData = (poiData) => {
+    this.setState({poiData : poiData});
+  }
+
   render() {
       return (
         <div className="core">
@@ -352,7 +358,12 @@ class Core extends React.Component {
           <Col span={10}>
             <Carte
               activitiesList={this.state.activities}
+              displayPoiData={this.displayPoiData}
             />
+            <div>
+              Adresse : {this.state.poiData.formatted_address}
+              Type : {this.state.poiData.types[0]}
+            </div>
           </Col>
         </Row>
         ):''}
