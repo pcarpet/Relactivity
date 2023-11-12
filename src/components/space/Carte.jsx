@@ -11,7 +11,9 @@ export default function Carte({activitiesList, displayPoiData}) {
       
 
     // Initialize the map
-    const map = new window.google.maps.Map(mapRef.current);
+    const map = new window.google.maps.Map(mapRef.current,{
+        mapId : 'e8fbc944e4790e01'
+    });
 
     // Create a PlacesService to get details about the clicked location
     const placesService = new window.google.maps.places.PlacesService(map);
@@ -112,6 +114,6 @@ export default function Carte({activitiesList, displayPoiData}) {
     return bounds;
   }
 
-  return <div ref={mapRef} style={{ width: '100%', height: '500px' }} />;
+  return <div ref={mapRef} style={{ width: '100%', height: '85vh' }} />;
 };
 
