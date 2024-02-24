@@ -4,7 +4,7 @@ import {database} from "../firebase.js";
 import { get, ref, push, update, child, remove } from "firebase/database";
 import Menu from './Menu';
 import ActivitiesCalendar from './calendar/ActivitiesCalendar';
-import Carte from './space/Carte';
+import Space from './space/Space';
 import {Row, Col} from "antd";
 import { UserContext } from "./auth/UserContext"
 import dayjs from "dayjs";
@@ -15,10 +15,16 @@ const db = database;
 dayjs.extend(customParseFormat);
 dayjs.extend(customSameOrBefore);
 
+const calendarSlotTimeRange = {
+  min : '07:00:00',
+  max :'23:00:00',
+  duration : '00:30:00'
+}
+
 class Core extends React.Component {
   
   static contextType = UserContext;
-  
+
   constructor(props, context) {
     super(props);
 
@@ -28,7 +34,6 @@ class Core extends React.Component {
       trips: [],
       selectedTrip: null, //{key : null, name: null, dateRange: []}
       activities: [],
-      poiData: {types : []}
     };
 
     this.addEtape = this.addEtape.bind(this);
@@ -324,11 +329,11 @@ class Core extends React.Component {
     this.loadActivitiesFromDb(selectedTrip.key);
   }
   
-  displayPoiData = (poiData) => {
-    this.setState({poiData : poiData});
-  }
+
 
   render() {
+
+
       return (
         <div className="core">
         <Row>
@@ -348,6 +353,7 @@ class Core extends React.Component {
         <Row>
           <Col span={14}>
             <ActivitiesCalendar
+              calendarSlotTimeRange={calendarSlotTimeRange}
               selectedTrip={this.state.selectedTrip}
               activities={this.state.activities}
               addEtape={this.addEtape}
@@ -356,14 +362,14 @@ class Core extends React.Component {
             />
           </Col>
           <Col span={10}>
-            <Carte
+            <Space
               activitiesList={this.state.activities}
-              displayPoiData={this.displayPoiData}
+              tripStartDate= {this.state.selectedTrip.dateRange[0]}
+              tripEndDate={this.state.selectedTrip.dateRange[1]}        
+              hoursRange={calendarSlotTimeRange}
+              addEtape={this.addEtape}
             />
-            <div>
-              Adresse : {this.state.poiData.formatted_address}
-              Type : {this.state.poiData.types[0]}
-            </div>
+
           </Col>
         </Row>
         ):''}
