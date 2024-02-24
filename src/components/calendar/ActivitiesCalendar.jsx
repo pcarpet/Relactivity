@@ -161,9 +161,9 @@ import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
                 selectable={true}
                 selectMirror={true}
                 editable={true}
-                slotMinTime='07:00:00'
-                slotMaxTime='23:00:00'
-                slotDuration='00:30:00'
+                slotMinTime={this.props.calendarSlotTimeRange.min}
+                slotMaxTime={this.props.calendarSlotTimeRange.max}
+                slotDuration={this.props.calendarSlotTimeRange.duration}
                 eventBackgroundColor='#3788d8'
                 select={(info) => this.createNewEvent(info)}
                 events={this.mapActivitiesToEvent(this.props.activities)}

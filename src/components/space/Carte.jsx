@@ -8,7 +8,7 @@ export default function Carte({activitiesList, displayPoiData}) {
   
 
   useEffect(() => {
-      
+    console.log("Reinitialisaiton de la ma. MapRef: ", mapRef);
 
     // Initialize the map
     const map = new window.google.maps.Map(mapRef.current,{
@@ -85,9 +85,12 @@ export default function Carte({activitiesList, displayPoiData}) {
     //Fit bounds to the markers or la France
     map.fitBounds(fitMyBounds(activitiesList));
 
-    // You can, polygons, etc. here
-
-  }, [activitiesList, displayPoiData]); // Run this effect only once on component mount
+    return () => {
+      //TODO: Je dois certainement cleaner des trucs mais je ne sais pas quoi....
+    };
+    //il m'emmerde avec son callback, apparement c'est que pour de l'optim...
+    // eslint-disable-next-line 
+  }, [activitiesList]); // Run this effect only once on component mount
 
 
   function fitMyBounds(activities) {
@@ -114,6 +117,6 @@ export default function Carte({activitiesList, displayPoiData}) {
     return bounds;
   }
 
-  return <div ref={mapRef} style={{ width: '100%', height: '85vh' }} />;
+  return <div ref={mapRef} style={{ width: '100%', height: '75vh' }} />;
 };
 
