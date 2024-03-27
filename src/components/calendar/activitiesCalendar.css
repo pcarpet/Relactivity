@@ -1,0 +1,21 @@
+.fc-day.fc-day-mon a{
+    color: #1abc9c;
+}
+.fc-day.fc-day-tue a{
+    color: #3498db;
+}
+.fc-day.fc-day-wed a{
+    color: #9b59b6;
+}
+.fc-day.fc-day-thu a{
+    color: #f1c40f;
+}
+.fc-day.fc-day-fri a{
+    color: #e67e22;
+}
+.fc-day.fc-day-sat a{
+    color: #e74c3c;
+}
+.fc-day.fc-day-sun a{
+    color: #2c3e50;
+  }
