@@ -5,6 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction'; // for selectable
 import EventModal from './finder/EventModal';
 import dayjs from "dayjs";
 import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
+import './activitiesCalendar.css'
 
 
  class ActivitiesCalendar extends React.Component {
